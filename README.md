@@ -1,7 +1,7 @@
 <div align="center">
   <img src="https://img.icons8.com/color/120/000000/ticket.png" alt="Eventix Logo" width="100"/>
-  <h1>🎫 Eventix - Modern Etkinlik Biletleme Platformu</h1>
-  <p>Python, Flask ve Turso kullanılarak geliştirilmiş, uçtan uca kapsamlı bir etkinlik ve bilet yönetim sistemi.</p>
+  <h1>🎫 Eventix - Yeni Nesil Akıllı Biletleme ve Etkinlik Yönetim Platformu</h1>
+  <p>Minimalist tasarım, kusursuz kullanıcı deneyimi ve gelişmiş yönetim araçlarıyla donatılmış, güvenilir dijital biletleme ekosistemi.</p>
 
   <div>
     <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/>
@@ -15,99 +15,61 @@
 
 <br />
 
-## 🌟 Genel Bakış
+## 🌟 Vizyon ve Genel Bakış
 
-**Eventix**, bir etkinliğin tüm yaşam döngüsünü yönetmek için tasarlanmış hepsi bir arada bir e-ticaret ve etkinlik yönetimi platformudur. Organizatörler tarafından etkinlik oluşturulmasından, müşterilerin bilet satın almasına ve QR kod doğrulamasına kadar Eventix, premium bir kullanıcı deneyimi sunar. Sistem; Müşteri, Organizatör ve Admin rolleriyle ayrılmış güçlü bir yetkilendirme (RBAC) yapısına sahiptir.
+**Eventix**, sıradan bir bilet alma sitesinin ötesinde; hem katılımcılar hem de organizatörler için tasarlanmış **premium bir deneyim merkezidir**. Canlı konserlerden workshop etkinliklerine kadar geniş bir yelpazede hizmet verir. Modern, göz yormayan karanlık teması (Dark Mode) ve akıcı arayüzü sayesinde kullanıcıyı yormaz, doğrudan hedefe ulaştırır.
 
----
-
-## 🔥 Temel Özellikler
-
-### 👤 Rol Bazlı Paneller
-*   **Müşteri Paneli**: Etkinlikleri inceleme, favorilere bilet ekleme, interaktif koltuk seçimi ve QR kodlu dijital biletlere erişim.
-*   **Organizatör Paneli**: Etkinlik oluşturma ve yönetme, satış takibi, dinamik oturma planı tanımlama ve finansal özetler.
-*   **Yönetici (Admin) Alanı**: Etkinlik onaylama/reddetme, kullanıcı yönetimi, genel analitik ve raporlama.
-
-### 🎟️ Akıllı Biletleme ve Oturma Düzeni
-*   **İnteraktif Koltuk Seçimi**: Oturma planı olan mekanlarda kullanıcılar istedikleri sıra ve koltuğu seçebilirler.
-*   **QR Kod Üretimi**: Satın alınan her bilet için benzersiz bir QR kod oluşturulur ve anında e-posta ile gönderilir.
-*   **Promosyon Kodları**: Sabit tutar veya yüzde bazlı indirim kuponu desteği.
-
-### 🚀 Teknik Detaylar
-*   **Turso Cloud DB**: Dağıtık SQLite üzerinden yüksek performanslı ve bulut tabanlı veritabanı yönetimi (lokal `database.db` yedeği ile).
-*   **Güvenli Kimlik Doğrulama**: Parola hashing ve güvenli session yönetimi.
-*   **SMTP E-posta Entegrasyonu**: Otomatik bilet gönderimi ve bildirimler.
+Temel hedefimiz; etkinlik düzenleyicilerine (Organizatör ve Admin) finansal kontrolü tam şeffaflıkla sunarken, kullanıcılara "tek tıkla" koltuğunu seçip biletine anında e-posta üzerinden **dijital E-Bilet (PDF benzeri mail barkodu)** formatında kavuşabileceği modern bir altyapı sağlamaktır.
 
 ---
 
-## 📸 Ekran Görüntüleri
+## 🔥 Öne Çıkan Özellikler ve Kullanıcı Deneyimi
 
-> [!TIP]
-> **Nasıl Resim Eklerim?** Aşağıdaki kutucukların görünmesi için uygulamanızdan ekran görüntüleri alıp, bu dosyadaki `src` kısımlarına dosya yollarını (örneğin: `frontend/static/images/screenshot1.png`) yazmanız yeterlidir.
+### 1. Görsel ve Etkileşimli Etkinlik Detayları
+Kullanıcılar bir etkinliğe tıkladığında; yüksek çözünürlüklü afişler, etkinliğin oturma planının **harita üzerindeki görselleştirilmiş krokisi** (Seating Layout) ve etkinliğin tam lokasyonunu gösteren entegre Google Harita görünümü ile karşılaşır. Etkinlikle ilgili tüm dinamik veriler (kalan bilet sayısı, kapasite, bilet fiyatı) anlık olarak güncellenir.
 
-| Anasayfa & Keşfet | Gerçek Zamanlı Koltuk Seçimi |
+<div align="center">
+  <img src="./images/event_detail.png" alt="Etkinlik Detay Sayfası" width="700"/>
+</div>
+
+### 2. Adım Adım Güvenli Bilet ve Koltuk Seçimi
+Karmaşık bilet alım süreçlerini rafa kaldıran Eventix, kullanıcıyı adım adım yönlendiren güvenli bir rezervasyon/ödeme akışı sunar:
+- **Kategori Seçimi:** VIP, BİSTRO veya GENEL gibi farklı alanlar, anlık boş koltuk kapasiteleriyle birlikte net olarak sunulur.
+- **İnteraktif Koltuk Seçimi (Matris):** Seçilen kategoriye özel (A-E sıraları, 1-10 numaralı koltuklar gibi) etkileşimli bir grid yapısı üzerinden istenilen nokta tıklanarak anında rezerve edilebilir.
+
+| Kategori ve Fiyat Seçimi | Dinamik Koltuk Seçimi |
 | :---: | :---: |
-| <img src="https://placehold.co/600x400/1e1e1e/white?text=Anasayfa+Ekran+Görüntüsü" width="400"/> | <img src="https://placehold.co/600x400/1e1e1e/white?text=Koltuk+Seçimi+Ekran+Görüntüsü" width="400"/> |
+| <img src="./images/category_select.png" width="400"/> | <img src="./images/seat_select.png" width="400"/> |
 
-| Müşteri Paneli | Organizatör / Admin Paneli |
-| :---: | :---: |
-| <img src="https://placehold.co/600x400/1e1e1e/white?text=Müşteri+Dashboard" width="400"/> | <img src="https://placehold.co/600x400/1e1e1e/white?text=Yönetim+Paneli" width="400"/> |
+### 3. Anında Dijital Teslimat: Mail Üzerinden QR E-Bilet
+Ödeme işlemi başarıyla tamamlandığı saniye, arka planda çalışan sistem bilet sahibine özel, şifrelenmiş benzersiz bir **QR Kod** üretir. 
 
----
+Bu QR kod, satın alınan koltuk numarası, saat ve konum bilgileriyle birlikte şık ve resmi bir **E-Ticket (Dijital Bilet)** şablonu halinde kullanıcının direkt e-posta kutusuna gönderilir. Katılımcıların etkinlik girişlerinde hiçbir kağıda ihtiyaç duymadan sadece telefonlarındaki e-postayı ve QR kodu görevliye okutması yeterlidir.
 
-## 🛠️ Kurulum ve Başlatma
+<div align="center">
+  <img src="./images/mail_ticket.png" alt="Mail ile Gelen Dijital QR Bilet" width="500"/>
+</div>
 
-1. **Projeyi Klonlayın**
-   ```bash
-   git clone https://github.com/gorkemcolakk/e-commerce.git
-   cd e-commerce
-   ```
+### 4. Şeffaf, Kapsamlı Yönetim ve Finans Paneli (Admin)
+Bir dijital platformun kalbi arka kapısındaki (backend) veri yönetimidir. Eventix, yetkilendirilmiş kullanıcılara muazzam bir finansal analiz paneli sunar:
+- **Platform Gelir Dağılımı (Revenue):** Sistemin toplam elde ettiği brüt kazanç, platformun organizatörlerden otomatik olarak tahsil ettiği komisyon (Platform Commission - %10) ve organizatörün cebine geçecek net kazanç (Earnings Payouts) hatasız şekilde hesaplanır.
+- **Detaylı Etkinlik ve Organizatör Dökümü:** Hangi organizatörün ne kadar bilet sattığı (kota/satış oranları), komisyon kesintileri sonrasındaki net hakedişleri ve aktif etkinliklerin anlık satış raporları tek bir ekrandan, dinamik algoritmalarla yönetilir.
 
-2. **Sanal Ortam Oluşturun (Önerilen)**
-   ```bash
-   python -m venv venv
-   source venv/Scripts/activate  # Windows için
-   ```
-
-3. **Bağımlılıkları Yükleyin**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Çevre Değişkenlerini Ayarlayın**
-   Kök dizinde `.env` dosyası oluşturun ve bilgilerinizi girin (SMTP, Turso, URL):
-   ```ini
-   FRONTEND_URL=http://localhost:5000
-   SMTP_SERVER=smtp.gmail.com
-   SMTP_PORT=587
-   SMTP_USERNAME=mail@adresiniz.com
-   SMTP_PASSWORD=uygulama_sifreniz
-   ```
-
-5. **Veritabanını Hazırlayın ve Başlatın**
-   ```bash
-   python seed.py
-   python app.py
-   ```
-   Uygulama `http://localhost:5000` adresinde çalışmaya başlayacaktır.
+<div align="center">
+  <img src="./images/admin_dashboard.png" alt="Admin Finans ve Yönetim Paneli" width="700"/>
+</div>
 
 ---
 
-## 🏗️ Proje Mimarisi
+## 🛠️ Teknik Altyapı ve Güvenlik Vizyonu
 
-```
-📂 E-commerce
-├── 📄 app.py              # Uygulama Giriş Noktası
-├── 📄 database.py         # DB Bağlantısı (Turso & SQLite)
-├── 📄 payment.py          # Ödeme Simülasyonu
-├── 📄 seed.py             # Örnek Veri Üretici (Mock Data)
-├── 📄 utils.py            # Yardımcı Araçlar (QR, Mail, Doğrulama)
-├── 📂 routes/             # Rotalar (Auth, Etkinlik, Organizatör vb.)
-└── 📂 frontend/           # Şablonlar, CSS, JS ve Assetler
-```
+- **Cloud Veritabanı Mimarisi (Turso / SQLite):** Yüksek sunucu maliyetleri yaratmayan, dağıtık ve çok hızlı **Turso Cloud** teknolojisiyle veri okuma/yazma süreleri minimize edilmiştir.
+- **Güvenlik Çemberi:** Uygulama şifre hashleme, güvenli JWT tabanlı Authorization (yetkilendirme), kötü amaçlı istekleri engelleyen Rate-Limiting ve QR kod içeriklerini koruyan **HMAC SHA-256** veri şifrelemesi gibi sıkı siber güvenlik standartlarıyla korunmaktadır.
+- **Otomatik Mail Sunucusu (SMTP):** Sorunsuz ve sıfır gecikmeli bilet/bildirim e-postaları gönderebilmek adına özel bir asenkron SMTP iletişim altyapısı kurulmuş, biletlerin spama düşmeden "Inbox"a ulaşması hedeflenmiştir.
 
 ---
 
 <div align="center">
-  <p>Bitirme projesi kapsamında hazırlanan Etkinlik Yönetim Sistemi.</p>
+  <p><i>Katılımcılar için eşsiz bir deneyim, organizatörler için maksimum karlılık kontrolü.</i></p>
+  <b>Eventix Projesi © 2026</b>
 </div>
