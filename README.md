@@ -45,7 +45,7 @@ Karmaşık süreçleri rafa kaldıran Eventix, kusursuz bir rezervasyon akışı
 | <img src="./images/category_select.png" width="400" style="border-radius: 10px;"/> | <img src="./images/seat_select.png" width="400" style="border-radius: 10px;"/> |
 
 ### ✉️ 3. Dijital E-Bilet (Anında Mail & QR)
-Ödeme bittiği saniye; şifrelenmiş benzersiz bir **QR Kod** üretilir ve şık bir **E-Ticket** şablonuyla kullanıcının mail kutusuna ışınlanır! 📧 Kapıda sadece telefonunu göster ve geç! 🏃‍♂️💨
+Ödeme bittiği saniye; şifelenmiş benzersiz bir **QR Kod** üretilir ve şık bir **E-Ticket** şablonuyla kullanıcının mail kutusuna ışınlanır! 📧 Kapıda sadece telefonunu göster ve geç! 🏃‍♂️💨
 
 <div align="center">
   <img src="./images/mail_ticket.png" alt="Mail Bilet" width="550" style="border-radius: 12px; border: 1px solid #2d2d4e;"/>
@@ -62,10 +62,9 @@ Dijital platformun kalbi veridir! 📈 Yetkilendirilmiş kullanıcılar için ö
 
 ### 🛠️ 5. Organizatörler İçin Esnek Etkinlik Oluşturma
 Sistem, etkinlik sahiplerine (Organizatör) teknik bilgi gerektirmeden profesyonel etkinlikler oluşturma imkanı tanır:
-*   🎟️ **Bilet Türü Seçimi:** Ayakta (General Admission) veya Numaralı Koltuklu (Seated Selection) etkinlikler arasında tek tıkla geçiş.
-*   🗺️ **Blok Bazlı Planlama:** VIP, Balkon veya Protokol gibi sınırsız kategori ekleme ve her bloğa özel fiyat/kapasite belirleme.
-*   📸 **Görsel Yönetimi:** Afiş ve oturma planı görsellerini anında yükleme ve önizleme.
-*   🔁 **Tekrar Eden Etkinlikler:** Günlük, haftalık veya aylık periyotlarda otomatik seans oluşturma desteği.
+*   🎟️ **Bilet Türü Seçimi:** Ayakta veya Numaralı Koltuklu etkinlikler arasında tek tıkla geçiş.
+*   🗺️ **Blok Bazlı Planlama:** VIP, Balkon veya Protokol gibi sınırsız kategori, fiyat ve kapasite belirleme.
+*   🔁 **Tekrar Eden Etkinlikler:** Günlük, haftalık veya aylık periyotlarda otomatik seans desteği.
 
 <div align="center">
   <img src="./images/create_event.png" alt="Etkinlik Oluşturma Paneli" width="700" style="border-radius: 12px;"/>
@@ -73,8 +72,19 @@ Sistem, etkinlik sahiplerine (Organizatör) teknik bilgi gerektirmeden profesyon
 
 ---
 
-## 🛡️ Teknik Altyapı ve Güvenlik
+## 🔐 Profesyonel İş Akışı ve Güvenlik Mekanizması
 
+Eventix, sıradan bir web sitesi değil, yaşayan bir **iş ekosistemidir**:
+
+*   🛡️ **Admin Onay Sistemi:** Organizatör tarafından oluşturulan her etkinlik önce "Beklemede" (Pending) olarak Admin paneline düşer. Yetkili onayı almayan hiçbir etkinlik satışa açılmaz.
+*   🚫 **Merkezi Müdahale:** Admin, yayındaki herhangi bir etkinliği düzenleyebilir veya bir ihlal durumunda "İptal" (Cancelled) konumuna çekerek satışları anlık olarak durdurabilir.
+*   🔄 **Dinamik Revizyon:** Organizatör, reddedilen veya düzenlenen etkinliklerini tekrar güncelleyerek Admin onayına saniyeler içinde geri gönderebilir.
+*   🎫 **QR Doğrulama Portalı:** Organizatörler, etkinlik girişinde kamera veya manuel kod girişiyle biletleri "Valid" (Geçerli) veya "Used" (Kullanıldı) olarak anlık kontrol edebilir.
+*   🎁 **Promosyon Yönetimi:** Her etkinliğe özel indirim kodları (Promo Codes) oluşturulabilir, kullanım limitleri ve oranları belirlenebilir.
+
+---
+
+## 🛡️ Teknik Altyapı
 *   ☁️ **Cloud Database:** **Turso Cloud** (Distributed SQLite) ile ışık hızında veri erişimi.
 *   🔒 **Siber Güvenlik:** JWT Auth, **HMAC SHA-256** QR şifreleme ve Rate-Limiting koruması.
 *   📫 **Async SMTP:** Sıfır gecikmeli, spama düşmeyen otomatik bilet teslimat altyapısı.
