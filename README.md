@@ -1,9 +1,10 @@
 <div align="center">
   <img src="https://img.icons8.com/color/120/000000/ticket.png" alt="Eventix Logo" width="100"/>
-  <h1>🎫 Eventix - Yeni Nesil Akıllı Biletleme ve Etkinlik Yönetim Platformu</h1>
-  <p>Minimalist tasarım, kusursuz kullanıcı deneyimi ve gelişmiş yönetim araçlarıyla donatılmış, güvenilir dijital biletleme ekosistemi.</p>
+  <h1> ✨ Eventix ✨ </h1>
+  <h3> 🚀 Yeni Nesil Akıllı Biletleme ve Etkinlik Yönetim Ekosistemi 🚀 </h3>
+  <p> 💎 Minimalist Tasarım • ⚡ Kusursuz Hız • 🛡️ Maksimum Güvenlik 💎 </p>
 
-  <div>
+  <div style="margin: 20px 0;">
     <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/>
     <img src="https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white" alt="Flask"/>
     <img src="https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite"/>
@@ -13,63 +14,63 @@
   </div>
 </div>
 
-<br />
+---
 
-## 🌟 Vizyon ve Genel Bakış
+## 🌈 Vizyon ve Genel Bakış
 
-**Eventix**, sıradan bir bilet alma sitesinin ötesinde; hem katılımcılar hem de organizatörler için tasarlanmış **premium bir deneyim merkezidir**. Canlı konserlerden workshop etkinliklerine kadar geniş bir yelpazede hizmet verir. Modern, göz yormayan karanlık teması (Dark Mode) ve akıcı arayüzü sayesinde kullanıcıyı yormaz, doğrudan hedefe ulaştırır.
+**Eventix**, sıradan bir bilet alma sitesinin ötesinde; hem katılımcılar hem de organizatörler için tasarlanmış **premium bir deneyim merkezidir**. ✨ Canlı konserlerden workshop etkinliklerine kadar geniş bir yelpazede hizmet verir. 🌙 Modern karanlık teması (Dark Mode) ve akıcı arayüzü sayesinde kullanıcıyı yormaz, doğrudan hedefe ulaştırır.
 
-Temel hedefimiz; etkinlik düzenleyicilerine (Organizatör ve Admin) finansal kontrolü tam şeffaflıkla sunarken, kullanıcılara "tek tıkla" koltuğunu seçip biletine anında e-posta üzerinden **dijital E-Bilet (PDF benzeri mail barkodu)** formatında kavuşabileceği modern bir altyapı sağlamaktır.
+<div align="center">
+  <img src="./images/homepage.png" alt="Anasayfa" width="850" style="border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);"/>
+</div>
 
 ---
 
-## 🔥 Öne Çıkan Özellikler ve Kullanıcı Deneyimi
+## ⚡ Öne Çıkan "Premium" Özellikler ⚡
 
-### 1. Görsel ve Etkileşimli Etkinlik Detayları
-Kullanıcılar bir etkinliğe tıkladığında; yüksek çözünürlüklü afişler, etkinliğin oturma planının **harita üzerindeki görselleştirilmiş krokisi** (Seating Layout) ve etkinliğin tam lokasyonunu gösteren entegre Google Harita görünümü ile karşılaşır. Etkinlikle ilgili tüm dinamik veriler (kalan bilet sayısı, kapasite, bilet fiyatı) anlık olarak güncellenir.
+### 🗺️ 1. İnteraktif Etkinlik Deneyimi
+Kullanıcılar bir etkinliğe tıkladığında; yüksek çözünürlüklü afişler, mekanın **krokisi** (Seating Layout) ve Google Harita entegrasyonu ile karşılaşır. 📊 Kalan bilet sayıları ve kapasite anlık olarak güncellenir.
 
 <div align="center">
-  <img src="./images/event_detail.png" alt="Etkinlik Detay Sayfası" width="700"/>
+  <img src="./images/event_detail.png" alt="Etkinlik Detay Sayfası" width="750" style="border-radius: 12px;"/>
 </div>
 
-### 2. Adım Adım Güvenli Bilet ve Koltuk Seçimi
-Karmaşık bilet alım süreçlerini rafa kaldıran Eventix, kullanıcıyı adım adım yönlendiren güvenli bir rezervasyon/ödeme akışı sunar:
-- **Kategori Seçimi:** VIP, BİSTRO veya GENEL gibi farklı alanlar, anlık boş koltuk kapasiteleriyle birlikte net olarak sunulur.
-- **İnteraktif Koltuk Seçimi (Matris):** Seçilen kategoriye özel (A-E sıraları, 1-10 numaralı koltuklar gibi) etkileşimli bir grid yapısı üzerinden istenilen nokta tıklanarak anında rezerve edilebilir.
+### 🎫 2. Akıllı Koltuk Seçimi (Smart Booking)
+Karmaşık süreçleri rafa kaldıran Eventix, kusursuz bir rezervasyon akışı sunar:
+*   🏁 **Kategori Ayrımı:** VIP, BİSTRO veya GENEL alanlar net şekilde ayrılmıştır.
+*   💺 **Matris Seçim:** A'dan E'ye sıralar, 1'den 10'a koltuklar... İstediğin yeri tıkla ve ayırt!
 
-| Kategori ve Fiyat Seçimi | Dinamik Koltuk Seçimi |
+| 💎 Kategori Seçimi | 💺 Koltuk Matrisi |
 | :---: | :---: |
-| <img src="./images/category_select.png" width="400"/> | <img src="./images/seat_select.png" width="400"/> |
+| <img src="./images/category_select.png" width="400" style="border-radius: 10px;"/> | <img src="./images/seat_select.png" width="400" style="border-radius: 10px;"/> |
 
-### 3. Anında Dijital Teslimat: Mail Üzerinden QR E-Bilet
-Ödeme işlemi başarıyla tamamlandığı saniye, arka planda çalışan sistem bilet sahibine özel, şifrelenmiş benzersiz bir **QR Kod** üretir. 
-
-Bu QR kod, satın alınan koltuk numarası, saat ve konum bilgileriyle birlikte şık ve resmi bir **E-Ticket (Dijital Bilet)** şablonu halinde kullanıcının direkt e-posta kutusuna gönderilir. Katılımcıların etkinlik girişlerinde hiçbir kağıda ihtiyaç duymadan sadece telefonlarındaki e-postayı ve QR kodu görevliye okutması yeterlidir.
+### ✉️ 3. Dijital E-Bilet (Anında Mail & QR)
+Ödeme bittiği saniye; şifrelenmiş benzersiz bir **QR Kod** üretilir ve şık bir **E-Ticket** şablonuyla kullanıcının mail kutusuna ışınlanır! 📧 Kapıda sadece telefonunu göster ve geç! 🏃‍♂️💨
 
 <div align="center">
-  <img src="./images/mail_ticket.png" alt="Mail ile Gelen Dijital QR Bilet" width="500"/>
+  <img src="./images/mail_ticket.png" alt="Mail Bilet" width="550" style="border-radius: 12px; border: 1px solid #2d2d4e;"/>
 </div>
 
-### 4. Şeffaf, Kapsamlı Yönetim ve Finans Paneli (Admin)
-Bir dijital platformun kalbi arka kapısındaki (backend) veri yönetimidir. Eventix, yetkilendirilmiş kullanıcılara muazzam bir finansal analiz paneli sunar:
-- **Platform Gelir Dağılımı (Revenue):** Sistemin toplam elde ettiği brüt kazanç, platformun organizatörlerden otomatik olarak tahsil ettiği komisyon (Platform Commission - %10) ve organizatörün cebine geçecek net kazanç (Earnings Payouts) hatasız şekilde hesaplanır.
-- **Detaylı Etkinlik ve Organizatör Dökümü:** Hangi organizatörün ne kadar bilet sattığı (kota/satış oranları), komisyon kesintileri sonrasındaki net hakedişleri ve aktif etkinliklerin anlık satış raporları tek bir ekrandan, dinamik algoritmalarla yönetilir.
+### 💰 4. Organizatör ve Finans Analitiği (Business Intel)
+Dijital platformun kalbi veridir! 📈 Yetkilendirilmiş kullanıcılar için özel finans paneli:
+*   💸 **Otamatik Hakediş:** %10 platform komisyonu otomatik kesilir, organizatör net kazancını görür.
+*   📊 **Dinamik Grafikler:** Hangi etkinlik ne kadar kazandırdı? Satış oranları nedir? Hepsi görsel şölen tadında!
 
-<div align="center">
-  <img src="./images/admin_dashboard.png" alt="Admin Finans ve Yönetim Paneli" width="700"/>
-</div>
+| 📈 Organizatör Raporu | 👑 Admin Finans Paneli |
+| :---: | :---: |
+| <img src="./images/organizer_revenue.png" width="400" style="border-radius: 10px;"/> | <img src="./images/admin_dashboard.png" width="400" style="border-radius: 10px;"/> |
 
 ---
 
-## 🛠️ Teknik Altyapı ve Güvenlik Vizyonu
+## 🛡️ Teknik Altyapı ve Güvenlik
 
-- **Cloud Veritabanı Mimarisi (Turso / SQLite):** Yüksek sunucu maliyetleri yaratmayan, dağıtık ve çok hızlı **Turso Cloud** teknolojisiyle veri okuma/yazma süreleri minimize edilmiştir.
-- **Güvenlik Çemberi:** Uygulama şifre hashleme, güvenli JWT tabanlı Authorization (yetkilendirme), kötü amaçlı istekleri engelleyen Rate-Limiting ve QR kod içeriklerini koruyan **HMAC SHA-256** veri şifrelemesi gibi sıkı siber güvenlik standartlarıyla korunmaktadır.
-- **Otomatik Mail Sunucusu (SMTP):** Sorunsuz ve sıfır gecikmeli bilet/bildirim e-postaları gönderebilmek adına özel bir asenkron SMTP iletişim altyapısı kurulmuş, biletlerin spama düşmeden "Inbox"a ulaşması hedeflenmiştir.
+*   ☁️ **Cloud Database:** **Turso Cloud** (Distributed SQLite) ile ışık hızında veri erişimi.
+*   🔒 **Siber Güvenlik:** JWT Auth, **HMAC SHA-256** QR şifreleme ve Rate-Limiting koruması.
+*   📫 **Async SMTP:** Sıfır gecikmeli, spama düşmeyen otomatik bilet teslimat altyapısı.
 
 ---
 
 <div align="center">
-  <p><i>Katılımcılar için eşsiz bir deneyim, organizatörler için maksimum karlılık kontrolü.</i></p>
-  <b>Eventix Projesi © 2026</b>
+  <p><i>🌟 Katılımcılar için eşsiz bir deneyim, organizatörler için maksimum kontrol. 🌟</i></p>
+  <b>🚀 Eventix Projesi © 2026 🚀</b>
 </div>
