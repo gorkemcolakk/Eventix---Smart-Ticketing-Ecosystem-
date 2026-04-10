@@ -98,6 +98,10 @@ Eventix, sıradan bir web sitesi değil, yaşayan bir **iş ekosistemidir**:
 *   📫 **Async SMTP:** Sorunsuz bilet teslimat altyapısı.
 
 ---
+## 📧 İletişim
+
+**Eren Görkem Çolak** - [GitHub](https://github.com/gorkemcolakk) - [LinkedIn](https://www.linkedin.com/in/eren-g%C3%B6rkem-%C3%A7olak-06104b35a/)
+
 
 <div align="center">
   <p><i>🌟 Katılımcılar için eşsiz bir deneyim, organizatörler için maksimum kontrol. 🌟</i></p>
