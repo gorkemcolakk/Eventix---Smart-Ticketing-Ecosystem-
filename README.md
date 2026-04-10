@@ -18,7 +18,7 @@
 
 ## 🌈 Vizyon ve Genel Bakış
 
-**Eventix**, sıradan bir bilet alma sitesinin ötesinde; hem katılımcılar hem de organizatörler için tasarlanmış **premium bir deneyim merkezidir**. ✨ Canlı konserlerden workshop etkinliklerine kadar geniş bir yelpazede hizmet verir. 🌙 Modern karanlık teması (Dark Mode) ve akıcı arayüzü sayesinde kullanıcıyı yormaz, doğrudan hedefe ulaştırır.
+**Eventix**, sıradan bir bilet alma sitesinin ötesinde; hem katılımcılar hem de organizatörler için tasarlanmış **premium bir deneyim merkezidir**. ✨ Canlı konserlerden workshop etkinliklerine kadar geniş bir yelpazede hizmet verir. 🌓 **Dinamik Tema Desteği** (Dark & Light Mode) ile kullanıcılara konforlu bir arayüz seçeneği sunar.
 
 <div align="center">
   <img src="./images/homepage.png" alt="Anasayfa" width="850" style="border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);"/>
@@ -45,7 +45,7 @@ Karmaşık süreçleri rafa kaldıran Eventix, kusursuz bir rezervasyon akışı
 | <img src="./images/category_select.png" width="400" style="border-radius: 10px;"/> | <img src="./images/seat_select.png" width="400" style="border-radius: 10px;"/> |
 
 ### ✉️ 3. Dijital E-Bilet (Anında Mail & QR)
-Ödeme bittiği saniye; şifelenmiş benzersiz bir **QR Kod** üretilir ve şık bir **E-Ticket** şablonuyla kullanıcının mail kutusuna ışınlanır! 📧 Kapıda sadece telefonunu göster ve geç! 🏃‍♂️💨
+Ödeme bittiği saniye; şifrelenmiş benzersiz bir **QR Kod** üretilir ve şık bir **E-Ticket** şablonuyla kullanıcının mail kutusuna ışınlanır! 📧 Kapıda sadece telefonunu göster ve geç! 🏃‍♂️💨
 
 <div align="center">
   <img src="./images/mail_ticket.png" alt="Mail Bilet" width="550" style="border-radius: 12px; border: 1px solid #2d2d4e;"/>
@@ -77,17 +77,25 @@ Sistem, etkinlik sahiplerine (Organizatör) teknik bilgi gerektirmeden profesyon
 Eventix, sıradan bir web sitesi değil, yaşayan bir **iş ekosistemidir**:
 
 *   🛡️ **Admin Onay Sistemi:** Organizatör tarafından oluşturulan her etkinlik önce "Beklemede" (Pending) olarak Admin paneline düşer. Yetkili onayı almayan hiçbir etkinlik satışa açılmaz.
-*   🚫 **Merkezi Müdahale:** Admin, yayındaki herhangi bir etkinliği düzenleyebilir veya bir ihlal durumunda "İptal" (Cancelled) konumuna çekerek satışları anlık olarak durdurabilir.
-*   🔄 **Dinamik Revizyon:** Organizatör, reddedilen veya düzenlenen etkinliklerini tekrar güncelleyerek Admin onayına saniyeler içinde geri gönderebilir.
-*   🎫 **QR Doğrulama Portalı:** Organizatörler, etkinlik girişinde kamera veya manuel kod girişiyle biletleri "Valid" (Geçerli) veya "Used" (Kullanıldı) olarak anlık kontrol edebilir.
-*   🎁 **Promosyon Yönetimi:** Her etkinliğe özel indirim kodları (Promo Codes) oluşturulabilir, kullanım limitleri ve oranları belirlenebilir.
+*   🚫 **Merkezi Müdahale:** Admin, yayındaki herhangi bir etkinliği düzenleyebilir veya satışları anlık olarak durdurabilir.
+*   🎫 **QR Doğrulama Portalı:** Organizatörler, etkinlik girişinde kamera ile biletleri "Geçerli" veya "Kullanıldı" olarak anlık kontrol edebilir.
+*   🎁 **Promosyon Yönetimi:** Her etkinliğe özel sınırlı sayıda indirim kodları (Promo Codes) tanımlanabilir.
+
+---
+
+## 🧠 Sistem Zekası ve Gizli Kahramanlar
+
+*   🎂 **Doğum Günü Sürprizi:** Arka planda çalışan asenkron iş parçacıkları (threading) ile doğum günü olan kullanıcılara otomatik tebrik mailleri gönderilir.
+*   📱 **Tam Duyarlı (Responsive) Tasarım:** Dashboard paneli dahil tüm arayüz, mobilden masaüstüne kadar her cihazda kusursuz görüntülenir.
+*   🌓 **Dual-Theme Desteği:** Kullanıcılar tek tıkla **Dark Mode** (Karanlık) ve **Light Mode** (Aydınlık) temalar arasında geçiş yapabilir.
+*   🔐 **Hassas Veri Güvenliği:** Kullanıcı şifreleri en yüksek standartlarda (Bcrypt/SHA) hashlanarak saklanır, asla düz metin olarak barındırılmaz.
 
 ---
 
 ## 🛡️ Teknik Altyapı
 *   ☁️ **Cloud Database:** **Turso Cloud** (Distributed SQLite) ile ışık hızında veri erişimi.
 *   🔒 **Siber Güvenlik:** JWT Auth, **HMAC SHA-256** QR şifreleme ve Rate-Limiting koruması.
-*   📫 **Async SMTP:** Sıfır gecikmeli, spama düşmeyen otomatik bilet teslimat altyapısı.
+*   📫 **Async SMTP:** Sorunsuz bilet teslimat altyapısı.
 
 ---
 
