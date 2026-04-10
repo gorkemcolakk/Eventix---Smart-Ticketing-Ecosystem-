@@ -1,7 +1,7 @@
 <div align="center">
   <img src="https://img.icons8.com/color/120/000000/ticket.png" alt="Eventix Logo" width="100"/>
-  <h1>🎫 Eventix - Modern Event Ticketing Platform</h1>
-  <p>A comprehensive, full-stack event and ticket management system built with Python, Flask, and Turso.</p>
+  <h1>🎫 Eventix - Modern Etkinlik Biletleme Platformu</h1>
+  <p>Python, Flask ve Turso kullanılarak geliştirilmiş, uçtan uca kapsamlı bir etkinlik ve bilet yönetim sistemi.</p>
 
   <div>
     <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/>
@@ -15,106 +15,99 @@
 
 <br />
 
-## 🌟 Overview
+## 🌟 Genel Bakış
 
-**Eventix** is an all-in-one e-commerce and event management platform designed to handle the entire lifecycle of an event. From event creation by organizers to ticket purchasing and QR code validation, Eventix delivers a seamless and premium UI/UX. The system is built with a robust role-based access control (RBAC) separating Customers, Organizers, and Admins.
-
----
-
-## 🔥 Key Features
-
-### 👤 Role-Based Portals
-*   **Customer Dashboard**: Browse events, add to wishlist, interactive seat selection, view purchased tickets with scan-ready QR codes.
-*   **Organizer Panel**: Create and manage events, track ticket sales, define dynamic seat maps, review financial summaries.
-*   **Admin Area**: Approve/reject events, manage system users, global analytics, and reporting.
-
-### 🎟️ Smart Ticketing & Seating
-*   **Interactive Seat Selection**: Users can pick their exact row and seat for venues with seating plans.
-*   **QR Code Generation**: Every purchased ticket generates a unique, secure QR code sent directly via email.
-*   **Promotional Codes**: Built-in support for discount codes (fixed amount or percentage).
-
-### 🚀 Technical Highlights
-*   **Turso Cloud Database Integration**: Leverages highly available distributed SQLite for fast and reliable edge database queries (with a local `database.db` fallback).
-*   **Secure Authentication**: Passwords hashed and sessions securely managed.
-*   **SMTP Email Handling**: Automated ticket delivery and notifications straight to user inboxes.
+**Eventix**, bir etkinliğin tüm yaşam döngüsünü yönetmek için tasarlanmış hepsi bir arada bir e-ticaret ve etkinlik yönetimi platformudur. Organizatörler tarafından etkinlik oluşturulmasından, müşterilerin bilet satın almasına ve QR kod doğrulamasına kadar Eventix, premium bir kullanıcı deneyimi sunar. Sistem; Müşteri, Organizatör ve Admin rolleriyle ayrılmış güçlü bir yetkilendirme (RBAC) yapısına sahiptir.
 
 ---
 
-## 📸 Screenshots
+## 🔥 Temel Özellikler
 
-*(Replace the image URLs below with actual screenshots of your application)*
+### 👤 Rol Bazlı Paneller
+*   **Müşteri Paneli**: Etkinlikleri inceleme, favorilere bilet ekleme, interaktif koltuk seçimi ve QR kodlu dijital biletlere erişim.
+*   **Organizatör Paneli**: Etkinlik oluşturma ve yönetme, satış takibi, dinamik oturma planı tanımlama ve finansal özetler.
+*   **Yönetici (Admin) Alanı**: Etkinlik onaylama/reddetme, kullanıcı yönetimi, genel analitik ve raporlama.
 
-| Homepage & Event Discovery | Real-time Seat Selection |
+### 🎟️ Akıllı Biletleme ve Oturma Düzeni
+*   **İnteraktif Koltuk Seçimi**: Oturma planı olan mekanlarda kullanıcılar istedikleri sıra ve koltuğu seçebilirler.
+*   **QR Kod Üretimi**: Satın alınan her bilet için benzersiz bir QR kod oluşturulur ve anında e-posta ile gönderilir.
+*   **Promosyon Kodları**: Sabit tutar veya yüzde bazlı indirim kuponu desteği.
+
+### 🚀 Teknik Detaylar
+*   **Turso Cloud DB**: Dağıtık SQLite üzerinden yüksek performanslı ve bulut tabanlı veritabanı yönetimi (lokal `database.db` yedeği ile).
+*   **Güvenli Kimlik Doğrulama**: Parola hashing ve güvenli session yönetimi.
+*   **SMTP E-posta Entegrasyonu**: Otomatik bilet gönderimi ve bildirimler.
+
+---
+
+## 📸 Ekran Görüntüleri
+
+> [!TIP]
+> **Nasıl Resim Eklerim?** Aşağıdaki kutucukların görünmesi için uygulamanızdan ekran görüntüleri alıp, bu dosyadaki `src` kısımlarına dosya yollarını (örneğin: `frontend/static/images/screenshot1.png`) yazmanız yeterlidir.
+
+| Anasayfa & Keşfet | Gerçek Zamanlı Koltuk Seçimi |
 | :---: | :---: |
-| <img src="https://placehold.co/600x400/1e1e1e/white?text=Homepage+Screenshot" width="400"/> | <img src="https://placehold.co/600x400/1e1e1e/white?text=Seat+Selection+Screenshot" width="400"/> |
+| <img src="https://placehold.co/600x400/1e1e1e/white?text=Anasayfa+Ekran+Görüntüsü" width="400"/> | <img src="https://placehold.co/600x400/1e1e1e/white?text=Koltuk+Seçimi+Ekran+Görüntüsü" width="400"/> |
 
-| Customer Dashboard | Organizer / Admin Panel |
+| Müşteri Paneli | Organizatör / Admin Paneli |
 | :---: | :---: |
-| <img src="https://placehold.co/600x400/1e1e1e/white?text=Customer+Dashboard" width="400"/> | <img src="https://placehold.co/600x400/1e1e1e/white?text=Admin+Panel" width="400"/> |
+| <img src="https://placehold.co/600x400/1e1e1e/white?text=Müşteri+Dashboard" width="400"/> | <img src="https://placehold.co/600x400/1e1e1e/white?text=Yönetim+Paneli" width="400"/> |
 
 ---
 
-## 🛠️ Installation & Setup
+## 🛠️ Kurulum ve Başlatma
 
-1. **Clone the repository**
+1. **Projeyi Klonlayın**
    ```bash
    git clone https://github.com/gorkemcolakk/e-commerce.git
    cd e-commerce
    ```
 
-2. **Create a virtual environment (Recommended)**
+2. **Sanal Ortam Oluşturun (Önerilen)**
    ```bash
    python -m venv venv
-   source venv/Scripts/activate  # Windows
-   # source venv/bin/activate    # macOS/Linux
+   source venv/Scripts/activate  # Windows için
    ```
 
-3. **Install the dependencies**
+3. **Bağımlılıkları Yükleyin**
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Environment Variables Config**
-   Create a `.env` file in the root directory and add your configurations (SMTP, Turso, URL):
+4. **Çevre Değişkenlerini Ayarlayın**
+   Kök dizinde `.env` dosyası oluşturun ve bilgilerinizi girin (SMTP, Turso, URL):
    ```ini
    FRONTEND_URL=http://localhost:5000
-   SMTP_SERVER=smtp.yourserver.com
+   SMTP_SERVER=smtp.gmail.com
    SMTP_PORT=587
-   SMTP_USERNAME=your_email@example.com
-   SMTP_PASSWORD=your_app_password
-   # TURSO_DB_URL=libsql://...
-   # TURSO_AUTH_TOKEN=ey...
+   SMTP_USERNAME=mail@adresiniz.com
+   SMTP_PASSWORD=uygulama_sifreniz
    ```
 
-5. **Initialize the Database & Seed Data**
+5. **Veritabanını Hazırlayın ve Başlatın**
    ```bash
    python seed.py
-   python database.py
-   ```
-
-6. **Run the Application**
-   ```bash
    python app.py
    ```
-   The application will be running at `http://localhost:5000`.
+   Uygulama `http://localhost:5000` adresinde çalışmaya başlayacaktır.
 
 ---
 
-## 🏗️ Project Architecture
+## 🏗️ Proje Mimarisi
 
 ```
 📂 E-commerce
-├── 📄 app.py              # Main Flask Application Entry Point
-├── 📄 database.py         # Database Connection (Turso & SQLite Config)
-├── 📄 payment.py          # Payment Gateway Mock / Handles
-├── 📄 seed.py             # Mock Data Generator (Events, Users, Promo codes)
-├── 📄 utils.py            # Helpers (QR logic, Mailing, Validation)
-├── 📂 routes/             # Blueprint routes (Auth, Events, User, Organizer)
-└── 📂 frontend/           # HTML Templates, CSS, JS and Assets
+├── 📄 app.py              # Uygulama Giriş Noktası
+├── 📄 database.py         # DB Bağlantısı (Turso & SQLite)
+├── 📄 payment.py          # Ödeme Simülasyonu
+├── 📄 seed.py             # Örnek Veri Üretici (Mock Data)
+├── 📄 utils.py            # Yardımcı Araçlar (QR, Mail, Doğrulama)
+├── 📂 routes/             # Rotalar (Auth, Etkinlik, Organizatör vb.)
+└── 📂 frontend/           # Şablonlar, CSS, JS ve Assetler
 ```
 
 ---
 
 <div align="center">
-  <p>Developed for the comprehensive Event Management capstone project.</p>
+  <p>Bitirme projesi kapsamında hazırlanan Etkinlik Yönetim Sistemi.</p>
 </div>
