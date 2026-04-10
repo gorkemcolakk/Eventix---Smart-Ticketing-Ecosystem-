@@ -60,6 +60,17 @@ Dijital platformun kalbi veridir! 📈 Yetkilendirilmiş kullanıcılar için ö
 | :---: | :---: |
 | <img src="./images/organizer_revenue.png" width="400" style="border-radius: 10px;"/> | <img src="./images/admin_dashboard.png" width="400" style="border-radius: 10px;"/> |
 
+### 🛠️ 5. Organizatörler İçin Esnek Etkinlik Oluşturma
+Sistem, etkinlik sahiplerine (Organizatör) teknik bilgi gerektirmeden profesyonel etkinlikler oluşturma imkanı tanır:
+*   🎟️ **Bilet Türü Seçimi:** Ayakta (General Admission) veya Numaralı Koltuklu (Seated Selection) etkinlikler arasında tek tıkla geçiş.
+*   🗺️ **Blok Bazlı Planlama:** VIP, Balkon veya Protokol gibi sınırsız kategori ekleme ve her bloğa özel fiyat/kapasite belirleme.
+*   📸 **Görsel Yönetimi:** Afiş ve oturma planı görsellerini anında yükleme ve önizleme.
+*   🔁 **Tekrar Eden Etkinlikler:** Günlük, haftalık veya aylık periyotlarda otomatik seans oluşturma desteği.
+
+<div align="center">
+  <img src="./images/create_event.png" alt="Etkinlik Oluşturma Paneli" width="700" style="border-radius: 12px;"/>
+</div>
+
 ---
 
 ## 🛡️ Teknik Altyapı ve Güvenlik
