@@ -16,11 +16,19 @@ from functools import wraps
 from database import get_db_connection
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_caching import Cache
+import html
 
 SECRET_KEY = 'eventix-super-secret-key-2026'
 COMMISSION_RATE = 0.10
 
 limiter = Limiter(key_func=get_remote_address)
+cache = Cache(config={'CACHE_TYPE': 'SimpleCache', 'CACHE_DEFAULT_TIMEOUT': 30})
+
+def sanitize_html(text):
+    if text is None:
+        return text
+    return html.escape(str(text))
 
 def sign_ticket_data(data: str) -> str:
     """Creates an HMAC-SHA256 signature for the ticket data."""

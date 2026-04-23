@@ -598,6 +598,10 @@
 
           <div class="checkout-actions">
             <button class="btn btn-outline" onclick="showStep('attendees')">← Back</button>
+            <button class="btn btn-outline" style="background: rgba(139,92,246,0.1); border-color: rgba(139,92,246,0.5); color: #c4b5fd;" id="addToCartFromCheckoutBtn" onclick="addToCartFromCheckout()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+              Add to Cart
+            </button>
             <button class="btn btn-primary" id="goPaymentFromSummary">Go to Payment 💳</button>
           </div>
         </div>
@@ -1030,13 +1034,28 @@
             const isSelected = selectedSeats.some(sel => sel.id === s.id);
             if (isSelected) sEl.classList.add('selected');
             
-            sEl.onclick = () => {
+            sEl.onclick = async () => {
               const idx = selectedSeats.findIndex(sel => sel.id === s.id);
               if (idx > -1) {
                 selectedSeats.splice(idx, 1);
                 sEl.classList.remove('selected');
               } else {
                 if (selectedSeats.length >= 10) return alert('Max 10 seats.');
+                
+                // Backend'e kilitleme isteği gönder
+                try {
+                  const res = await fetch('/api/tickets/lock-seat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({seat_id: s.id})
+                  });
+                  const data = await res.json();
+                  if (!data.success) {
+                      alert(data.message);
+                      return;
+                  }
+                } catch(e) { console.error(e); }
+
                 selectedSeats.push(s);
                 sEl.classList.add('selected');
               }
@@ -1281,6 +1300,70 @@
       }
       showStep(2);
     });
+
+    // --- Summary -> Add to Cart ---
+    window.addToCartFromCheckout = async () => {
+      const c1 = document.getElementById('agreeSales').checked;
+      const c2 = document.getElementById('agreePrivacy').checked;
+      const c3 = document.getElementById('agreeRules').checked;
+
+      if (!c1 || !c2 || !c3) {
+        alert('Please read and approve all agreements to add to cart.');
+        return;
+      }
+
+      const btn = document.getElementById('addToCartFromCheckoutBtn');
+      const prevHtml = btn.innerHTML;
+      btn.innerHTML = 'Processing...';
+      btn.disabled = true;
+
+      const forms = document.querySelectorAll('.attendee-form');
+      const ticketsInfo = [];
+      let seatIdsToLock = [];
+      
+      forms.forEach(f => {
+         let sid = f.dataset.seatId ? parseInt(f.dataset.seatId) : null;
+         if (sid) seatIdsToLock.push(sid);
+         ticketsInfo.push({
+             name: f.querySelector('.attendee-name').value.trim(),
+             surname: f.querySelector('.attendee-surname').value.trim(),
+             seat_id: sid,
+             seatLabel: f.querySelector('h4')?.textContent?.replace('Attendee - ', '') || ''
+         });
+      });
+
+      // Lock all seats
+      for (let sid of seatIdsToLock) {
+         try {
+             await fetch('/api/tickets/lock-seat', {
+                 method: 'POST',
+                 headers: {'Content-Type': 'application/json'},
+                 body: JSON.stringify({seat_id: sid})
+             });
+         } catch(e) {}
+      }
+
+      let cart = [];
+      try { cart = JSON.parse(localStorage.getItem('eventix_cart')) || []; } catch(e){}
+
+      cart.push({
+         eventId: evData.id,
+         title: evData.title,
+         image: evData.image,
+         price: evData.price, 
+         date: evData.date,
+         location: evData.location,
+         has_seating: evData.has_seating,
+         qty: ticketsInfo.length,
+         tickets_info: ticketsInfo
+      });
+
+      localStorage.setItem('eventix_cart', JSON.stringify(cart));
+      if(typeof updateGlobalCartCount === 'function') updateGlobalCartCount();
+
+      alert('Tickets added to cart! Seats reserved for 10 minutes.');
+      window.location.href = 'index.html';
+    };
 
     // Payment Logic
     document.getElementById('paymentForm').addEventListener('submit', async (e) => {
@@ -1534,6 +1617,21 @@
         alert('An error occurred while generating the PDF.');
       }
     }
+
+    // Update Cart Count Globally
+    function updateGlobalCartCount() {
+        try {
+            const cart = JSON.parse(localStorage.getItem('eventix_cart')) || [];
+            const el = document.getElementById('globalCartCount');
+            if(el) {
+                const total = cart.reduce((acc, item) => acc + item.qty, 0);
+                el.textContent = total;
+                el.style.display = total > 0 ? 'inline-block' : 'none';
+            }
+        } catch(e) {}
+    }
+    document.addEventListener('DOMContentLoaded', updateGlobalCartCount);
+    window.addEventListener('storage', updateGlobalCartCount); // If modified in another tab
   </script>
 </body>
 </html>

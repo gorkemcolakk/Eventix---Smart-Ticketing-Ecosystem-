@@ -107,28 +107,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     attachBuyListeners();
   }
 
-  function applyFilters() {
-    const searchVal = searchInput ? searchInput.value.toLowerCase().trim() : '';
-    let filtered = activeCategory === 'all' ? globalEvents : globalEvents.filter(e => e.category === activeCategory);
-    if (searchVal) {
-      filtered = filtered.filter(e =>
-        e.title.toLowerCase().includes(searchVal) ||
-        e.location.toLowerCase().includes(searchVal)
-      );
-    }
-    renderEvents(filtered);
+
+  // Expose category setter to global for index.html hero usage
+  window._setActiveCategory = (cat) => { activeCategory = cat; };
+
+  // Triggered manually when users click 'Apply Filters' or type
+  window.executeServerFiltering = () => {
+      const target = document.getElementById('events-section');
+      if(target) target.scrollIntoView({behavior:'smooth'});
+      
+      const prevHtml = eventsGrid.innerHTML;
+      eventsGrid.innerHTML = `
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      `;
+      fetchEvents(1, false);
+  };
+
+  let searchTimeout;
+  if (searchInput) {
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+          fetchEvents(1, false);
+      }, 500); // 500ms debounce
+    });
   }
 
-  filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      filterBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      activeCategory = btn.getAttribute('data-filter');
-      applyFilters();
-    });
-  });
-
-  if (searchInput) searchInput.addEventListener('input', applyFilters);
 
   // ── MODAL ──────────────────────────────────────────────────
   function attachBuyListeners() {
@@ -155,11 +161,36 @@ document.addEventListener('DOMContentLoaded', async () => {
       globalEvents = [];
     }
     try {
-      const res = await fetch(`/api/events?page=${page}&limit=${itemsPerPage}`);
+      const sp = new URLSearchParams();
+      sp.append('page', page);
+      sp.append('limit', itemsPerPage);
+      
+      if(activeCategory && activeCategory !== 'all') sp.append('category', activeCategory);
+      const searchVal = document.getElementById('searchInput')?.value.trim();
+      if(searchVal) sp.append('search', searchVal);
+      
+      const loc = document.getElementById('filterLocation')?.value;
+      if(loc && loc !== 'all') sp.append('location', loc);
+      
+      const minP = document.getElementById('filterMinP')?.value;
+      if(minP) sp.append('min_price', minP);
+      const maxP = document.getElementById('filterMaxP')?.value;
+      if(maxP) sp.append('max_price', maxP);
+      
+      const sDay = document.getElementById('filterStart')?.value;
+      if(sDay) sp.append('start_date', sDay);
+      const eDay = document.getElementById('filterEnd')?.value;
+      if(eDay) sp.append('end_date', eDay);
+      
+      const sortV = document.getElementById('filterSort')?.value || 'date_asc';
+      sp.append('sort', sortV);
+
+      const res = await fetch(`/api/events?${sp.toString()}`);
       if (res.ok) {
         const data = await res.json();
         globalEvents = append ? [...globalEvents, ...data] : data;
-        applyFilters();
+        // Don't call client-side applyFilters anymore, server did it:
+        renderEvents(globalEvents);
         
         if (data.length < itemsPerPage) {
           loadMoreBtn.style.display = 'none';
@@ -183,7 +214,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
+  async function loadLocations() {
+      try {
+          const res = await fetch('/api/events/locations');
+          if(res.ok) {
+              const locs = await res.json();
+              const sel = document.getElementById('filterLocation');
+              if(sel) {
+                 locs.forEach(l => {
+                    sel.innerHTML += `<option value="${l}">${l}</option>`;
+                 });
+              }
+          }
+      } catch(e){}
+  }
+
   await loadWishlistIds();
+  await loadLocations();
   await fetchEvents(1, false);
 
   loadNotifBadge();

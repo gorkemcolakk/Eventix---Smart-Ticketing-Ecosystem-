@@ -2,11 +2,12 @@ import uuid
 import json
 from flask import Blueprint, request, jsonify, g
 from database import get_db_connection
-from utils import token_required, role_required, event_to_dict, create_notification
+from utils import token_required, role_required, event_to_dict, create_notification, sanitize_html, cache
 
 events_bp = Blueprint('events', __name__, url_prefix='/api/events')
 
 @events_bp.route('', methods=['GET'])
+@cache.cached(timeout=60, query_string=True)
 def get_events():
     category = request.args.get('category', '').strip()
     search = request.args.get('search', '').strip()
@@ -23,6 +24,39 @@ def get_events():
         query += " AND (title LIKE ? OR location LIKE ?)"
         params.extend([f'%{search}%', f'%{search}%'])
 
+    min_price = request.args.get('min_price', type=int)
+    max_price = request.args.get('max_price', type=int)
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    loc = request.args.get('location')
+
+    if min_price is not None:
+        query += " AND price >= ?"
+        params.append(min_price)
+    if max_price is not None:
+        query += " AND price <= ?"
+        params.append(max_price)
+    if start_date:
+        query += " AND date >= ?"
+        params.append(start_date + "T00:00:00")
+    if end_date:
+        query += " AND date <= ?"
+        params.append(end_date + "T23:59:59")
+    if loc and loc != 'all':
+        query += " AND location LIKE ?"
+        params.append(f'%{loc.strip()}%')
+
+    sort_opt = request.args.get('sort')
+    if sort_opt == 'price_asc':
+        query += " ORDER BY price ASC"
+    elif sort_opt == 'price_desc':
+        query += " ORDER BY price DESC"
+    elif sort_opt == 'date_desc':
+        query += " ORDER BY date DESC"
+    else:
+        # Default sort by date upcoming
+        query += " ORDER BY date ASC"
+
     page = request.args.get('page', 1, type=int)
     limit = request.args.get('limit', 12, type=int)
     offset = (page - 1) * limit
@@ -34,6 +68,21 @@ def get_events():
     conn.close()
 
     return jsonify([event_to_dict(e) for e in events]), 200
+
+@events_bp.route('/locations', methods=['GET'])
+@cache.cached(timeout=300)
+def get_locations():
+    conn = get_db_connection()
+    rows = conn.execute("SELECT DISTINCT location FROM events WHERE status = 'active' AND parent_event_id IS NULL").fetchall()
+    conn.close()
+    
+    locations = set()
+    for r in rows:
+        loc_str = r['location'].strip()
+        if loc_str:
+            locations.add(loc_str)
+            
+    return jsonify(sorted(list(locations))), 200
 
 @events_bp.route('/<event_id>', methods=['GET'])
 def get_event(event_id):
@@ -91,6 +140,7 @@ def get_event_seats(event_id):
 @events_bp.route('', methods=['POST'])
 @role_required('organizer', 'admin')
 def create_event():
+    cache.clear()
     import datetime as dt
     import calendar as cal_mod
 
@@ -123,6 +173,12 @@ def create_event():
 
     conn = get_db_connection()
 
+    # ── sanitize string inputs ──────────────────────────────
+    s_title = sanitize_html(data.get('title'))
+    s_cat = sanitize_html(data.get('category'))
+    s_loc = sanitize_html(data.get('location'))
+    s_desc = sanitize_html(data.get('description', ''))
+
     base_price     = int(data.get('price', 0))
     total_capacity = int(data.get('capacity', 0))
     if has_seating and zones:
@@ -138,9 +194,9 @@ def create_event():
                                 parent_event_id, recurring_config)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?)
         ''', (
-            ev_id, data['title'], data['category'], ev_date_str, data['location'],
+            ev_id, s_title, s_cat, ev_date_str, s_loc,
             base_price, image_url, 1 if data.get('featured') else 0,
-            data.get('description', ''), lineup_json, total_capacity,
+            s_desc, lineup_json, total_capacity,
             event_status, g.user['id'], has_seating, data.get('seating_image', ''),
             parent_id, json.dumps(rec_cfg) if rec_cfg else None
         ))
@@ -226,6 +282,7 @@ def create_event():
 @events_bp.route('/<event_id>', methods=['PATCH'])
 @role_required('organizer', 'admin')
 def update_event(event_id):
+    cache.clear()
     conn = get_db_connection()
     event = conn.execute('SELECT * FROM events WHERE id = ?', (event_id,)).fetchone()
     if not event:
@@ -252,7 +309,11 @@ def update_event(event_id):
                 continue
                 
             fields.append(f"{col} = ?")
-            values.append(data[col])
+            val = data[col]
+            if col in ['title', 'category', 'location', 'description'] and isinstance(val, str):
+                val = sanitize_html(val)
+            values.append(val)
+            
             if col in significant_fields:
                 needs_reapproval = True
 
@@ -313,6 +374,7 @@ def update_event(event_id):
 @events_bp.route('/<event_id>', methods=['DELETE', 'POST'])
 @role_required('organizer', 'admin')
 def cancel_event(event_id):
+    cache.clear()
     permanent = request.args.get('permanent', 'false').lower() == 'true'
     conn = get_db_connection()
     event = conn.execute('SELECT * FROM events WHERE id = ?', (event_id,)).fetchone()

@@ -44,6 +44,13 @@ const THEME_BTN = `
     <svg class="icon-sun"  width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
   </button>`;
 
+const CART_BTN = `
+  <a href="cart.html" class="nav-link cart-link-nav" style="position:relative; margin-right:15px; display:flex; align-items:center; gap:5px; text-decoration:none;">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+    <span style="font-weight:600;">Cart</span> <span id="globalCartCount" style="background:#ec4899; color:white; border-radius:10px; padding:2px 6px; font-size:0.7rem; font-weight:bold; margin-left:4px; display:none;">0</span>
+  </a>
+`;
+
 function renderNav() {
     const token = getToken(), user = getUser();
     const ctrls = document.querySelectorAll('.user-controls');
@@ -87,6 +94,7 @@ function renderNav() {
             }
 
             ctrl.innerHTML = `
+              ${CART_BTN}
               ${THEME_BTN}
               <div class="user-dropdown-wrapper">
                 <div style="display:flex; align-items:center; gap:8px;">
@@ -105,7 +113,9 @@ function renderNav() {
                 </div>
               </div>`;
         } else {
-            ctrl.innerHTML = `${THEME_BTN}
+            ctrl.innerHTML = `
+              ${CART_BTN}
+              ${THEME_BTN}
               <a href="login.html" class="btn btn-outline" style="font-size:.85rem;">Login</a>
               <a href="register.html" class="btn btn-primary" style="font-size:.85rem;">Register</a>`;
         }
@@ -149,6 +159,11 @@ function renderNav() {
                 document.body.appendChild(btn);
             }
         }
+    }
+    
+    // Restore cart count after re-rendering the nav bar
+    if (typeof updateGlobalCartCount === 'function') {
+        updateGlobalCartCount();
     }
 }
 

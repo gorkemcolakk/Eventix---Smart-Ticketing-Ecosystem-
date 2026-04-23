@@ -17,7 +17,7 @@ os.environ['SSL_CERT_FILE'] = certifi.where()
 
 from flask import Flask
 from flask_cors import CORS
-from utils import SECRET_KEY, limiter, send_birthday_emails
+from utils import SECRET_KEY, limiter, cache, send_birthday_emails
 import threading
 import time
 from datetime import datetime
@@ -36,6 +36,7 @@ app = Flask(__name__, static_folder=os.path.join(BASE_DIR, 'frontend'), static_u
 CORS(app)
 app.config['SECRET_KEY'] = SECRET_KEY
 limiter.init_app(app)
+cache.init_app(app)
 
 # Register blueprints
 app.register_blueprint(auth_bp)
@@ -47,6 +48,15 @@ app.register_blueprint(notifications_bp)
 app.register_blueprint(organizer_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(upload_bp)
+
+@app.errorhandler(429)
+def ratelimit_handler(e):
+    # Bekleme Odası (Waiting Room) Mantığı
+    # Eğer API isteği ise JSON döndür (frontend bunu anlayıp bekleme odası modalı gösterebilir)
+    if request.path.startswith('/api/'):
+        return {"error": "ratelimit", "message": "High Traffic. You have been placed in the waiting room. Please try again in a few minutes."}, 429
+    # Sayfa isteği ise basit bir HTML
+    return "<h2>Waiting Room</h2><p>Due to high demand, you are in a queue. Please wait and refresh the page shortly.</p>", 429
 
 # ─────────────────────────────────────────────
 # STATIC SERVE

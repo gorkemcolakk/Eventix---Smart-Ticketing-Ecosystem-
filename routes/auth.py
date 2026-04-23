@@ -3,7 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 import datetime
 from database import get_db_connection
-from utils import SECRET_KEY, limiter
+from utils import SECRET_KEY, limiter, sanitize_html
 import os
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
@@ -32,10 +32,11 @@ def register():
         conn.close()
         return jsonify({'message': 'This email is already registered'}), 409
 
+    s_name = sanitize_html(data['fullname'])
     hashed_pw = generate_password_hash(data['password'])
     c.execute(
         'INSERT INTO users (fullname, email, password, role, phone, birthdate) VALUES (?, ?, ?, ?, ?, ?)',
-        (data['fullname'], data['email'], hashed_pw, role, phone, birthdate)
+        (s_name, data['email'], hashed_pw, role, phone, birthdate)
     )
     conn.commit()
     conn.close()

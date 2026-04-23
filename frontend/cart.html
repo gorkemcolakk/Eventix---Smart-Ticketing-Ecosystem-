@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Cart | EVENTIX</title>
+  <link rel="stylesheet" href="./styles/main.css">
+  <link rel="stylesheet" href="./styles/components.css">
+  <style>
+    .cart-page { padding: 100px 0 60px; min-height: calc(100vh - 80px); }
+    .cart-container { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: 1fr 320px; gap: 30px; }
+    @media (max-width: 768px) {
+      .cart-container { grid-template-columns: 1fr; }
+    }
+    .cart-item {
+      display: flex; gap: 20px; background: var(--bg-surface);
+      border: 1px solid var(--border-color); border-radius: 12px; padding: 20px;
+      margin-bottom: 20px; align-items: center; position: relative;
+    }
+    .cart-item img { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; }
+    .cart-item-details { flex: 1; }
+    .cart-item-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+    .cart-item-meta { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px; }
+    .cart-qty-control { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+    .cart-qty-btn { background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); color: var(--text); width: 30px; height: 30px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .cart-qty-btn:hover { background: var(--accent-purple); border-color: var(--accent-purple); }
+    .cart-remove { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #ef4444; cursor: pointer; padding: 5px; opacity: 0.7; transition: 0.2s; }
+    .cart-remove:hover { opacity: 1; transform: scale(1.1); }
+    .cart-summary { background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 25px; position: sticky; top: 100px; height: fit-content; }
+    .summary-row { display: flex; justify-content: space-between; margin-bottom: 15px; color: var(--text-muted); }
+    .summary-total { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; margin-top: 5px; font-weight: 700; font-size: 1.25rem; color: var(--text); }
+  </style>
+</head>
+<body>
+  <nav class="navbar scrolled">
+    <div class="container nav-container">
+      <a href="index.html" class="logo">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="url(#gd)" stroke-width="2"><defs><linearGradient id="gd" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#ec4899"/></linearGradient></defs><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+        <span>EVENT<span class="logo-highlight">IX</span></span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Explore</a></li>
+      </ul>
+      <div class="user-controls">
+        <span id="navAuthArea"></span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container cart-page">
+    <h1 style="margin-bottom: 30px; font-size: 2rem;">Your Cart</h1>
+    
+    <div class="cart-container" id="cartContainer" style="display: none;">
+      <div class="cart-items" id="cartItemsList">
+        <!-- Rendered by JS -->
+      </div>
+      
+      <div class="cart-summary">
+        <h3 style="margin-bottom: 20px;">Order Summary</h3>
+        <div id="summaryRows"></div>
+        <div class="summary-row summary-total">
+          <span>Total</span>
+          <span id="cartTotal" style="color:var(--accent-teal);">0 ₺</span>
+        </div>
+        <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 20px; padding: 14px;" onclick="proceedToCheckout()">
+          Proceed to Checkout &rarr;
+        </button>
+      </div>
+    </div>
+
+    <div id="emptyCart" style="text-align: center; padding: 60px 20px; background: var(--bg-surface); border-radius: 16px; display: none;">
+      <div style="font-size: 4rem; margin-bottom: 20px; filter: grayscale(1) opacity(0.5);">🛒</div>
+      <h2>Your cart is empty</h2>
+      <p style="color: var(--text-muted); margin-bottom: 30px;">Looks like you haven't added any tickets yet.</p>
+      <a href="index.html" class="btn btn-primary" style="display: inline-flex;">Discover Events</a>
+    </div>
+  </main>
+
+  <script src="./scripts/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      renderCart();
+    });
+
+    function getCart() {
+      try { return JSON.parse(localStorage.getItem('eventix_cart')) || []; }
+      catch { return []; }
+    }
+    
+    function saveCart(cart) {
+      localStorage.setItem('eventix_cart', JSON.stringify(cart));
+      renderCart();
+    }
+
+    function changeQty(index, delta) {
+      const cart = getCart();
+      if(!cart[index]) return;
+      if (cart[index].tickets_info && cart[index].tickets_info.length > 0) {
+        alert("This item has pre-assigned seats and names. If you wish to change the quantity, please remove the item and add it again.");
+        return;
+      }
+      if(cart[index].has_seating && delta > 0) {
+        alert("For seated events, please edit items at checkout or add again from event page.");
+        return;
+      }
+      cart[index].qty += delta;
+      if(cart[index].qty < 1) cart.splice(index, 1);
+      saveCart(cart);
+    }
+
+    function removeItem(index) {
+      const cart = getCart();
+      cart.splice(index, 1);
+      saveCart(cart);
+    }
+
+    function renderCart() {
+      const cart = getCart();
+      if (cart.length === 0) {
+        document.getElementById('cartContainer').style.display = 'none';
+        document.getElementById('emptyCart').style.display = 'block';
+        return;
+      }
+
+      document.getElementById('cartContainer').style.display = 'grid';
+      document.getElementById('emptyCart').style.display = 'none';
+
+      const list = document.getElementById('cartItemsList');
+      const sumRows = document.getElementById('summaryRows');
+      list.innerHTML = '';
+      sumRows.innerHTML = '';
+      let total = 0;
+
+      cart.forEach((item, idx) => {
+        const itemTotal = item.price * item.qty;
+        total += itemTotal;
+
+        list.innerHTML += `
+          <div class="cart-item">
+            <button class="cart-remove" onclick="removeItem(${idx})" title="Remove item">
+               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+            <img src="${item.image}" alt="">
+            <div class="cart-item-details">
+              <div class="cart-item-title">${item.title}</div>
+              <div class="cart-item-meta">Price: ${item.price.toLocaleString()} ₺</div>
+              ${item.has_seating ? '<div class="cart-item-meta" style="color:var(--accent-purple);">Seated Event</div>' : ''}
+              ${item.tickets_info && item.tickets_info.length > 0 ? 
+                `<div class="cart-item-meta" style="color:#10b981; font-weight:600;">Reserved for: ${item.tickets_info.map(t => t.name + ' ' + t.surname).join(', ')}</div>
+                 <div class="cart-qty-control"><span style="font-weight:600; background:rgba(255,255,255,0.1); padding:4px 12px; border-radius:6px;">Quantity: ${item.qty}</span></div>` 
+                : 
+                `<div class="cart-qty-control">
+                  <button class="cart-qty-btn" onclick="changeQty(${idx}, -1)">–</button>
+                  <span style="width: 20px; text-align: center;">${item.qty}</span>
+                  <button class="cart-qty-btn" onclick="changeQty(${idx}, 1)">+</button>
+                </div>`
+              }
+            </div>
+            <div style="font-weight: 700; font-size: 1.1rem;">${itemTotal.toLocaleString()} ₺</div>
+          </div>
+        `;
+
+        sumRows.innerHTML += `
+          <div class="summary-row">
+            <span>${item.qty}x ${item.title}</span>
+            <span>${itemTotal.toLocaleString()} ₺</span>
+          </div>
+        `;
+      });
+
+      document.getElementById('cartTotal').textContent = total.toLocaleString() + ' ₺';
+    }
+
+    function proceedToCheckout() {
+      // Directs to the multi-event cart checkout
+      window.location.href = 'cart-checkout.html';
+    }
+  </script>
+</body>
+</html>

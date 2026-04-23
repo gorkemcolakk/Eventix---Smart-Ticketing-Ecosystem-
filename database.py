@@ -1,6 +1,8 @@
 import os
 import sys
 import sqlite3
+import certifi
+os.environ['SSL_CERT_FILE'] = certifi.where()
 from dotenv import load_dotenv
 
 # PyInstaller ile paketlendiğinde dosya yollarını doğru ayarla
@@ -262,6 +264,27 @@ def init_db():
     except sqlite3.OperationalError:
         pass
 
+    # Optimistic Locking & Seat Reservation columns
+    try:
+        c.execute("ALTER TABLE seats ADD COLUMN version INTEGER NOT NULL DEFAULT 1")
+    except sqlite3.OperationalError:
+        pass
+
+    try:
+        c.execute("ALTER TABLE seats ADD COLUMN locked_until TIMESTAMP")
+    except sqlite3.OperationalError:
+        pass
+
+    try:
+        c.execute("ALTER TABLE seats ADD COLUMN locked_by_session TEXT")
+    except sqlite3.OperationalError:
+        pass
+
+    try:
+        c.execute("ALTER TABLE events ADD COLUMN version INTEGER NOT NULL DEFAULT 1")
+    except sqlite3.OperationalError:
+        pass
+
     # Wishlist table
     c.execute('''
         CREATE TABLE IF NOT EXISTS wishlist (
@@ -305,6 +328,14 @@ def init_db():
         )
     ''')
 
+    # PERFORMANS OPTIMIZASYONU - INDEx'ler:
+    # Bu indeksler, Events tablosunu boydan boya okurken (Full Table Scan) 
+    # B-Tree algoritması kullanarak sayfa yüklenme hızını artırır (O(logN)).
+    c.execute("CREATE INDEX IF NOT EXISTS idx_events_status_parent ON events (status, parent_event_id)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_events_date ON events (date)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_events_price ON events (price)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_events_location ON events (location)")
+    
     conn.commit()
     conn.close()
 

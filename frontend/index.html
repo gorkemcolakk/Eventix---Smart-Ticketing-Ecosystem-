@@ -8,6 +8,27 @@
   <link rel="stylesheet" href="./styles/main.css">
   <link rel="stylesheet" href="./styles/components.css">
   <link rel="stylesheet" href="./styles/home.css">
+  <style>
+    .adv-filter-box {
+      display: none;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 15px;
+      animation: fadeIn 0.3s ease;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .adv-filter-box.active { display: block; }
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 15px;
+    }
+    .filter-col label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px; font-weight: 600; text-transform: uppercase; }
+    .filter-col input, .filter-col select { border-radius: 8px; padding: 10px; background: rgba(255,255,255,0.05); }
+    .filter-toggle-btn.active { background: var(--accent-purple) !important; border-color: var(--accent-purple) !important; }
+  </style>
 </head>
 <body>
 
@@ -32,6 +53,11 @@
       </ul>
 
       <div class="user-controls">
+        <a href="cart.html" class="nav-link" style="position:relative; margin-right:20px; display:flex; align-items:center; gap:5px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+          Cart <span id="globalCartCount" style="background:#ec4899; color:white; border-radius:10px; padding:2px 6px; font-size:0.7rem; font-weight:bold; margin-left:4px;">0</span>
+        </a>
+
         <a href="login.html" class="btn btn-outline">Login</a>
         <a href="register.html" class="btn btn-primary">Register</a>
       </div>
@@ -69,12 +95,56 @@
       </p>
       
       <!-- Biletix style large search bar -->
-      <div class="hero-search-box animate-up delay-2">
-        <div class="search-input-group">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          <input type="text" id="searchInput" placeholder="Search events, artists or venues...">
+      <div style="position:relative; width:100%; max-width:800px; margin:0 auto;" class="animate-up delay-2">
+        <div class="hero-search-box">
+          <div class="search-input-group">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="searchInput" placeholder="Search events, artists or venues...">
+          </div>
+          <button id="filterToggleBtn" class="btn btn-outline filter-toggle-btn" onclick="toggleAdvancedFilters()" style="border-radius:30px; margin-right:10px; color:var(--text); background:rgba(0,0,0,0.5); padding: 0 20px;">Filters ⚙️</button>
+          <button class="btn btn-primary search-submit-btn" onclick="executeServerFiltering()">Find Tickets</button>
         </div>
-        <button class="btn btn-primary search-submit-btn" onclick="document.getElementById('events-section').scrollIntoView({behavior:'smooth'})">Find Tickets</button>
+        
+        <!-- Advanced Filters Box -->
+        <div id="advFilterBox" class="adv-filter-box text-left">
+          <div class="filter-grid">
+            <div class="filter-col">
+               <label>Start Date</label>
+               <input type="date" id="filterStart" class="form-control">
+            </div>
+            <div class="filter-col">
+               <label>End Date</label>
+               <input type="date" id="filterEnd" class="form-control">
+            </div>
+            <div class="filter-col">
+               <label>Location</label>
+               <select id="filterLocation" class="form-control">
+                 <option value="all">Global (Any Location)</option>
+               </select>
+            </div>
+            <div class="filter-col">
+               <label>Min Price</label>
+               <input type="number" id="filterMinP" class="form-control" placeholder="0 ₺">
+            </div>
+            <div class="filter-col">
+               <label>Max Price</label>
+               <input type="number" id="filterMaxP" class="form-control" placeholder="Any">
+            </div>
+            <div class="filter-col">
+               <label>Sort By</label>
+               <select id="filterSort" class="form-control">
+                 <option value="date_asc">🗓 Upcoming First</option>
+                 <option value="date_desc">🗓 Latest First</option>
+                 <option value="price_asc">💰 Price: Low to High</option>
+                 <option value="price_desc">💰 Price: High to Low</option>
+               </select>
+            </div>
+          </div>
+          <div style="text-align:right; margin-top:15px;">
+             <button class="btn btn-outline" style="padding:6px 15px; font-size:0.85rem; margin-right:10px" onclick="clearFilters()">Reset</button>
+             <button class="btn btn-primary" style="padding:6px 15px; font-size:0.85rem; background: var(--accent-teal); color:black;" onclick="executeServerFiltering()">Apply Filters</button>
+          </div>
+        </div>
       </div>
 
       <!-- Categories shortcut -->
@@ -147,12 +217,47 @@
         b.classList.toggle('cat-active', b.getAttribute('data-filter') === category);
       });
       
-      // Arkada çalışan Javascript filtresine tıkla (Verileri render etmek için)
-      const hiddenFilterBtn = document.querySelector('.filter-btn[data-filter="' + category + '"]');
-      if (hiddenFilterBtn) hiddenFilterBtn.click();
-
-      document.getElementById('events-section').scrollIntoView({ behavior: 'smooth' });
+      // Update global variable and trigger server fetch directly
+      if(typeof window._setActiveCategory === 'function') {
+         window._setActiveCategory(category);
+         executeServerFiltering();
+      }
     }
+    
+    function toggleAdvancedFilters() {
+      const box = document.getElementById('advFilterBox');
+      const btn = document.getElementById('filterToggleBtn');
+      if(box) {
+         box.classList.toggle('active');
+         if(box.classList.contains('active')) btn.classList.add('active');
+         else btn.classList.remove('active');
+      }
+    }
+
+    function clearFilters() {
+      document.getElementById('filterStart').value = '';
+      document.getElementById('filterEnd').value = '';
+      document.getElementById('filterMinP').value = '';
+      document.getElementById('filterMaxP').value = '';
+      document.getElementById('filterLocation').value = 'all';
+      document.getElementById('filterSort').value = 'date_asc';
+      executeServerFiltering();
+    }
+
+    // Update Cart Count Globally
+    function updateGlobalCartCount() {
+        try {
+            const cart = JSON.parse(localStorage.getItem('eventix_cart')) || [];
+            const el = document.getElementById('globalCartCount');
+            if(el) {
+                const total = cart.reduce((acc, item) => acc + item.qty, 0);
+                el.textContent = total;
+                el.style.display = total > 0 ? 'inline-block' : 'none';
+            }
+        } catch(e) {}
+    }
+    document.addEventListener('DOMContentLoaded', updateGlobalCartCount);
+    window.addEventListener('storage', updateGlobalCartCount); // If modified in another tab
   </script>
 </body>
 </html>

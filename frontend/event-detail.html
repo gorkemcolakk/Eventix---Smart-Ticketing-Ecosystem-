@@ -27,6 +27,11 @@
         <li><a href="index.html" class="nav-link">Explore</a></li>
       </ul>
       <div class="user-controls">
+        <a href="cart.html" class="nav-link" style="position:relative; margin-right:20px; display:flex; align-items:center; gap:5px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+          Cart <span id="globalCartCount" style="background:#ec4899; color:white; border-radius:10px; padding:2px 6px; font-size:0.7rem; font-weight:bold; margin-left:4px;">0</span>
+        </a>
+
         <a href="login.html" class="btn btn-outline">Login</a>
         <a href="register.html" class="btn btn-primary">Register</a>
       </div>
@@ -165,6 +170,8 @@
           <button id="buyDetailBtn" class="btn btn-primary" style="width:100%;padding:16px;font-size:1.05rem;justify-content:center;margin-top:4px;" onclick="goToCheckout()">
             Buy Ticket
           </button>
+
+
 
           <button id="wishDetailBtn" class="btn btn-outline" style="width:100%;padding:12px;font-size:0.9rem;justify-content:center;margin-top:10px;" onclick="toggleDetailWishlist()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
@@ -406,6 +413,52 @@
       }
     }
 
+    
+    function addToCart() {
+      if (!currentDetailedEvent) return;
+      
+      let targetId = currentDetailedEvent.id;
+      const sel = document.getElementById('sessionSelect');
+      if (sel && sel.value) {
+          targetId = sel.value;
+      }
+      
+      let cart = [];
+      try { cart = JSON.parse(localStorage.getItem('eventix_cart')) || []; } catch(e){}
+      
+      const existingIdx = cart.findIndex(c => c.eventId === targetId);
+      if(existingIdx >= 0 && !currentDetailedEvent.has_seating) {
+         cart[existingIdx].qty += 1;
+      } else {
+         cart.push({
+            eventId: targetId,
+            title: currentDetailedEvent.title,
+            image: currentDetailedEvent.image,
+            price: currentDetailedEvent.price,
+            has_seating: currentDetailedEvent.has_seating,
+            qty: 1
+         });
+      }
+      localStorage.setItem('eventix_cart', JSON.stringify(cart));
+      
+      // Update badge directly
+      if(typeof updateGlobalCartCount === 'function') updateGlobalCartCount();
+      
+      const btn = document.getElementById('addToCartBtn');
+      const originalHtml = btn.innerHTML;
+      btn.innerHTML = '✔ Added to Cart!';
+      btn.style.background = 'rgba(16,185,129,0.2)';
+      btn.style.borderColor = '#10b981';
+      btn.style.color = '#34d399';
+      
+      setTimeout(() => {
+         btn.innerHTML = originalHtml;
+         btn.style.background = 'rgba(139,92,246,0.1)';
+         btn.style.borderColor = 'rgba(139,92,246,0.5)';
+         btn.style.color = '#c4b5fd';
+      }, 2000);
+    }
+    
     function goToCheckout() {
       let targetId = currentDetailedEvent.id;
       const sel = document.getElementById('sessionSelect');
@@ -414,6 +467,21 @@
       }
       window.location.assign('checkout.html?id=' + targetId);
     }
+
+    // Update Cart Count Globally
+    function updateGlobalCartCount() {
+        try {
+            const cart = JSON.parse(localStorage.getItem('eventix_cart')) || [];
+            const el = document.getElementById('globalCartCount');
+            if(el) {
+                const total = cart.reduce((acc, item) => acc + item.qty, 0);
+                el.textContent = total;
+                el.style.display = total > 0 ? 'inline-block' : 'none';
+            }
+        } catch(e) {}
+    }
+    document.addEventListener('DOMContentLoaded', updateGlobalCartCount);
+    window.addEventListener('storage', updateGlobalCartCount); // If modified in another tab
   </script>
 </body>
 </html>
