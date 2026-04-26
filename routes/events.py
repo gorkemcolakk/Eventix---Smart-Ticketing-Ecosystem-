@@ -132,10 +132,50 @@ def get_event(event_id):
 
 @events_bp.route('/<event_id>/seats', methods=['GET'])
 def get_event_seats(event_id):
+    session_id = request.headers.get('X-Session-ID', 'guest_session')
     conn = get_db_connection()
-    seats = conn.execute('SELECT * FROM seats WHERE event_id = ?', (event_id,)).fetchall()
+    seats_raw = conn.execute('SELECT * FROM seats WHERE event_id = ?', (event_id,)).fetchall()
     conn.close()
-    return jsonify([dict(s) for s in seats]), 200
+    
+    from datetime import datetime
+    now = datetime.now()
+    
+    seats = []
+    for s in seats_raw:
+        seat_dict = dict(s)
+        is_locked = False
+        is_my_lock = False
+        
+        if seat_dict.get('locked_until'):
+            locked_dt = None
+            val = str(seat_dict.get('locked_until'))
+            
+            # Eğer değer tamamen rakamlardan oluşuyorsa (timestamp - milisaniye)
+            if val.isdigit():
+                try:
+                    from datetime import datetime
+                    locked_dt = datetime.fromtimestamp(int(val) / 1000.0)
+                except:
+                    pass
+            else:
+                # Checkout formatlarını dene
+                for fmt in ('%Y-%m-%d %H:%M:%S.%f', '%Y-%m-%d %H:%M:%S', '%Y-%m-%dT%H:%M:%S.%f', '%Y-%m-%dT%H:%M:%S'):
+                    try:
+                        locked_dt = datetime.strptime(val, fmt)
+                        break
+                    except ValueError:
+                        continue
+            
+            if locked_dt and locked_dt > now:
+                is_locked = True
+                if seat_dict.get('locked_by_session') == session_id:
+                    is_my_lock = True
+        
+        seat_dict['is_locked'] = is_locked
+        seat_dict['is_my_lock'] = is_my_lock
+        seats.append(seat_dict)
+        
+    return jsonify(seats), 200
 
 @events_bp.route('', methods=['POST'])
 @role_required('organizer', 'admin')

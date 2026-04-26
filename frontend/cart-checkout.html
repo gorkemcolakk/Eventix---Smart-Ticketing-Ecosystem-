@@ -167,11 +167,16 @@
           <div id="qrsContainer" style="display:flex; flex-wrap:wrap; gap:20px; justify-content:center; margin-bottom:20px;"></div>
           <div id="extraTicketsMsg" style="margin-bottom:20px;"></div>
 
-          <div class="checkout-actions" style="justify-content: center; margin-top:20px;">
-            <button class="btn btn-primary" id="pdfDownloadRow" style="display:none; flex:none; width:220px; background:#10b981; border-color:#10b981;" onclick="downloadAllTicketsPDF()">
-               Download All Tickets (PDF)
+          <!-- PDF Download Button -->
+          <div id="pdfDownloadRow" style="display:none; justify-content:center; margin-bottom:20px;">
+            <button id="pdfDownloadBtn" onclick="downloadAllTicketsPDF()" class="btn btn-primary" style="gap:8px; padding: 12px 28px; background: linear-gradient(135deg,#10b981,#059669); border-color:#10b981;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download All Tickets as PDF
             </button>
-            <a href="dashboard.html" class="btn btn-outline" id="dashLink" style="flex:none; width:200px;">Go to My Tickets</a>
+          </div>
+
+          <div class="checkout-actions" style="justify-content: center; margin-top:20px;">
+            <a href="dashboard.html" class="btn btn-primary" id="dashLink" style="flex:none; width:200px;">Go to My Tickets</a>
             <a href="index.html" class="btn btn-outline" style="flex:none; width:200px;">Back to Homepage</a>
           </div>
         </div>
@@ -180,53 +185,52 @@
     </div>
   </main>
   
-  <div style="display:none;">
-    <div id="pdfTemplate" class="pdf-container">
-      <div class="pdf-ticket" id="pdfTicketContent">
-        <div class="pdf-header">
-          <div class="pdf-logo">EVENTIX</div>
-        </div>
-        <div class="pdf-body">
-          <div class="pdf-title" id="pdfEventTitle">Event Title</div>
-          <div class="pdf-info-grid">
-            <div>
-              <div class="pdf-field">
-                <div class="pdf-label">Date & Time</div>
-                <div class="pdf-value" id="pdfEventDate">...</div>
-              </div>
-              <div class="pdf-field">
-                <div class="pdf-label">Location</div>
-                <div class="pdf-value" id="pdfEventLocation">...</div>
-              </div>
-              <div class="pdf-field">
-                <div class="pdf-label">Attendee</div>
-                <div class="pdf-value" id="pdfAttendeeName">...</div>
-              </div>
-              <div class="pdf-field" id="pdfSeatField" style="display:none;">
-                <div class="pdf-label">Seat</div>
-                <div class="pdf-value" id="pdfSeatInfo">-</div>
-              </div>
-              <div class="pdf-field">
-                <div class="pdf-label">Price</div>
-                <div class="pdf-value" id="pdfTicketPrice">...</div>
-              </div>
+  <!-- Hidden Ticket Template for PDF Generation -->
+  <div id="hiddenTicketTemplate" style="display:none;">
+    <div class="pdf-ticket">
+      <div class="pdf-header">
+        <div class="pdf-logo">EVENT <span style="color:#fcd34d;">IX</span></div>
+        <div style="font-size:10px; margin-top:5px; opacity:0.9; font-weight:600;">OFFICIAL E-TICKET & CONFIRMATION</div>
+      </div>
+      <div class="pdf-body">
+        <div class="pdf-title" id="pdfEventTitle">Event Name</div>
+        <div class="pdf-info-grid">
+          <div>
+            <div class="pdf-field">
+              <div class="pdf-label">Date & Time</div>
+              <div class="pdf-value" id="pdfEventDate">...</div>
             </div>
-            <div class="pdf-qr-box">
-              <img src="" id="pdfQrImage" class="pdf-qr-img" alt="QR Code">
-              <div class="pdf-label" style="margin-top:10px;">Ticket Code</div>
-              <div style="font-family:monospace; font-weight:700; font-size:14px; letter-spacing:1px;" id="pdfTicketKey">XXXX-XXXX-XXXX</div>
+            <div class="pdf-field">
+              <div class="pdf-label">Location</div>
+              <div class="pdf-value" id="pdfEventLocation">...</div>
+            </div>
+            <div class="pdf-field">
+              <div class="pdf-label">Attendee</div>
+              <div class="pdf-value" id="pdfAttendeeName">...</div>
+            </div>
+            <div class="pdf-field" id="pdfSeatField" style="display:none;">
+              <div class="pdf-label">Seat</div>
+              <div class="pdf-value" id="pdfSeatInfo">-</div>
+            </div>
+            <div class="pdf-field">
+              <div class="pdf-label">Price</div>
+              <div class="pdf-value" id="pdfTicketPrice">...</div>
             </div>
           </div>
-          
-          <div style="margin-top:40px; padding:20px; background:#f5f3ff; border-radius:12px; border:1px solid #ddd; text-align:center;">
-             <span style="display:block; font-size:10px; color:#7c3aed; font-weight:700; margin-bottom:5px;">IMPORTANT NOTE</span>
-             <span style="font-size:12px; color:#4b5563;">This ticket is personal. Please have the QR code scanned by the attendant at entry.</span>
+          <div class="pdf-qr-box">
+            <img src="" id="pdfQrImage" class="pdf-qr-img" alt="QR Code">
+            <div class="pdf-label" style="margin-top:10px;">Ticket Key</div>
+            <div style="font-family:monospace; font-weight:700; font-size:14px; letter-spacing:1px; color:#111; margin-top:5px;" id="pdfTicketKey">XXXX-XXXX</div>
           </div>
         </div>
-        <div class="pdf-footer">
-          This document has been automatically generated by the EVENTIX Ticketing Platform. 
-          It is protected against forgery. © 2026
+        
+        <div style="margin-top:40px; padding:20px; background:#f5f3ff; border-radius:12px; border:1px solid #ddd; text-align:center;">
+           <span style="display:block; font-size:10px; color:#7c3aed; font-weight:700; margin-bottom:5px; text-transform:uppercase;">IMPORTANT NOTE</span>
+           <span style="font-size:12px; color:#4b5563;">This ticket is personal. Please have the QR code scanned by the attendant at entry.</span>
         </div>
+      </div>
+      <div class="pdf-footer">
+        This document has been automatically generated by the EVENTIX Ticketing Platform.<br>It is protected against forgery. © 2026
       </div>
     </div>
   </div>
@@ -238,7 +242,7 @@
     let guestInfo = {};
     
     document.addEventListener('DOMContentLoaded', () => {
-        cart = JSON.parse(localStorage.getItem('eventix_cart')) || [];
+        cart = window.getCart();
         if(cart.length === 0) { window.location.href = 'cart.html'; return; }
         
         if (getToken()) {
@@ -414,15 +418,21 @@
                 window._purchasedTickets = responseData.tickets.map(t => {
                    // Enrich with cart details
                    const cItem = cart.find(ci => ci.eventId === t.event_id);
+                   let sLabel = '';
+                   if (cItem && cItem.tickets_info && t.seat_id) {
+                       const tInfo = cItem.tickets_info.find(ti => ti.seat_id === t.seat_id);
+                       if (tInfo && tInfo.seatLabel) sLabel = tInfo.seatLabel;
+                   }
                    return {
                        ...t,
                        eventTitle: cItem ? cItem.title : 'Eventix Event',
                        eventDate: cItem ? cItem.date : '',
-                       eventLocation: cItem ? cItem.location : 'Online'
+                       eventLocation: cItem ? cItem.location : 'Online',
+                       seatLabel: sLabel
                    };
                 });
                 
-                localStorage.removeItem('eventix_cart');
+                localStorage.removeItem(window.getCartKey());
                 if(typeof updateGlobalCartCount === 'function') updateGlobalCartCount();
                 
                 showStep(3);
@@ -505,73 +515,33 @@
     }
 
     function generateTicketHTML(ticket) {
-      const tmpl = document.getElementById('pdfTemplate').innerHTML;
+      const tmpl = document.getElementById('hiddenTicketTemplate').innerHTML;
+      const tDiv = document.createElement('div');
+      tDiv.innerHTML = tmpl;
+      
       const fDate = d => { try { return new Date(d).toLocaleDateString("en-US", {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'}); } catch { return d; } };
       
-      const oDate = ticket.eventDate ? fDate(ticket.eventDate) : '-';
-      const oLoc = ticket.eventLocation || '-';
-      const oName = ticket.name + ' ' + ticket.surname;
-      const oSeatDisp = ticket.seat_id ? 'block' : 'none';
-      const oSeatVal = ticket.seat_id || '-';
-      const oPrice = ticket.price || 0;
-      const qrSrc = ticket.qr_code;
-
-      return `
-        <div style="background: white; font-family: 'Inter', sans-serif; width: 595px; margin: 0 auto; color: black; box-sizing: border-box;">
-          <div style="background: linear-gradient(135deg, #5a19a0, #8b5cf6); padding: 30px 40px; color: white;">
-            <div style="font-size: 28px; font-weight: 800; letter-spacing: 1px;">EVENTIX</div>
-          </div>
-          <div style="padding: 40px;">
-            <div style="font-size: 24px; font-weight: 800; margin-bottom: 30px; border-bottom: 2px solid #f3f4f6; padding-bottom: 15px; color: #111;">
-              ${ticket.eventTitle}
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 200px; gap: 30px;">
-              <div>
-                <div style="margin-bottom: 20px;">
-                  <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Date & Time</div>
-                  <div style="font-size: 16px; font-weight: 700; color: #111;">${oDate}</div>
-                </div>
-                <div style="margin-bottom: 20px;">
-                  <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Location</div>
-                  <div style="font-size: 16px; font-weight: 700; color: #111;">${oLoc}</div>
-                </div>
-                <div style="margin-bottom: 20px;">
-                  <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Attendee</div>
-                  <div style="font-size: 16px; font-weight: 700; color: #111;">${oName}</div>
-                </div>
-                <div style="margin-bottom: 20px; display: ${oSeatDisp};">
-                  <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Seat</div>
-                  <div style="font-size: 16px; font-weight: 700; color: #111;">${oSeatVal}</div>
-                </div>
-                <div style="margin-bottom: 20px;">
-                  <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Price</div>
-                  <div style="font-size: 16px; font-weight: 700; color: #111;">${oPrice} ₺</div>
-                </div>
-              </div>
-              <div style="border: 1px solid #e5e7eb; padding: 15px; border-radius: 12px; text-align: center; width: 170px; height: 230px;">
-                <img src="${qrSrc}" alt="QR Code" style="width: 170px; height: 170px; display: block; margin: 0 auto; object-fit: contain;">
-                <div style="margin-top:10px; font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700;">Ticket Key</div>
-                <div style="font-family:monospace; font-weight:700; font-size:14px; letter-spacing:1px; color: #111; margin-top: 5px;">${ticket.ticket_key}</div>
-              </div>
-            </div>
-            
-            <div style="margin-top:40px; padding:20px; background:#f5f3ff; border-radius:12px; border:1px solid #ddd; text-align:center;">
-               <span style="display:block; font-size:10px; color:#7c3aed; font-weight:700; margin-bottom:5px;">IMPORTANT NOTE</span>
-               <span style="font-size:12px; color:#4b5563;">This ticket is personal. Please have the QR code scanned by the attendant at entry.</span>
-            </div>
-          </div>
-          <div style="background: #f9fafb; padding: 20px; text-align: center; font-size: 10px; color: #9ca3af; border-top: 1px dashed #e5e7eb;">
-            This document has been automatically generated by the EVENTIX Ticketing Platform.<br>It is protected against forgery. © 2026
-          </div>
-        </div>
-      `;
+      tDiv.querySelector('#pdfEventTitle').textContent = ticket.eventTitle;
+      tDiv.querySelector('#pdfEventDate').textContent = ticket.eventDate ? fDate(ticket.eventDate) : '-';
+      tDiv.querySelector('#pdfEventLocation').textContent = ticket.eventLocation || '-';
+      tDiv.querySelector('#pdfAttendeeName').textContent = ticket.name + ' ' + ticket.surname;
+      tDiv.querySelector('#pdfTicketPrice').textContent = ticket.price + ' ₺';
+      tDiv.querySelector('#pdfTicketKey').textContent = ticket.ticket_key;
+      tDiv.querySelector('#pdfQrImage').src = ticket.qr_code;
+      
+      if (ticket.seat_id) {
+          tDiv.querySelector('#pdfSeatField').style.display = 'block';
+          tDiv.querySelector('#pdfSeatInfo').textContent = ticket.seatLabel || ticket.seat_id;
+      }
+      
+      return `<div class="pdf-container" style="position:static; display:block; margin:0 auto;">${tDiv.innerHTML}</div>`;
     }
 
     async function downloadAllTicketsPDF() {
       const tickets = window._purchasedTickets;
       if (!tickets || tickets.length === 0) return;
 
-      const btn = document.getElementById('pdfDownloadRow');
+      const btn = document.getElementById('pdfDownloadBtn');
       const ogText = btn.innerHTML;
       btn.innerHTML = 'Generating PDF... Please wait';
       btn.disabled = true;

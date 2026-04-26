@@ -8,6 +8,26 @@ const authHeaders = () => ({
     'Authorization': `Bearer ${getToken()}`
 });
 
+// Sepet ve Session için kullanıcıya özel anahtarlar üretir
+window.getCartKey = () => {
+    const user = getUser();
+    return user ? `eventix_cart_${user.id}` : 'eventix_cart_guest';
+};
+window.getSessionKey = () => {
+    const user = getUser();
+    return user ? 'eventix_session_' + user.id : 'eventix_session_guest';
+};
+
+window.getOrCreateSessionId = () => {
+    const key = window.getSessionKey();
+    let sid = localStorage.getItem(key);
+    if (!sid) {
+        sid = 'sess_' + Math.random().toString(36).slice(2, 10) + '_' + Date.now();
+        localStorage.setItem(key, sid);
+    }
+    return sid;
+};
+
 // ── ROUTE HELPERS ────────────────────────────────────────────
 window.goToLogin = () => { window.location.href = 'login.html'; };
 window.goToDashboard = () => {
@@ -20,8 +40,35 @@ window.goToDashboard = () => {
 window.logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    // Sepeti SİLMİYORUZ, sadece oturum bilgisini kaldırıyoruz
     window.location.href = 'index.html';
 };
+
+// GLOBAL CART HELPERS
+window.getCart = () => {
+    try { return JSON.parse(localStorage.getItem(window.getCartKey())) || []; }
+    catch { return []; }
+};
+
+window.saveCart = (cart) => {
+    localStorage.setItem(window.getCartKey(), JSON.stringify(cart));
+    if (typeof window.updateGlobalCartCount === 'function') window.updateGlobalCartCount();
+    if (typeof window.renderCart === 'function') window.renderCart();
+};
+
+window.updateGlobalCartCount = () => {
+    const cart = window.getCart();
+    const count = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
+    const badge = document.getElementById('globalCartCount');
+    if (badge) {
+        badge.style.display = count > 0 ? 'inline-flex' : 'none';
+        badge.textContent = count;
+    }
+};
+
+window.addEventListener('storage', (e) => {
+    if (e.key === window.getCartKey()) window.updateGlobalCartCount();
+});
 
 // ── THEME ─────────────────────────────────────────────────────
 function applyTheme(t) {
@@ -231,6 +278,8 @@ function initLoginForm() {
             if (r.ok) {
                 localStorage.setItem('token', d.token);
                 localStorage.setItem('user', JSON.stringify(d.user));
+                
+                // Giriş yapınca yeni sepet anahtarı devreye girecek
                 window.location.href = d.user.role === 'admin' ? 'admin.html' : d.user.role === 'organizer' ? 'organizer.html' : 'index.html';
             } else { setFeedback(form, d.message || 'Login failed', 'error'); btn.textContent = orig; btn.disabled = false; }
         } catch { setFeedback(form, 'Could not connect to server', 'error'); btn.textContent = orig; btn.disabled = false; }

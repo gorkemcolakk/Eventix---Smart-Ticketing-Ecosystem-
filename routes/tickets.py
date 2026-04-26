@@ -149,7 +149,7 @@ def guest_buy_ticket():
                   (guest_user_id, event_id, key, q_data, 1, t_p, t_name, t_surname, sid))
         ticket_db_id = c.lastrowid
         
-        gen_tix.append({'id': ticket_db_id, 'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p})
+        gen_tix.append({'id': ticket_db_id, 'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'seat_id': sid})
 
     conn.commit()
     conn.close()
@@ -178,17 +178,48 @@ def lock_seat():
         return jsonify({'success': False, 'message': 'Seat is not available'}), 400
         
     now = datetime.now()
-    if seat['locked_until'] and datetime.strptime(seat['locked_until'], '%Y-%m-%d %H:%M:%S.%f') > now:
-        if seat['locked_by_session'] != session_id:
-            conn.close()
-            return jsonify({'success': False, 'message': 'Seat is temporarily reserved by someone else'}), 409
+    if seat['locked_until']:
+        locked_dt = None
+        val = str(seat['locked_until'])
+        if val.isdigit():
+            try:
+                locked_dt = datetime.fromtimestamp(int(val) / 1000.0)
+            except:
+                pass
+        else:
+            for fmt in ('%Y-%m-%d %H:%M:%S.%f', '%Y-%m-%d %H:%M:%S', '%Y-%m-%dT%H:%M:%S.%f', '%Y-%m-%dT%H:%M:%S'):
+                try:
+                    locked_dt = datetime.strptime(val, fmt)
+                    break
+                except ValueError:
+                    continue
+        if locked_dt and locked_dt > now:
+            if seat['locked_by_session'] != session_id:
+                conn.close()
+                return jsonify({'success': False, 'message': 'Seat is temporarily reserved by someone else'}), 409
             
     # Kilitle (10 dakika)
     lock_time = now + timedelta(minutes=10)
-    conn.execute("UPDATE seats SET locked_until = ?, locked_by_session = ? WHERE id = ?", (lock_time, session_id, seat_id))
+    conn.execute("UPDATE seats SET locked_until = ?, locked_by_session = ? WHERE id = ?", (str(lock_time), session_id, seat_id))
     conn.commit()
     conn.close()
     return jsonify({'success': True, 'message': 'Seat locked for 10 minutes.'})
+
+@tickets_bp.route('/unlock-seat', methods=['POST'])
+def unlock_seat():
+    data = request.get_json()
+    seat_id = data.get('seat_id')
+    session_id = request.headers.get('X-Session-ID', 'guest_session')
+    
+    conn = get_db_connection()
+    seat = conn.execute("SELECT locked_by_session FROM seats WHERE id = ?", (seat_id,)).fetchone()
+    
+    if seat and seat['locked_by_session'] == session_id:
+        conn.execute("UPDATE seats SET locked_until = NULL, locked_by_session = NULL WHERE id = ?", (seat_id,))
+        conn.commit()
+        
+    conn.close()
+    return jsonify({'success': True})
 
 # ─────────────────────────────────────────────────────────────────────────────
 # DYNAMIC QR GENERATION (SAHTECİLİK ÖNLEME)
@@ -328,7 +359,7 @@ def buy_ticket():
         c.execute("INSERT INTO tickets (user_id, event_id, ticket_key, qr_code, quantity, total_price, status, owner_name, owner_surname, seat_id) VALUES (?, ?, ?, ?, ?, ?, 'valid', ?, ?, ?)",
                   (g.user['id'], event_id, key, q_data, 1, t_p, t_name, t_surname, sid))
         ticket_db_id = c.lastrowid
-        gen_tix.append({'id': ticket_db_id, 'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p})
+        gen_tix.append({'id': ticket_db_id, 'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'seat_id': sid})
 
     create_notification(conn, g.user['id'], f"Successfully purchased {quantity} tickets.")
     conn.commit()
@@ -424,7 +455,7 @@ def cart_buy():
             t_surname = sanitize_html(t_info.get('surname', ''))
             
             inserts.append((g.user['id'], event_id, key, q_data, 1, t_p, t_name, t_surname, sid))
-            all_gen_tix.append({'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p})
+            all_gen_tix.append({'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'event_id': event_id, 'seat_id': sid})
             
     # PAYMENT
     from payment import PaymentGateway
@@ -446,6 +477,23 @@ def cart_buy():
         
     create_notification(conn, g.user['id'], f"Successfully purchased {len(all_gen_tix)} tickets.")
     conn.commit()
+    
+    # E-POSTA GONDERIMI
+    try:
+        events_dict = {}
+        for sql, params in event_updates:
+            eid = params[-1] if 'WHERE id = ?' in sql and len(params)==2 else params[1] # A bit hacky, so let's just query events directly
+        
+        # Daha güvenli event bulma
+        event_ids_in_cart = set([t['event_id'] for t in all_gen_tix])
+        for eid in event_ids_in_cart:
+            ev = conn.execute('SELECT * FROM events WHERE id = ?', (eid,)).fetchone()
+            ev_tix = [t for t in all_gen_tix if t['event_id'] == eid]
+            ev_price = sum(t['price'] for t in ev_tix)
+            send_ticket_confirmation_email(g.user['email'], g.user['fullname'], ev, ev_tix, ev_price, "")
+    except Exception as e:
+        pass
+
     conn.close()
     
     return jsonify({'message': 'Success!', 'tickets': all_gen_tix}), 201
@@ -535,7 +583,7 @@ def guest_cart_buy():
             t_surname = sanitize_html(t_info.get('surname', ''))
             
             inserts.append((guest_user_id, event_id, key, q_data, 1, t_p, t_name, t_surname, sid))
-            all_gen_tix.append({'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p})
+            all_gen_tix.append({'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'event_id': event_id, 'seat_id': sid})
             
     from payment import PaymentGateway
     pay_res = PaymentGateway.process_payment(total_price, card_name, card_number, card_exp, cvc)
@@ -551,6 +599,18 @@ def guest_cart_buy():
         c.execute("INSERT INTO tickets (user_id, event_id, ticket_key, qr_code, quantity, total_price, status, owner_name, owner_surname, seat_id) VALUES (?, ?, ?, ?, ?, ?, 'valid', ?, ?, ?)", params)
         
     conn.commit()
+    
+    # E-POSTA GONDERIMI
+    try:
+        event_ids_in_cart = set([t['event_id'] for t in all_gen_tix])
+        for eid in event_ids_in_cart:
+            ev = conn.execute('SELECT * FROM events WHERE id = ?', (eid,)).fetchone()
+            ev_tix = [t for t in all_gen_tix if t['event_id'] == eid]
+            ev_price = sum(t['price'] for t in ev_tix)
+            send_ticket_confirmation_email(guest_email, guest_name + " " + guest_surname, ev, ev_tix, ev_price, "")
+    except Exception as e:
+        pass
+
     conn.close()
     
     return jsonify({'message': 'Success!', 'tickets': all_gen_tix}), 201
