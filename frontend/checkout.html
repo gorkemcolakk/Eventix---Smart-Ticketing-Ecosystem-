@@ -391,16 +391,17 @@
       height: 34px; 
       flex-shrink: 0;
       border-radius: 6px; 
-      background: rgba(255,255,255,0.1); 
+      background: var(--bg-surface); 
       display: flex; 
       align-items: center; 
       justify-content: center; 
       font-size: 0.75rem; 
       cursor: pointer; 
-      border:1px solid var(--border-color); 
+      border: 1px solid var(--border-color); 
       transition: all 0.2s; 
       user-select: none;
-      color:var(--text);
+      color: var(--text);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
     .row-label-header {
       width: 30px;
@@ -411,9 +412,9 @@
       text-align: center;
       margin-right: 4px;
     }
-    .seat.available:hover { background: rgba(250,204,21,0.4); border-color: #fbbf24;}
-    .seat.selected { background: #f59e0b; border-color:#fbbf24; color:#1a1a2e; box-shadow: 0 0 10px rgba(251,191,36,0.7); font-weight:700;}
-    .seat.sold { background: rgba(239,68,68,0.3); color: rgba(255,255,255,0.3); border-color: transparent; cursor: not-allowed; }
+    .seat.available:hover { background: var(--accent-purple); color: white; border-color: var(--accent-purple); transform: translateY(-2px);}
+    .seat.selected { background: #f59e0b; border-color:#fbbf24; color:#1a1a2e; box-shadow: 0 0 10px rgba(251,191,36,0.7); font-weight:700; transform: scale(1.05);}
+    .seat.sold { background: #ef4444; color: white; border-color: #dc2626; cursor: not-allowed; opacity: 0.8; }
     /* Başkasının koltukta rezervasyonu - soluk sarı */
     .seat.locked { background: rgba(251,191,36,0.18); border-color: rgba(251,191,36,0.45); color: rgba(251,191,36,0.65); cursor: not-allowed; }
     /* Bu kullanıcının sepetindeki koltuk - parlak altın */
