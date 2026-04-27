@@ -1318,7 +1318,7 @@
       if (simpleTotalEl) simpleTotalEl.textContent = finalStr;
 
       // 3. Update Final Checkout Page (if exists)
-      const finalPayEl = document.getElementById('finalTotalAmount');
+      const finalPayEl = document.getElementById('finalTotal');
       if (finalPayEl) finalPayEl.textContent = finalStr;
 
       // Promo info update
@@ -1805,6 +1805,7 @@
         return;
       }
       showStep(2);
+      updateTotals(); // Payment ekranındaki finalTotal'ı güncelle
     });
 
     window.addToCartFromCheckout = async () => {

@@ -92,4 +92,4 @@ if __name__ == '__main__':
         t.start()
         print(">>> Birthday Background Service Started (Waiting for 00:00)")
     # On Windows, using use_reloader=False is more stable for custom threading
-    app.run(debug=True, port=5002, use_reloader=False)
+    app.run(debug=True, host='0.0.0.0', port=5002, use_reloader=False)

@@ -109,7 +109,7 @@
           </div>
           <div class="checkout-actions">
             <button class="btn btn-outline" id="summaryBackBtn" onclick="showStep('attendees')">Back</button>
-            <button class="btn btn-primary" onclick="showStep(2)">Go to Payment 💳</button>
+            <button class="btn btn-primary" onclick="showStep(2); generateSummary(true);">Go to Payment 💳</button>
           </div>
         </div>
 
@@ -326,7 +326,7 @@
         });
     }
 
-    function generateSummary() {
+    function generateSummary(stayOnStep = false) {
         const forms = document.querySelectorAll('.att-form');
         let allValid = true;
         forms.forEach(f => {
@@ -361,8 +361,9 @@
                 finalTotalEl.textContent = finalVal.toLocaleString() + ' ₺';
             }
         }
-        
-        showStep('summary');
+        if (!stayOnStep) {
+            showStep('summary');
+        }
     }
 
     document.getElementById('paymentForm').addEventListener('submit', async (e) => {
@@ -475,11 +476,11 @@
             if(r.ok && j.valid) {
                 currentDiscount = { type: j.discount_type, value: j.discount_value };
                 msgCont.innerHTML = `<span style="color:#6ee7b7;">Promo valid! ${j.discount_type === 'percentage' ? '%'+j.discount_value : j.discount_value+' ₺'} discount.</span>`;
-                generateSummary(); // Recalculate
+                generateSummary(true); // Recalculate
             } else {
                 currentDiscount = { type: null, value: 0 };
                 msgCont.innerHTML = `<span style="color:#ef4444;">Invalid or not applicable promo code.</span>`;
-                generateSummary();
+                generateSummary(true);
             }
         } catch(e) {
             msgCont.innerHTML = `<span style="color:#ef4444;">Error checking code.</span>`;

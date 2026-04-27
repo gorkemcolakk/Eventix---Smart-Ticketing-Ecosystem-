@@ -423,8 +423,7 @@
           targetId = sel.value;
       }
       
-      let cart = [];
-      try { cart = JSON.parse(localStorage.getItem('eventix_cart')) || []; } catch(e){}
+      const cart = window.getCart();
       
       const existingIdx = cart.findIndex(c => c.eventId === targetId);
       if(existingIdx >= 0 && !currentDetailedEvent.has_seating) {
@@ -439,24 +438,23 @@
             qty: 1
          });
       }
-      localStorage.setItem('eventix_cart', JSON.stringify(cart));
-      
-      // Update badge directly
-      if(typeof updateGlobalCartCount === 'function') updateGlobalCartCount();
+      window.saveCart(cart);
       
       const btn = document.getElementById('addToCartBtn');
-      const originalHtml = btn.innerHTML;
-      btn.innerHTML = '✔ Added to Cart!';
-      btn.style.background = 'rgba(16,185,129,0.2)';
-      btn.style.borderColor = '#10b981';
-      btn.style.color = '#34d399';
-      
-      setTimeout(() => {
-         btn.innerHTML = originalHtml;
-         btn.style.background = 'rgba(139,92,246,0.1)';
-         btn.style.borderColor = 'rgba(139,92,246,0.5)';
-         btn.style.color = '#c4b5fd';
-      }, 2000);
+      if (btn) {
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '✔ Added to Cart!';
+        btn.style.background = 'rgba(16,185,129,0.2)';
+        btn.style.borderColor = '#10b981';
+        btn.style.color = '#34d399';
+        
+        setTimeout(() => {
+           btn.innerHTML = originalHtml;
+           btn.style.background = 'rgba(139,92,246,0.1)';
+           btn.style.borderColor = 'rgba(139,92,246,0.5)';
+           btn.style.color = '#c4b5fd';
+        }, 2000);
+      }
     }
     
     function goToCheckout() {
@@ -468,20 +466,6 @@
       window.location.assign('checkout.html?id=' + targetId);
     }
 
-    // Update Cart Count Globally
-    function updateGlobalCartCount() {
-        try {
-            const cart = JSON.parse(localStorage.getItem('eventix_cart')) || [];
-            const el = document.getElementById('globalCartCount');
-            if(el) {
-                const total = cart.reduce((acc, item) => acc + item.qty, 0);
-                el.textContent = total;
-                el.style.display = total > 0 ? 'inline-block' : 'none';
-            }
-        } catch(e) {}
-    }
-    document.addEventListener('DOMContentLoaded', updateGlobalCartCount);
-    window.addEventListener('storage', updateGlobalCartCount); // If modified in another tab
   </script>
 </body>
 </html>

@@ -303,7 +303,8 @@ def buy_ticket():
                 return jsonify({'message': 'Already used this year.'}), 400
             promo_record = {'id': 0, 'is_bday': True, 'discount_type': 'percentage', 'discount_value': 15}
         else:
-            promo_record = c.execute('SELECT * FROM promotions WHERE event_id = ? AND code = ?', (event_id, promo_code)).fetchone()
+            res = c.execute('SELECT * FROM promotions WHERE event_id = ? AND code = ?', (event_id, promo_code)).fetchone()
+            promo_record = dict(res) if res else None
         
         if not promo_record:
             conn.close()
@@ -581,6 +582,7 @@ def guest_cart_buy():
             t_p = event['price'] if not event['has_seating'] else seats_dict[str(t_info['seat_id'])]['price']
             t_name = sanitize_html(t_info.get('name', ''))
             t_surname = sanitize_html(t_info.get('surname', ''))
+            sid = t_info.get('seat_id') if event['has_seating'] else None
             
             inserts.append((guest_user_id, event_id, key, q_data, 1, t_p, t_name, t_surname, sid))
             all_gen_tix.append({'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'event_id': event_id, 'seat_id': sid})
@@ -712,9 +714,9 @@ def validate_promo():
         conn.close()
         if not u or u['birthdate'][5:10] != datetime.now().strftime('%m-%d'):
             return jsonify({'valid': False, 'message': 'Only on birthday.'}), 400
-        return jsonify({'valid': True, 'discount_type': 'percentage', 'discount_value': 15}), 200
+        return jsonify({'valid': True, 'message': 'Birthday discount applied!', 'discount_type': 'percentage', 'discount_value': 15}), 200
     conn = get_db_connection()
     p = conn.execute('SELECT * FROM promotions WHERE event_id = ? AND code = ?', (eid, code)).fetchone()
     conn.close()
-    if not p: return jsonify({'valid': False}), 404
-    return jsonify({'valid': True, 'discount_type': p['discount_type'], 'discount_value': p['discount_value']}), 200
+    if not p: return jsonify({'valid': False, 'message': 'Invalid promo code.'}), 404
+    return jsonify({'valid': True, 'message': 'Promo code applied!', 'discount_type': p['discount_type'], 'discount_value': p['discount_value']}), 200

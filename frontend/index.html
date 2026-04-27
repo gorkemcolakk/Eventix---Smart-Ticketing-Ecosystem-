@@ -256,20 +256,6 @@
       executeServerFiltering();
     }
 
-    // Update Cart Count Globally
-    function updateGlobalCartCount() {
-        try {
-            const cart = JSON.parse(localStorage.getItem('eventix_cart')) || [];
-            const el = document.getElementById('globalCartCount');
-            if(el) {
-                const total = cart.reduce((acc, item) => acc + item.qty, 0);
-                el.textContent = total;
-                el.style.display = total > 0 ? 'inline-block' : 'none';
-            }
-        } catch(e) {}
-    }
-    document.addEventListener('DOMContentLoaded', updateGlobalCartCount);
-    window.addEventListener('storage', updateGlobalCartCount); // If modified in another tab
   </script>
 </body>
 </html>
