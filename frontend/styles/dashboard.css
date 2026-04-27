@@ -139,11 +139,44 @@
   margin-left: auto;
 }
 
-/* ── RESPONSIVE ──────────────────────────────────────────── */
+/* ── RESPONSIVE ─────────────────────────────────────────── */
 @media (max-width: 768px) {
   .dashboard-page {
     grid-template-columns: 1fr;
     padding-top: 76px;
+    gap: 16px;
   }
-  .dash-sidebar { position: static; }
+  .dash-sidebar {
+    position: static;
+    padding: 16px 12px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+  .dash-avatar { width: 48px; height: 48px; font-size: 1rem; margin-bottom: 0; }
+  .dash-name { font-size: 0.85rem; }
+  .dash-email { display: none; }
+  .dash-role-badge { margin-bottom: 0; }
+  .dash-nav {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 0;
+  }
+  .dash-nav-btn {
+    width: auto;
+    flex: 1;
+    min-width: 90px;
+    padding: 8px 10px;
+    font-size: 0.78rem;
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .dash-section-title { font-size: 1.1rem; }
+  .dashboard-page { padding-top: 68px; }
 }

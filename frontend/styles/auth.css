@@ -143,3 +143,11 @@
 }
 .auth-alert.error   { background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3); color: #fca5a5; }
 .auth-alert.success { background: rgba(20,184,166,.1); border: 1px solid rgba(20,184,166,.3); color: #5eead4; }
+
+/* ── MOBILE ───────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .auth-page { padding: 70px 12px 30px; }
+  .auth-card { padding: 24px 20px; }
+  .auth-title { font-size: 1.4rem; }
+  .social-login-grid { grid-template-columns: 1fr; }
+}

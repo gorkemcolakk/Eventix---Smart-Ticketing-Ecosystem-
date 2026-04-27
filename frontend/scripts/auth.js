@@ -168,6 +168,35 @@ function renderNav() {
         }
     });
 
+    // ── MOBİL NAV AUTH ALANI ─────────────────────────────────────
+    const mobileAuthArea = document.getElementById('mobileNavAuth');
+    if (mobileAuthArea) {
+        if (token && user) {
+            const firstName = user.fullname.split(' ')[0];
+            const dashBase = user.role === 'admin' ? 'admin.html' : user.role === 'organizer' ? 'organizer.html' : 'dashboard.html';
+            mobileAuthArea.innerHTML = `
+              <a href="cart.html" class="btn btn-outline mobile-link" style="justify-content:center; gap:8px;">
+                🛒 Cart
+              </a>
+              <a href="${dashBase}?tab=profile" class="btn btn-outline mobile-link" style="justify-content:center; gap:6px;">
+                👤 ${firstName}
+              </a>
+              <a href="${dashBase}?tab=tickets" class="btn btn-outline mobile-link" style="justify-content:center;">
+                🎟 My Tickets
+              </a>
+              <button onclick="logout()" class="btn btn-danger mobile-link" style="justify-content:center; border-color:rgba(239,68,68,0.4);">
+                🚪 Logout
+              </button>`;
+        } else {
+            mobileAuthArea.innerHTML = `
+              <a href="cart.html" class="btn btn-outline mobile-link" style="justify-content:center; gap:8px;">
+                🛒 Cart
+              </a>
+              <a href="login.html" class="btn btn-outline mobile-link" style="justify-content:center;">Login</a>
+              <a href="register.html" class="btn btn-primary mobile-link" style="justify-content:center;">Register</a>`;
+        }
+    }
+
     // Handle dropdown closing
     window.toggleUserDropdown = () => {
         const menu = document.getElementById('userDropdown');
