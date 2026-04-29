@@ -241,9 +241,12 @@
       let total = 0;
 
       cart.forEach((item, idx) => {
+        const isSelected = item._selected !== false;
         // Koltuklu etkinlikte totalPrice kullan, yoksa price * qty
         const itemTotal = item.totalPrice != null ? item.totalPrice : (item.price * item.qty);
-        total += itemTotal;
+        if (isSelected) {
+            total += itemTotal;
+        }
 
         // Koltuk etiketlerini göster
         const seatLabels = item.tickets_info && item.tickets_info.length > 0 && item.has_seating
@@ -269,11 +272,12 @@
         }
 
         list.innerHTML += `
-          <div class="cart-item">
+          <div class="cart-item" style="${!isSelected ? 'opacity: 0.6; background: rgba(0,0,0,0.05);' : ''} padding-left: 50px;">
+            <input type="checkbox" class="cart-item-check" ${isSelected ? 'checked' : ''} onchange="toggleItemSelection(${idx})" style="position: absolute; left: 16px; top: 20px; width: 22px; height: 22px; cursor: pointer; accent-color: var(--accent-purple);">
             <button class="cart-remove" onclick="removeItem(${idx})" title="Remove item">
                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
-            <img src="${item.image}" alt="">
+            <img src="${item.image}" alt="" style="${!isSelected ? 'filter: grayscale(0.8);' : ''}">
             <div class="cart-item-details">
               <div class="cart-item-title">${item.title}</div>
               <div class="cart-item-meta">Unit Price: ${item.price.toLocaleString()} ₺</div>
@@ -300,16 +304,18 @@
               }
               ${timerHtml}
             </div>
-            <div style="font-weight: 700; font-size: 1.1rem;">${itemTotal.toLocaleString()} ₺</div>
+            <div style="font-weight: 700; font-size: 1.1rem; ${!isSelected ? 'text-decoration: line-through; opacity: 0.6;' : ''}">${itemTotal.toLocaleString()} ₺</div>
           </div>
         `;
 
-        sumRows.innerHTML += `
-          <div class="summary-row">
-            <span>${item.qty}x ${item.title}</span>
-            <span>${itemTotal.toLocaleString()} ₺</span>
-          </div>
-        `;
+        if (isSelected) {
+            sumRows.innerHTML += `
+              <div class="summary-row">
+                <span>${item.qty}x ${item.title}</span>
+                <span>${itemTotal.toLocaleString()} ₺</span>
+              </div>
+            `;
+        }
       });
 
       document.getElementById('cartTotal').textContent = total.toLocaleString() + ' ₺';
@@ -322,14 +328,34 @@
       });
     }
 
-    function proceedToCheckout() {
-      // Süresi dolmuş koltuklu kalemleri kontrol et
+    function toggleItemSelection(idx) {
       const cart = window.getCart();
-      const expiredItem = cart.find(item => item.has_seating && item.reservationExpiry && item.reservationExpiry < Date.now());
+      if (cart[idx]) {
+        cart[idx]._selected = cart[idx]._selected === false ? true : false;
+        window.saveCart(cart);
+      }
+    }
+
+    function proceedToCheckout() {
+      const cart = window.getCart();
+      const selectedIndices = [];
+      cart.forEach((item, idx) => {
+         if (item._selected !== false) selectedIndices.push(idx);
+      });
+
+      if (selectedIndices.length === 0) {
+         alert("Please select at least one item to proceed to checkout.");
+         return;
+      }
+
+      // Süresi dolmuş koltuklu kalemleri kontrol et (sadece seçili olanlar)
+      const expiredItem = cart.find((item, idx) => selectedIndices.includes(idx) && item.has_seating && item.reservationExpiry && item.reservationExpiry < Date.now());
       if (expiredItem) {
         alert(`The seat reservation for "${expiredItem.title}" has expired. Please reselect your seats.`);
         return;
       }
+      
+      sessionStorage.setItem('checkout_indices', JSON.stringify(selectedIndices));
       window.location.href = 'cart-checkout.html';
     }
     window.renderCart = renderCart;

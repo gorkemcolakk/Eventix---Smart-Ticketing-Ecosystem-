@@ -241,8 +241,21 @@
     let isGuest = false;
     let guestInfo = {};
     
+    // Partial checkout tracking
+    let originalCart = [];
+    let selectedIndices = [];
+    
     document.addEventListener('DOMContentLoaded', () => {
-        cart = window.getCart();
+        originalCart = window.getCart();
+        const selectedStr = sessionStorage.getItem('checkout_indices');
+        if (selectedStr) {
+            try { selectedIndices = JSON.parse(selectedStr); } catch(e){}
+        } else {
+            selectedIndices = originalCart.map((_, i) => i);
+        }
+        
+        cart = selectedIndices.map(i => originalCart[i]).filter(Boolean);
+
         if(cart.length === 0) { window.location.href = 'cart.html'; return; }
         
         if (getToken()) {
@@ -433,7 +446,15 @@
                    };
                 });
                 
-                localStorage.removeItem(window.getCartKey());
+                // Partial Checkout: Remove ONLY the checked out items from the localStorage cart
+                const newCart = originalCart.filter((_, i) => !selectedIndices.includes(i));
+                if (newCart.length > 0) {
+                    localStorage.setItem(window.getCartKey(), JSON.stringify(newCart));
+                } else {
+                    localStorage.removeItem(window.getCartKey());
+                }
+                
+                sessionStorage.removeItem('checkout_indices'); // clean up
                 if(typeof updateGlobalCartCount === 'function') updateGlobalCartCount();
                 
                 showStep(3);
