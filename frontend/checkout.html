@@ -254,9 +254,9 @@
 
     /* Müsait koltuk */
     .seat.available {
-      background: rgba(255,255,255,0.08);
+      background: rgba(128, 128, 128, 0.15);
       color: var(--text-muted);
-      border-color: rgba(255,255,255,0.12);
+      border-color: rgba(128, 128, 128, 0.35);
     }
     .seat.available:hover {
       background: rgba(139, 92, 246, 0.3);
@@ -417,6 +417,7 @@
       user-select: none;
       color: var(--text);
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      position: relative;
     }
     .row-label-header {
       width: 30px;
@@ -427,9 +428,22 @@
       text-align: center;
       margin-right: 4px;
     }
-    .seat.available:hover { background: var(--accent-purple); color: white; border-color: var(--accent-purple); transform: translateY(-2px);}
+    .seat.available:hover { background: var(--accent-purple); color: var(--text); border-color: var(--accent-purple); transform: translateY(-2px);}
     .seat.selected { background: #f59e0b; border-color:#fbbf24; color:#1a1a2e; box-shadow: 0 0 10px rgba(251,191,36,0.7); font-weight:700; transform: scale(1.05);}
-    .seat.sold { background: #ef4444; color: white; border-color: #dc2626; cursor: not-allowed; opacity: 0.8; }
+    .seat.sold { background: #ef4444; color: var(--text); border-color: #dc2626; cursor: not-allowed; opacity: 0.8; }
+    /* Mevcut kullanıcının kendi satın aldığı koltuk — yeşil, tıklanamaz */
+    .seat.mine {
+      background: linear-gradient(135deg, #059669, #10b981);
+      border-color: #10b981;
+      color: var(--text);
+      cursor: not-allowed;
+      box-shadow: 0 0 10px rgba(16,185,129,0.45);
+      animation: mine-glow 2.5s ease-in-out infinite;
+    }
+    @keyframes mine-glow {
+      0%, 100% { box-shadow: 0 0 6px rgba(16,185,129,0.35); }
+      50%       { box-shadow: 0 0 16px rgba(16,185,129,0.75); }
+    }
     /* Başkasının koltukta rezervasyonu - soluk sarı */
     .seat.locked { background: rgba(251,191,36,0.18); border-color: rgba(251,191,36,0.45); color: rgba(251,191,36,0.65); cursor: not-allowed; }
     /* Bu kullanıcının sepetindeki koltuk - parlak altın */
@@ -1501,9 +1515,14 @@
             sEl.textContent = s.col_label;
             sEl.title = '🔒 Reserved by someone else';
             sEl.style.cursor = 'not-allowed';
+          } else if (s.status === 'sold' && s.is_mine) {
+            // Bu koltuk mevcut kullanıcı tarafından satın alınmış — yeşil göster
+            sEl.className = 'seat mine';
+            sEl.textContent = s.col_label;
+            sEl.title = s.zone + ' ' + s.row_label + '-' + s.col_label + ' — Your seat';
           } else if (s.status === 'sold') {
             sEl.className = 'seat sold';
-            sEl.textContent = s.col_label;
+            sEl.innerHTML = s.col_label + '<span style="position:absolute; top:2px; right:4px; font-size:0.5rem; font-weight:900; line-height:1; opacity:0.8;">x</span>';
             sEl.title = 'Sold out';
           } else {
             sEl.className = 'seat available';
@@ -1561,6 +1580,40 @@
         grid.appendChild(rowDiv);
       });
       wrapper.appendChild(grid);
+
+      // Legend Ekleme
+      const legend = document.createElement('div');
+      legend.className = 'seat-legend';
+      legend.style.cssText = 'display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-top:20px; padding:15px; background:var(--bg-surface); border:1px solid var(--border-color); border-radius:12px; width:100%;';
+      
+      const legendItems = [
+        { class: 'seat sold', html: '<span style="position:absolute; top:2px; right:3px; font-size:0.5rem; font-weight:900; line-height:1; opacity:0.8;">x</span>', label: 'Dolu' },
+        { class: 'seat mine', label: 'Sizin Biletiniz' },
+        { class: 'seat my-cart', text: '🛒', label: 'Sepetinizde' },
+        { class: 'seat selected', label: 'Seçili' },
+        { class: 'seat locked', label: 'Başkasının İşleminde' },
+        { class: 'seat available', label: 'Boş' }
+      ];
+
+      legendItems.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.style.cssText = 'display:flex; align-items:center; gap:8px; font-size:0.85rem; color:var(--text);';
+        
+        const seatBox = document.createElement('div');
+        seatBox.className = item.class;
+        seatBox.style.cssText = 'width:22px; height:22px; pointer-events:none; font-size:0.6rem; box-shadow:none; animation:none; border-radius:4px; position:relative;';
+        if (item.html) seatBox.innerHTML = item.html;
+        if (item.text) seatBox.textContent = item.text;
+        
+        const labelSpan = document.createElement('span');
+        labelSpan.textContent = item.label;
+        
+        itemDiv.appendChild(seatBox);
+        itemDiv.appendChild(labelSpan);
+        legend.appendChild(itemDiv);
+      });
+
+      wrapper.appendChild(legend);
     }
 
     function showStep(s) {

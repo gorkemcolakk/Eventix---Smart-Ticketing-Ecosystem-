@@ -133,23 +133,47 @@ def get_event(event_id):
 @events_bp.route('/<event_id>/seats', methods=['GET'])
 def get_event_seats(event_id):
     session_id = request.headers.get('X-Session-ID', 'guest_session')
+
+    # Mevcut kullanıcının ID'sini JWT'den al (opsiyonel - yoksa None)
+    current_user_id = None
+    try:
+        import jwt as _jwt
+        auth_header = request.headers.get('Authorization', '')
+        if auth_header.startswith('Bearer '):
+            token = auth_header.split(' ')[1]
+            from utils import SECRET_KEY
+            payload = _jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+            current_user_id = payload.get('id')
+    except Exception:
+        current_user_id = None
+
     conn = get_db_connection()
     seats_raw = conn.execute('SELECT * FROM seats WHERE event_id = ?', (event_id,)).fetchall()
+
+    # Mevcut kullanıcının bu etkinlikte satın aldığı koltuk ID'lerini çek
+    my_seat_ids = set()
+    if current_user_id:
+        my_tickets = conn.execute(
+            "SELECT seat_id FROM tickets WHERE event_id = ? AND user_id = ? AND seat_id IS NOT NULL AND status IN ('valid', 'used')",
+            (event_id, current_user_id)
+        ).fetchall()
+        my_seat_ids = {row['seat_id'] for row in my_tickets}
+
     conn.close()
-    
+
     from datetime import datetime
     now = datetime.now()
-    
+
     seats = []
     for s in seats_raw:
         seat_dict = dict(s)
         is_locked = False
         is_my_lock = False
-        
+
         if seat_dict.get('locked_until'):
             locked_dt = None
             val = str(seat_dict.get('locked_until'))
-            
+
             # Eğer değer tamamen rakamlardan oluşuyorsa (timestamp - milisaniye)
             if val.isdigit():
                 try:
@@ -165,16 +189,18 @@ def get_event_seats(event_id):
                         break
                     except ValueError:
                         continue
-            
+
             if locked_dt and locked_dt > now:
                 is_locked = True
                 if seat_dict.get('locked_by_session') == session_id:
                     is_my_lock = True
-        
+
         seat_dict['is_locked'] = is_locked
         seat_dict['is_my_lock'] = is_my_lock
+        # is_mine: Bu koltuk mevcut giriş yapmış kullanıcı tarafından satın alındıysa True
+        seat_dict['is_mine'] = seat_dict['id'] in my_seat_ids
         seats.append(seat_dict)
-        
+
     return jsonify(seats), 200
 
 @events_bp.route('', methods=['POST'])

@@ -277,15 +277,24 @@
             <div class="cart-item-details">
               <div class="cart-item-title">${item.title}</div>
               <div class="cart-item-meta">Unit Price: ${item.price.toLocaleString()} ₺</div>
-              ${item.has_seating ? '<div class="cart-item-meta" style="color:var(--accent-purple);">Seated Event</div>' : ''}
-              ${seatLabels.length > 0 ? `<div class="cart-item-meta" style="color:#f59e0b; font-size:0.8rem;">🪑 Seats: ${seatLabels.join(', ')}</div>` : ''}
+              ${item.has_seating ? '<div class="cart-item-meta" style="color:var(--accent-purple); font-weight:700; margin-bottom:10px;">🎟️ Seated Event</div>' : ''}
               ${item.tickets_info && item.tickets_info.length > 0 ? 
-                `<div class="cart-item-meta" style="color:#10b981; font-weight:600;">Reserved for: ${item.tickets_info.map(t => t.name + ' ' + t.surname).join(', ')}</div>
-                 <div class="cart-qty-control"><span style="font-weight:600; background:rgba(255,255,255,0.1); padding:4px 12px; border-radius:6px;">Quantity: ${item.qty}</span></div>` 
+                `<ul style="list-style:none; padding:0; margin:10px 0; display:flex; flex-direction:column; gap:8px;">
+                  ${item.tickets_info.map(t => `
+                    <li style="font-weight:600; font-size:0.9rem; padding:10px 14px; background:var(--bg-surface); border:1px solid var(--border-color); border-left:4px solid var(--accent-purple); border-radius:8px; color:var(--text); display:flex; align-items:center; flex-wrap:wrap; gap:8px;">
+                      <span style="color:var(--accent-teal); white-space:nowrap;">🪑 Seat: ${t.seatLabel || 'N/A'}</span> 
+                      <span style="opacity:0.3; margin:0 2px;">|</span> 
+                      <span style="white-space:nowrap;">👤 Reserved: ${t.name} ${t.surname}</span>
+                    </li>
+                  `).join('')}
+                 </ul>
+                 <div class="cart-qty-control" style="margin-top:12px;">
+                   <span style="font-weight:600; background:var(--bg-surface); border:1px solid var(--border-color); padding:6px 14px; border-radius:6px; color:var(--text);">Quantity: ${item.qty}</span>
+                 </div>` 
                 : 
                 `<div class="cart-qty-control">
                   <button class="cart-qty-btn" onclick="changeQty(${idx}, -1)">–</button>
-                  <span style="width: 20px; text-align: center;">${item.qty}</span>
+                  <span style="width: 20px; text-align: center; color:var(--text); font-weight:600;">${item.qty}</span>
                   <button class="cart-qty-btn" onclick="changeQty(${idx}, 1)">+</button>
                 </div>`
               }
