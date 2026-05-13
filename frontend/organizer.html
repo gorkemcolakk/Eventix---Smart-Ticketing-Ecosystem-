@@ -328,8 +328,8 @@
 
           <!-- Manual Entry -->
           <div style="margin-bottom:12px;">
-            <label class="form-label">Manual QR Code Entry</label>
-            <input type="text" id="qrInput" class="form-control" placeholder="Paste EVENTIX-... code">
+            <label class="form-label">Manual Ticket Number / QR Entry</label>
+            <input type="text" id="qrInput" class="form-control" placeholder="Enter Ticket Key or Paste QR Code...">
           </div>
           <div style="display:flex;gap:10px;margin-bottom:16px;">
             <button class="btn btn-outline" style="flex:1;justify-content:center;" onclick="checkQR()">👁 Check</button>
@@ -922,12 +922,14 @@
       })
       .then(function(r){ return r.json(); })
       .then(function(d) {
+        var refundComp = d.total_refund_comp || 0;
         el.innerHTML =
           '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;">' +
           '<div class="glass-panel" style="padding:18px;text-align:center;border-top:2px solid var(--gold);"><div style="font-size:1.6rem;font-weight:700;color:var(--gold);">' + d.total_revenue.toLocaleString('en-US') + ' TL</div><div style="color:var(--text-muted);font-size:0.82rem;margin-top:4px;">Total Revenue</div></div>' +
           '<div class="glass-panel" style="padding:18px;text-align:center;border-top:2px solid #ef4444;"><div style="font-size:1.6rem;font-weight:700;color:#ef4444;">' + d.commission.toLocaleString('en-US') + ' TL</div><div style="color:var(--text-muted);font-size:0.82rem;margin-top:4px;">Commission (%10)</div></div>' +
           '<div class="glass-panel" style="padding:18px;text-align:center;border-top:2px solid #14b8a6;"><div style="font-size:1.6rem;font-weight:700;color:#14b8a6;">' + d.net_revenue.toLocaleString('en-US') + ' TL</div><div style="color:var(--text-muted);font-size:0.82rem;margin-top:4px;">Net Income</div></div>' +
           '<div class="glass-panel" style="padding:18px;text-align:center;border-top:2px solid #3b82f6;"><div style="font-size:1.6rem;font-weight:700;color:#3b82f6;">' + d.total_tickets + '</div><div style="color:var(--text-muted);font-size:0.82rem;margin-top:4px;">Tickets Sold</div></div>' +
+          '<div class="glass-panel" style="padding:18px;text-align:center;border-top:2px solid #8b5cf6;box-shadow:0 4px 20px rgba(139,92,246,0.15);"><div style="font-size:1.6rem;font-weight:700;background:linear-gradient(135deg,#8b5cf6,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">' + refundComp.toLocaleString('en-US') + ' TL</div><div style="color:var(--text-muted);font-size:0.82rem;margin-top:4px;">Refund Compensation</div><div style="font-size:0.72rem;color:#a78bfa;margin-top:2px;">(%15 from refunds)</div></div>' +
           '</div>';
         var rows = '';
         var chartLabels = [];
@@ -936,15 +938,17 @@
           var b = d.breakdown[i];
           chartLabels.push(b.title);
           chartNetData.push(b.net_revenue);
+          var rc = b.refund_comp || 0;
           rows += '<tr style="border-bottom:1px solid var(--border);">' +
             '<td style="padding:9px 12px;color:var(--text);">' + b.title + '</td>' +
             '<td style="padding:9px 12px;text-align:right;color:var(--text-muted);">' + b.sold_count + '/' + b.capacity + '</td>' +
             '<td style="padding:9px 12px;text-align:right;color:var(--text);">' + b.gross_revenue.toLocaleString('en-US') + ' TL</td>' +
             '<td style="padding:9px 12px;text-align:right;color:#ef4444;">-' + b.commission.toLocaleString('en-US') + ' TL</td>' +
             '<td style="padding:9px 12px;text-align:right;color:#14b8a6;">' + b.net_revenue.toLocaleString('en-US') + ' TL</td>' +
+            '<td style="padding:9px 12px;text-align:right;color:#a78bfa;font-weight:600;">' + (rc > 0 ? '+' + rc.toLocaleString('en-US') + ' TL' : '<span style="color:var(--text-muted);">—</span>') + '</td>' +
             '</tr>';
         }
-        el2.innerHTML = '<div class="glass-panel" style="overflow:auto;margin-top:16px;"><table style="width:100%;border-collapse:collapse;font-size:0.85rem;"><thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left;padding:9px 12px;color:var(--text-muted);">Event</th><th style="text-align:right;padding:9px 12px;color:var(--text-muted);">Sales</th><th style="text-align:right;padding:9px 12px;color:var(--text-muted);">Gross</th><th style="text-align:right;padding:9px 12px;color:var(--text-muted);">Commission</th><th style="text-align:right;padding:9px 12px;color:var(--text-muted);">Net</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
+        el2.innerHTML = '<div class="glass-panel" style="overflow:auto;margin-top:16px;"><table style="width:100%;border-collapse:collapse;font-size:0.85rem;"><thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left;padding:9px 12px;color:var(--text-muted);">Event</th><th style="text-align:right;padding:9px 12px;color:var(--text-muted);">Sales</th><th style="text-align:right;padding:9px 12px;color:var(--text-muted);">Gross</th><th style="text-align:right;padding:9px 12px;color:var(--text-muted);">Commission</th><th style="text-align:right;padding:9px 12px;color:var(--text-muted);">Net</th><th style="text-align:right;padding:9px 12px;color:#a78bfa;">Refund Comp.</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
         
         renderChart(chartLabels, chartNetData);
       })
@@ -1156,22 +1160,52 @@
       .then(d => {
         if (d.valid) {
           var t = d.ticket || {};
+          
+          let formattedDate = t.date || '-';
+          if (t.date) {
+            try {
+               let dObj = new Date(t.date);
+               if(!isNaN(dObj)) {
+                  formattedDate = dObj.toLocaleDateString("tr-TR", {day:'numeric', month:'short', year:'numeric'}) + ' - ' + dObj.toLocaleTimeString("tr-TR", {hour:'2-digit', minute:'2-digit'});
+               }
+            } catch(e) {}
+          }
+          
+          let seatHtml = '';
+          if (t.zone) {
+            seatHtml = `<tr><td style="padding:3px 6px;color:var(--text-muted);">Seat</td><td style="padding:3px 6px;font-weight:600;">${t.zone} ${t.row_label}-${t.col_label}</td></tr>`;
+          }
+
           el.innerHTML = `
             <div style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.4);border-radius:10px;padding:16px;">
               <p style="color:#6ee7b7;font-weight:700;margin:0 0 8px;font-size:1rem;">✅ VALID TICKET${ action === 'use' ? ' — Marked as Used' : '' }</p>
               <table style="width:100%;font-size:0.85rem;color:var(--text);border-collapse:collapse;">
                 <tr><td style="padding:3px 6px;color:var(--text-muted);">Event</td><td style="padding:3px 6px;font-weight:600;">${t.title || '-'}</td></tr>
-                <tr><td style="padding:3px 6px;color:var(--text-muted);">Date</td><td style="padding:3px 6px;">${t.date || '-'}</td></tr>
+                <tr><td style="padding:3px 6px;color:var(--text-muted);">Date</td><td style="padding:3px 6px;">${formattedDate}</td></tr>
                 <tr><td style="padding:3px 6px;color:var(--text-muted);">Location</td><td style="padding:3px 6px;">${t.location || '-'}</td></tr>
+                ${seatHtml}
                 <tr><td style="padding:3px 6px;color:var(--text-muted);">Attendee</td><td style="padding:3px 6px;font-weight:600;">${(t.owner_name || '') + ' ' + (t.owner_surname || '') || t.fullname || '-'}</td></tr>
                 <tr><td style="padding:3px 6px;color:var(--text-muted);">Ticket No</td><td style="padding:3px 6px;font-family:monospace;">${t.ticket_key || '-'}</td></tr>
               </table>
             </div>`;
         } else {
-          var color = d.status === 'already_used' ? '#f59e0b' : '#ef4444';
-          var bgColor = d.status === 'already_used' ? 'rgba(245,158,11,.15)' : 'rgba(239,68,68,.15)';
-          var borderColor = d.status === 'already_used' ? 'rgba(245,158,11,.4)' : 'rgba(239,68,68,.4)';
-          var icon = d.status === 'already_used' ? '⚠️' : '❌';
+          var color = '#ef4444';
+          var bgColor = 'rgba(239,68,68,.15)';
+          var borderColor = 'rgba(239,68,68,.4)';
+          var icon = '❌';
+
+          if (d.status === 'already_used') {
+              color = '#f59e0b';
+              bgColor = 'rgba(245,158,11,.15)';
+              borderColor = 'rgba(245,158,11,.4)';
+              icon = '⚠️';
+          } else if (d.status === 'refunded') {
+              color = '#8b5cf6'; // Mor renk
+              bgColor = 'rgba(139,92,246,.15)';
+              borderColor = 'rgba(139,92,246,.4)';
+              icon = '↩️';
+          }
+
           var t = d.ticket || {};
           el.innerHTML = `
             <div style="background:${bgColor};border:1px solid ${borderColor};border-radius:10px;padding:16px;">

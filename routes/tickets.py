@@ -429,7 +429,7 @@ def cart_buy():
             for s in seats:
                 item_price += s['price']
                 seats_dict[str(s['id'])] = s
-            seat_updates.append((f"UPDATE seats SET status = 'sold' WHERE id IN ({placeholders})", seat_ids))
+            seat_updates.append((f"UPDATE seats SET status = 'sold', locked_until = NULL, locked_by_session = NULL WHERE id IN ({placeholders})", seat_ids))
             event_updates.append(("UPDATE events SET sold_count = sold_count + ? WHERE id = ?", (quantity, event_id)))
         else:
             item_price = event['price'] * quantity
@@ -456,7 +456,8 @@ def cart_buy():
             t_surname = sanitize_html(t_info.get('surname', ''))
             
             inserts.append((g.user['id'], event_id, key, q_data, 1, t_p, t_name, t_surname, sid))
-            all_gen_tix.append({'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'event_id': event_id, 'seat_id': sid})
+            s_label = f"{seats_dict[str(sid)]['zone']} - R{seats_dict[str(sid)]['row_label']} S{seats_dict[str(sid)]['col_label']}" if sid and event['has_seating'] else ""
+            all_gen_tix.append({'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'event_id': event_id, 'seat_id': sid, 'seat_label': s_label})
             
     # PAYMENT
     from payment import PaymentGateway
@@ -491,7 +492,9 @@ def cart_buy():
             ev = conn.execute('SELECT * FROM events WHERE id = ?', (eid,)).fetchone()
             ev_tix = [t for t in all_gen_tix if t['event_id'] == eid]
             ev_price = sum(t['price'] for t in ev_tix)
-            send_ticket_confirmation_email(g.user['email'], g.user['fullname'], ev, ev_tix, ev_price, "")
+            seat_labels_list = [t['seat_label'] for t in ev_tix if t.get('seat_label')]
+            seat_labels_str = ", ".join(seat_labels_list) if seat_labels_list else ""
+            send_ticket_confirmation_email(g.user['email'], g.user['fullname'], ev, ev_tix, ev_price, seat_labels_str)
     except Exception as e:
         pass
 
@@ -569,7 +572,7 @@ def guest_cart_buy():
             for s in seats:
                 item_price += s['price']
                 seats_dict[str(s['id'])] = s
-            seat_updates.append((f"UPDATE seats SET status = 'sold' WHERE id IN ({placeholders})", seat_ids))
+            seat_updates.append((f"UPDATE seats SET status = 'sold', locked_until = NULL, locked_by_session = NULL WHERE id IN ({placeholders})", seat_ids))
             event_updates.append(("UPDATE events SET sold_count = sold_count + ? WHERE id = ?", (quantity, event_id)))
         else:
             item_price = event['price'] * quantity
@@ -585,7 +588,8 @@ def guest_cart_buy():
             sid = t_info.get('seat_id') if event['has_seating'] else None
             
             inserts.append((guest_user_id, event_id, key, q_data, 1, t_p, t_name, t_surname, sid))
-            all_gen_tix.append({'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'event_id': event_id, 'seat_id': sid})
+            s_label = f"{seats_dict[str(sid)]['zone']} - R{seats_dict[str(sid)]['row_label']} S{seats_dict[str(sid)]['col_label']}" if sid and event['has_seating'] else ""
+            all_gen_tix.append({'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'event_id': event_id, 'seat_id': sid, 'seat_label': s_label})
             
     from payment import PaymentGateway
     pay_res = PaymentGateway.process_payment(total_price, card_name, card_number, card_exp, cvc)
@@ -609,7 +613,9 @@ def guest_cart_buy():
             ev = conn.execute('SELECT * FROM events WHERE id = ?', (eid,)).fetchone()
             ev_tix = [t for t in all_gen_tix if t['event_id'] == eid]
             ev_price = sum(t['price'] for t in ev_tix)
-            send_ticket_confirmation_email(guest_email, guest_name + " " + guest_surname, ev, ev_tix, ev_price, "")
+            seat_labels_list = [t['seat_label'] for t in ev_tix if t.get('seat_label')]
+            seat_labels_str = ", ".join(seat_labels_list) if seat_labels_list else ""
+            send_ticket_confirmation_email(guest_email, guest_name + " " + guest_surname, ev, ev_tix, ev_price, seat_labels_str)
     except Exception as e:
         pass
 
@@ -659,21 +665,37 @@ def validate_by_qr():
     conn = get_db_connection()
     if is_dynamic:
         t = conn.execute('''
-            SELECT t.*, e.organizer_id, e.title, e.date, e.location
-            FROM tickets t JOIN events e ON t.event_id = e.id
+            SELECT t.*, e.organizer_id, e.title, e.date, e.location,
+                   s.zone, s.row_label, s.col_label
+            FROM tickets t 
+            JOIN events e ON t.event_id = e.id
+            LEFT JOIN seats s ON t.seat_id = s.id
             WHERE t.ticket_key = ?
         ''', (ticket_key,)).fetchone()
     else:
-        # Statik QR Geri Dönük Uyumluluk
-        if not verify_ticket_signature(qr_code):
-            conn.close()
-            return jsonify({'valid': False, 'message': 'Invalid signature.'}), 400
-            
+        # Önce doğrudan bilet numarası (ticket_key) olarak aramayı dene (Manuel girişler için)
         t = conn.execute('''
-            SELECT t.*, e.organizer_id, e.title, e.date, e.location
-            FROM tickets t JOIN events e ON t.event_id = e.id
-            WHERE t.qr_code = ?
+            SELECT t.*, e.organizer_id, e.title, e.date, e.location,
+                   s.zone, s.row_label, s.col_label
+            FROM tickets t 
+            JOIN events e ON t.event_id = e.id
+            LEFT JOIN seats s ON t.seat_id = s.id
+            WHERE t.ticket_key = ?
         ''', (qr_code,)).fetchone()
+        
+        # Eğer bilet numarası ile bulunamadıysa, imzalı tam QR kodu olarak aramayı dene
+        if not t:
+            if verify_ticket_signature(qr_code):
+                t = conn.execute('''
+                    SELECT t.*, e.organizer_id, e.title, e.date, e.location,
+                           s.zone, s.row_label, s.col_label
+                    FROM tickets t 
+                    JOIN events e ON t.event_id = e.id
+                    LEFT JOIN seats s ON t.seat_id = s.id
+                    WHERE t.qr_code = ?
+                ''', (qr_code,)).fetchone()
+            # İmza geçersizse ve bilet no ile de bulunamadıysa t hala None kalacak
+
 
     if not t:
         conn.close()
@@ -684,13 +706,39 @@ def validate_by_qr():
 
     ticket_data = dict(t)
 
-    # Already used ticket - return invalid with status
+    ticket_data = dict(t)
+
+    # Check ticket status
     if t['status'] == 'used':
         conn.close()
         return jsonify({
             'valid': False,
             'status': 'already_used',
             'message': 'This ticket has already been used!',
+            'ticket': ticket_data
+        }), 200
+    elif t['status'] == 'refunded':
+        conn.close()
+        return jsonify({
+            'valid': False,
+            'status': 'refunded',
+            'message': 'This ticket has been REFUNDED and is no longer valid.',
+            'ticket': ticket_data
+        }), 200
+    elif t['status'] == 'cancelled':
+        conn.close()
+        return jsonify({
+            'valid': False,
+            'status': 'cancelled',
+            'message': 'This ticket has been CANCELLED and is no longer valid.',
+            'ticket': ticket_data
+        }), 200
+    elif t['status'] != 'valid':
+        conn.close()
+        return jsonify({
+            'valid': False,
+            'status': t['status'],
+            'message': f"Ticket status is {t['status']}.",
             'ticket': ticket_data
         }), 200
 
@@ -720,3 +768,188 @@ def validate_promo():
     conn.close()
     if not p: return jsonify({'valid': False, 'message': 'Invalid promo code.'}), 404
     return jsonify({'valid': True, 'message': 'Promo code applied!', 'discount_type': p['discount_type'], 'discount_value': p['discount_value']}), 200
+
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TICKET REFUND (İADE SİSTEMİ)
+# ─────────────────────────────────────────────────────────────────────────────
+@tickets_bp.route('/<int:ticket_id>/refund', methods=['POST'])
+@token_required
+def refund_ticket(ticket_id):
+    """
+    İade Kuralları:
+    - Etkinliğe en az 72 saat kalmış olmalı
+    - Bilet sahibi bu kullanıcı olmalı
+    - Bilet valid statüsünde olmalı
+
+    Finansal Dağılım (yüzde 20 ceza):
+    - yüzde 80 Kullanıcıya iade
+    - yüzde 15 Organizatöre tazminat
+    - yüzde 5  Admin/Platform komisyonu
+    """
+    conn = get_db_connection()
+    c = conn.cursor()
+
+    ticket = c.execute(
+        'SELECT t.id, t.status, t.total_price, t.event_id, t.seat_id, '
+        'e.date as event_date, e.has_seating, e.title as event_title, e.sold_count '
+        'FROM tickets t JOIN events e ON t.event_id = e.id '
+        'WHERE t.id = ? AND t.user_id = ?',
+        (ticket_id, g.user['id'])
+    ).fetchone()
+
+    if not ticket:
+        conn.close()
+        return jsonify({'message': 'Ticket not found or unauthorized.'}), 404
+
+    if ticket['status'] != 'valid':
+        conn.close()
+        msgs = {
+            'used': 'Used tickets cannot be refunded.',
+            'refunded': 'This ticket has already been refunded.',
+            'cancelled': 'Cancelled tickets cannot be refunded.'
+        }
+        return jsonify({'message': msgs.get(ticket['status'], f'Status "{ticket["status"]}" is not refundable.')}), 400
+
+    if c.execute('SELECT id FROM refunds WHERE ticket_id = ?', (ticket_id,)).fetchone():
+        conn.close()
+        return jsonify({'message': 'This ticket has already been refunded.'}), 400
+
+    # ── 72 SAAT KURALI ──────────────────────────────────────
+    try:
+        edate = str(ticket['event_date'])
+        edt = None
+        for fmt in ('%Y-%m-%dT%H:%M:%S', '%Y-%m-%dT%H:%M', '%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M', '%Y-%m-%d'):
+            try:
+                edt = datetime.strptime(edate, fmt)
+                break
+            except ValueError:
+                continue
+        if edt is None:
+            conn.close()
+            return jsonify({'message': 'Cannot parse event date.'}), 500
+        hours_left = (edt - datetime.now()).total_seconds() / 3600
+        if hours_left < 72:
+            conn.close()
+            return jsonify({
+                'message': 'Refunds require at least 72 hours before the event. '
+                           f'{max(0, hours_left):.1f} hours remaining.',
+                'hours_until_event': round(max(0, hours_left), 1),
+                'refund_eligible': False
+            }), 400
+    except Exception as ex:
+        conn.close()
+        return jsonify({'message': str(ex)}), 500
+
+    # ── FİNANSAL HESAPLAMA (yüzde 20 CEZA) ──────────────────────
+    original = ticket['total_price'] or 0
+    org_comp = round(original * 0.15)   # yüzde 15 organizatöre tazminat
+    adm_fee  = round(original * 0.05)   # yüzde 5 admin/platform
+    to_cust  = original - org_comp - adm_fee  # yüzde 80 kullanıcıya
+
+    # ── VERİTABANI İŞLEMLERİ ────────────────────────────────
+    try:
+        c.execute(
+            "UPDATE tickets SET status='refunded', refunded_at=? WHERE id=?",
+            (datetime.now().strftime('%Y-%m-%d %H:%M:%S'), ticket_id)
+        )
+
+        seat_label = None
+        if ticket['has_seating'] and ticket['seat_id']:
+            s = c.execute(
+                'SELECT zone, row_label, col_label FROM seats WHERE id=?',
+                (ticket['seat_id'],)
+            ).fetchone()
+            if s:
+                seat_label = f"{s['zone']} {s['row_label']}-{s['col_label']}"
+                c.execute(
+                    "UPDATE seats SET status='available', locked_until=NULL, locked_by_session=NULL WHERE id=?",
+                    (ticket['seat_id'],)
+                )
+
+        c.execute(
+            'UPDATE events SET sold_count=MAX(0, sold_count-1) WHERE id=?',
+            (ticket['event_id'],)
+        )
+
+        c.execute(
+            'INSERT INTO refunds (ticket_id, user_id, event_id, original_price, '
+            'refund_to_customer, organizer_compensation, admin_fee) VALUES (?,?,?,?,?,?,?)',
+            (ticket_id, g.user['id'], ticket['event_id'], original, to_cust, org_comp, adm_fee)
+        )
+
+        create_notification(
+            conn, g.user['id'],
+            f"Ticket for '{ticket['event_title']}' refunded. "
+            f"Amount: {to_cust:,} TL (20%% cancellation fee applied)."
+        )
+        conn.commit()
+
+    except Exception as ex:
+        conn.close()
+        return jsonify({'message': f'Refund error: {str(ex)}'}), 500
+
+    conn.close()
+    cache.clear()
+    return jsonify({
+        'message': 'Refund processed successfully!',
+        'refund_details': {
+            'original_price': original,
+            'refund_to_customer': to_cust,
+            'organizer_compensation': org_comp,
+            'admin_fee': adm_fee,
+            'penalty_percent': 20,
+            'seat_released': seat_label
+        }
+    }), 200
+
+
+@tickets_bp.route('/<int:ticket_id>/refund-eligibility', methods=['GET'])
+@token_required
+def check_refund_eligibility(ticket_id):
+    """Iade butonu ön kontrol: aktif/pasif gösterim için."""
+    conn = get_db_connection()
+    ticket = conn.execute(
+        'SELECT t.status, t.total_price, e.date as event_date '
+        'FROM tickets t JOIN events e ON t.event_id = e.id '
+        'WHERE t.id = ? AND t.user_id = ?',
+        (ticket_id, g.user['id'])
+    ).fetchone()
+    conn.close()
+
+    if not ticket:
+        return jsonify({'eligible': False, 'message': 'Not found.'}), 404
+    if ticket['status'] != 'valid':
+        return jsonify({'eligible': False, 'message': f'Status: {ticket["status"]}'}), 200
+
+    try:
+        edt = None
+        for fmt in ('%Y-%m-%dT%H:%M:%S', '%Y-%m-%dT%H:%M', '%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M', '%Y-%m-%d'):
+            try:
+                edt = datetime.strptime(str(ticket['event_date']), fmt)
+                break
+            except ValueError:
+                continue
+        if edt is None:
+            return jsonify({'eligible': False, 'message': 'Invalid event date.'}), 200
+
+        h = (edt - datetime.now()).total_seconds() / 3600
+        elig = h >= 72
+        orig = ticket['total_price'] or 0
+        oc = round(orig * 0.15)
+        af = round(orig * 0.05)
+        rc = orig - oc - af
+        return jsonify({
+            'eligible': elig,
+            'hours_until_event': round(h, 1),
+            'message': 'Eligible for refund.' if elig else f'{h:.1f}h left (min 72h required).',
+            'refund_preview': {
+                'original_price': orig,
+                'refund_to_customer': rc,
+                'organizer_compensation': oc,
+                'admin_fee': af
+            }
+        }), 200
+    except Exception as ex:
+        return jsonify({'eligible': False, 'message': str(ex)}), 500

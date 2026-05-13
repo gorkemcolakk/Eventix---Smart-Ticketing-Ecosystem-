@@ -127,7 +127,12 @@ def init_db():
             # veritabanı zaten kuruludur, 25 tane ayrı HTTP isteği atmaya gerek yok.
             _client.execute("SELECT id FROM users LIMIT 1", [])
             _client.execute("SELECT owner_name FROM tickets LIMIT 1", [])
-            return  # Veritabanı hazır, hızlıca çık
+            # Refunds tablosunu da kontrol et - yoksa oluşturmaya izin ver
+            try:
+                _client.execute("SELECT id FROM refunds LIMIT 1", [])
+                return  # Veritabanı hazır, hızlıca çık
+            except Exception:
+                pass  # refunds tablosu yok, aşağıdan oluştur
         except Exception:
             pass # Eğer kurulu değilse, aşağıdan normal şekilde tabloları oluşturmaya devam et
             
@@ -284,6 +289,30 @@ def init_db():
         c.execute("ALTER TABLE events ADD COLUMN version INTEGER NOT NULL DEFAULT 1")
     except sqlite3.OperationalError:
         pass
+
+    # Migration: add refunded_at to tickets if missing
+    try:
+        c.execute("ALTER TABLE tickets ADD COLUMN refunded_at TIMESTAMP")
+    except sqlite3.OperationalError:
+        pass
+
+    # Refunds table — tracks all refund transactions
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS refunds (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            ticket_id INTEGER NOT NULL UNIQUE,
+            user_id INTEGER NOT NULL,
+            event_id TEXT NOT NULL,
+            original_price INTEGER NOT NULL DEFAULT 0,
+            refund_to_customer INTEGER NOT NULL DEFAULT 0,
+            organizer_compensation INTEGER NOT NULL DEFAULT 0,
+            admin_fee INTEGER NOT NULL DEFAULT 0,
+            refunded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (ticket_id) REFERENCES tickets (id),
+            FOREIGN KEY (user_id) REFERENCES users (id),
+            FOREIGN KEY (event_id) REFERENCES events (id)
+        )
+    ''')
 
     # Wishlist table
     c.execute('''

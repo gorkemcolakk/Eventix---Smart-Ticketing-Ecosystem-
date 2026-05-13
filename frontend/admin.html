@@ -513,6 +513,11 @@
             <div style="font-family:'Space Mono',monospace;font-size:1.8rem;font-weight:700;color:var(--blue);">${d.total_tickets || 0}</div>
             <div style="color:var(--text-muted);font-size:0.85rem;margin-top:6px;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Total Tickets</div>
           </div>
+          <div class="glass-panel" style="padding:22px;text-align:center;border-top:3px solid #14b8a6;box-shadow:0 10px 30px rgba(20,184,166,0.15);">
+            <div style="font-family:'Space Mono',monospace;font-size:1.8rem;font-weight:700;background:linear-gradient(135deg,#14b8a6,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">${(d.total_admin_refund_fee || 0).toLocaleString('en-US')} ₺</div>
+            <div style="color:var(--text-muted);font-size:0.85rem;margin-top:6px;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Refund Fees</div>
+            <div style="font-size:0.75rem;color:#5eead4;margin-top:3px;">5% from refunds</div>
+          </div>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr;gap:30px;">
@@ -530,6 +535,7 @@
                   <th style="padding:12px;color:var(--text-muted);font-weight:500;text-align:right;">Total Revenue</th>
                   <th style="padding:12px;color:var(--text-muted);font-weight:500;text-align:right;">Commission</th>
                   <th style="padding:12px;color:var(--text-muted);font-weight:500;text-align:right;">Net Payment</th>
+                  <th style="padding:12px;color:#5eead4;font-weight:500;text-align:right;">Refund Fees</th>
                 </tr></thead>
                 <tbody>
                   ${d.organizer_breakdown.map(o => `
@@ -542,6 +548,7 @@
                       <td style="padding:14px 12px;color:var(--text);font-weight:600;text-align:right;">${o.gross_revenue.toLocaleString('en-US')} ₺</td>
                       <td style="padding:14px 12px;color:var(--coral);text-align:right;font-weight:500;">-${o.commission.toLocaleString('en-US')} ₺</td>
                       <td style="padding:14px 12px;color:var(--teal);text-align:right;font-weight:700;font-family:'Space Mono';">${o.net_revenue.toLocaleString('en-US')} ₺</td>
+                      <td style="padding:14px 12px;text-align:right;font-weight:600;color:#5eead4;">${(o.admin_refund_fee||0) > 0 ? '+' + (o.admin_refund_fee||0).toLocaleString('en-US') + ' ₺' : '<span style="color:var(--text-muted);">—</span>'}</td>
                     </tr>
                   `).join('')}
                 </tbody>

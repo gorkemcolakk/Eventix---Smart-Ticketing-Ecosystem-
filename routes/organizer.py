@@ -45,6 +45,21 @@ def organizer_revenue():
     commission = round(total_revenue * COMMISSION_RATE)
     net_revenue = total_revenue - commission
 
+    # Toplam iade tazminatları (refund compensation)
+    refund_comp_rows = conn.execute(f'''
+        SELECT COALESCE(SUM(r.organizer_compensation), 0) as total_org_comp
+        FROM refunds r
+        JOIN events e ON r.event_id = e.id
+        WHERE 1=1 {event_filter}
+    ''', params).fetchone()
+    total_refund_comp = refund_comp_rows['total_org_comp'] if refund_comp_rows else 0
+
+    # Toplam admin iade komisyonu (sadece admin için)
+    total_admin_refund_fee = 0
+    if g.user['role'] == 'admin':
+        admin_fee_row = conn.execute("SELECT COALESCE(SUM(admin_fee), 0) as total FROM refunds").fetchone()
+        total_admin_refund_fee = admin_fee_row['total'] if admin_fee_row else 0
+
     # Etkinlik bazlı döküm
     events_stats = conn.execute(f'''
         SELECT 
@@ -68,22 +83,22 @@ def organizer_revenue():
     breakdown = []
     for ev in events_stats:
         gross = ev['real_gross']
-        # Format date and truncate long titles even more for the chart
         try:
             from datetime import datetime
             dt_obj = datetime.fromisoformat(ev['date'].replace('T', ' '))
             day_str = dt_obj.strftime('%d %b')
-            
-            # Shorter truncation for chart readability: 15 chars
             raw_title = ev['title']
-            if len(raw_title) > 15:
-                short_title = raw_title[:12] + "..."
-            else:
-                short_title = raw_title
-            
+            short_title = raw_title[:12] + '...' if len(raw_title) > 15 else raw_title
             display_title = f"{short_title} ({day_str})"
         except:
             display_title = ev['title']
+
+        # Bu etkinliğe ait iade tazminatını çek
+        ev_refund_row = conn.execute(
+            'SELECT COALESCE(SUM(organizer_compensation), 0) as ev_comp FROM refunds WHERE event_id = ?',
+            (ev['id'],)
+        ).fetchone()
+        ev_refund_comp = ev_refund_row['ev_comp'] if ev_refund_row else 0
 
         breakdown.append({
             'event_id': ev['id'],
@@ -94,6 +109,7 @@ def organizer_revenue():
             'gross_revenue': gross,
             'commission': round(gross * COMMISSION_RATE),
             'net_revenue': round(gross * (1 - COMMISSION_RATE)),
+            'refund_comp': ev_refund_comp,
             'status': ev['status']
         })
 
@@ -114,9 +130,19 @@ def organizer_revenue():
             HAVING total_tickets > 0
             ORDER BY total_gross DESC
         ''').fetchall()
-        
+
         for org in orgs_stats:
             gross = org['total_gross']
+            # Bu organizatöre ait iade tazminatını çek
+            org_refund_row = conn.execute(
+                'SELECT COALESCE(SUM(r.organizer_compensation), 0) as org_comp, '
+                'COALESCE(SUM(r.admin_fee), 0) as adm_fee '
+                'FROM refunds r JOIN events e ON r.event_id = e.id '
+                'WHERE e.organizer_id = ?',
+                (org['organizer_id'],)
+            ).fetchone()
+            org_refund_comp = org_refund_row['org_comp'] if org_refund_row else 0
+            org_admin_fee = org_refund_row['adm_fee'] if org_refund_row else 0
             organizer_breakdown.append({
                 'organizer_id': org['organizer_id'],
                 'name': org['organizer_name'],
@@ -124,7 +150,9 @@ def organizer_revenue():
                 'total_tickets': org['total_tickets'],
                 'gross_revenue': gross,
                 'commission': round(gross * COMMISSION_RATE),
-                'net_revenue': round(gross * (1 - COMMISSION_RATE))
+                'net_revenue': round(gross * (1 - COMMISSION_RATE)),
+                'refund_comp': org_refund_comp,
+                'admin_refund_fee': org_admin_fee
             })
 
     conn.close()
@@ -134,6 +162,8 @@ def organizer_revenue():
         'commission': commission,
         'net_revenue': net_revenue,
         'commission_rate': COMMISSION_RATE,
+        'total_refund_comp': total_refund_comp,
+        'total_admin_refund_fee': total_admin_refund_fee,
         'breakdown': breakdown,
         'organizer_breakdown': organizer_breakdown
     }), 200

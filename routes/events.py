@@ -170,7 +170,8 @@ def get_event_seats(event_id):
         is_locked = False
         is_my_lock = False
 
-        if seat_dict.get('locked_until'):
+        # Hiyerarşi Kontrolü: Koltuk zaten SATILMIŞSA (sold), sepet (lock) kontrolünü atla.
+        if seat_dict.get('status') != 'sold' and seat_dict.get('locked_until'):
             locked_dt = None
             val = str(seat_dict.get('locked_until'))
 
