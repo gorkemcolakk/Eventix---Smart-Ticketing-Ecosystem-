@@ -43,7 +43,6 @@ def organizer_revenue():
     total_revenue = sum(t['total_price'] for t in tickets) if tickets else 0
     total_tickets = sum(t['quantity'] for t in tickets) if tickets else 0
     commission = round(total_revenue * COMMISSION_RATE)
-    net_revenue = total_revenue - commission
 
     # Toplam iade tazminatları (refund compensation)
     refund_comp_rows = conn.execute(f'''
@@ -53,6 +52,9 @@ def organizer_revenue():
         WHERE 1=1 {event_filter}
     ''', params).fetchone()
     total_refund_comp = refund_comp_rows['total_org_comp'] if refund_comp_rows else 0
+
+    # Net Income = (Total Revenue - Commission) + Refund Compensation
+    net_revenue = (total_revenue - commission) + total_refund_comp
 
     # Toplam admin iade komisyonu (sadece admin için)
     total_admin_refund_fee = 0
@@ -71,7 +73,8 @@ def organizer_revenue():
             e.status,
             u.fullname as organizer_name,
             COALESCE(SUM(CASE WHEN t.status IN ('valid', 'used') THEN t.quantity ELSE 0 END), 0) as real_sold_count,
-            COALESCE(SUM(CASE WHEN t.status IN ('valid', 'used') THEN t.total_price ELSE 0 END), 0) as real_gross
+            COALESCE(SUM(CASE WHEN t.status IN ('valid', 'used') THEN t.total_price ELSE 0 END), 0) as real_gross,
+            COALESCE(SUM(CASE WHEN t.status = 'refunded' THEN t.total_price * 0.05 ELSE 0 END), 0) as ev_admin_fee_from_tickets
         FROM events e
         LEFT JOIN users u ON e.organizer_id = u.id
         LEFT JOIN tickets t ON e.id = t.event_id
@@ -93,12 +96,14 @@ def organizer_revenue():
         except:
             display_title = ev['title']
 
-        # Bu etkinliğe ait iade tazminatını çek
+        # Bu etkinliğe ait iade tazminatını çek (Admin fee'yi tickets üzerinden hesapladık)
         ev_refund_row = conn.execute(
-            'SELECT COALESCE(SUM(organizer_compensation), 0) as ev_comp FROM refunds WHERE event_id = ?',
+            'SELECT COALESCE(SUM(organizer_compensation), 0) as ev_comp '
+            'FROM refunds WHERE event_id = ?',
             (ev['id'],)
         ).fetchone()
         ev_refund_comp = ev_refund_row['ev_comp'] if ev_refund_row else 0
+        ev_admin_fee = ev['ev_admin_fee_from_tickets']
 
         breakdown.append({
             'event_id': ev['id'],
@@ -110,6 +115,7 @@ def organizer_revenue():
             'commission': round(gross * COMMISSION_RATE),
             'net_revenue': round(gross * (1 - COMMISSION_RATE)),
             'refund_comp': ev_refund_comp,
+            'admin_fee': ev_admin_fee,
             'status': ev['status']
         })
 
@@ -164,6 +170,7 @@ def organizer_revenue():
         'commission_rate': COMMISSION_RATE,
         'total_refund_comp': total_refund_comp,
         'total_admin_refund_fee': total_admin_refund_fee,
+        'platform_net_income': commission + total_admin_refund_fee,
         'breakdown': breakdown,
         'organizer_breakdown': organizer_breakdown
     }), 200

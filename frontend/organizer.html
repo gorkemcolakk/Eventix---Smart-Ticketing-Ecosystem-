@@ -924,12 +924,12 @@
       .then(function(d) {
         var refundComp = d.total_refund_comp || 0;
         el.innerHTML =
-          '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;">' +
-          '<div class="glass-panel" style="padding:18px;text-align:center;border-top:2px solid var(--gold);"><div style="font-size:1.6rem;font-weight:700;color:var(--gold);">' + d.total_revenue.toLocaleString('en-US') + ' TL</div><div style="color:var(--text-muted);font-size:0.82rem;margin-top:4px;">Total Revenue</div></div>' +
-          '<div class="glass-panel" style="padding:18px;text-align:center;border-top:2px solid #ef4444;"><div style="font-size:1.6rem;font-weight:700;color:#ef4444;">' + d.commission.toLocaleString('en-US') + ' TL</div><div style="color:var(--text-muted);font-size:0.82rem;margin-top:4px;">Commission (%10)</div></div>' +
-          '<div class="glass-panel" style="padding:18px;text-align:center;border-top:2px solid #14b8a6;"><div style="font-size:1.6rem;font-weight:700;color:#14b8a6;">' + d.net_revenue.toLocaleString('en-US') + ' TL</div><div style="color:var(--text-muted);font-size:0.82rem;margin-top:4px;">Net Income</div></div>' +
-          '<div class="glass-panel" style="padding:18px;text-align:center;border-top:2px solid #3b82f6;"><div style="font-size:1.6rem;font-weight:700;color:#3b82f6;">' + d.total_tickets + '</div><div style="color:var(--text-muted);font-size:0.82rem;margin-top:4px;">Tickets Sold</div></div>' +
-          '<div class="glass-panel" style="padding:18px;text-align:center;border-top:2px solid #8b5cf6;box-shadow:0 4px 20px rgba(139,92,246,0.15);"><div style="font-size:1.6rem;font-weight:700;background:linear-gradient(135deg,#8b5cf6,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">' + refundComp.toLocaleString('en-US') + ' TL</div><div style="color:var(--text-muted);font-size:0.82rem;margin-top:4px;">Refund Compensation (%15)</div></div>' +
+          '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;">' +
+          '<div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid var(--gold);"><div style="font-size:1.6rem;font-weight:700;color:var(--gold);">' + d.total_revenue.toLocaleString('en-US') + ' ₺</div><div style="color:var(--text-muted);font-size:0.8rem;margin-top:4px;">Total Revenue</div></div>' +
+          '<div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid #ef4444;"><div style="font-size:1.6rem;font-weight:700;color:#ef4444;">' + d.commission.toLocaleString('en-US') + ' ₺</div><div style="color:var(--text-muted);font-size:0.8rem;margin-top:4px;">Commission (%10)</div></div>' +
+          '<div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid #14b8a6;"><div style="font-size:1.6rem;font-weight:700;color:#14b8a6;">' + d.net_revenue.toLocaleString('en-US') + ' ₺</div><div style="color:var(--text-muted);font-size:0.8rem;margin-top:4px;">Net Income</div></div>' +
+          '<div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid #3b82f6;"><div style="font-size:1.6rem;font-weight:700;color:#3b82f6;">' + d.total_tickets + '</div><div style="color:var(--text-muted);font-size:0.8rem;margin-top:4px;">Tickets Sold</div></div>' +
+          '<div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid #8b5cf6;box-shadow:0 4px 20px rgba(139,92,246,0.15);"><div style="font-size:1.6rem;font-weight:700;background:linear-gradient(135deg,#8b5cf6,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">' + refundComp.toLocaleString('en-US') + ' ₺</div><div style="color:var(--text-muted);font-size:0.8rem;margin-top:4px;white-space:nowrap;">Refund Compensation (%15)</div></div>' +
           '</div>';
         var rows = '';
         var chartLabels = [];
@@ -945,10 +945,10 @@
             '<td style="padding:9px 12px;text-align:right;color:var(--text);">' + b.gross_revenue.toLocaleString('en-US') + ' TL</td>' +
             '<td style="padding:9px 12px;text-align:right;color:#ef4444;">-' + b.commission.toLocaleString('en-US') + ' TL</td>' +
             '<td style="padding:9px 12px;text-align:right;color:#14b8a6;">' + b.net_revenue.toLocaleString('en-US') + ' TL</td>' +
-            '<td style="padding:9px 12px;text-align:right;color:#a78bfa;font-weight:600;">' + (rc > 0 ? '+' + rc.toLocaleString('en-US') + ' TL' : '<span style="color:var(--text-muted);">—</span>') + '</td>' +
+            '<td style="padding:9px 12px;text-align:right;color:#a78bfa;font-weight:600;">' + (rc > 0 ? '+' + rc.toLocaleString('en-US') + ' TL' : '0 TL') + '</td>' +
             '</tr>';
         }
-        el2.innerHTML = '<div class="glass-panel" style="overflow:auto;margin-top:16px;"><table style="width:100%;border-collapse:collapse;font-size:0.85rem;"><thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left;padding:9px 12px;color:var(--text-muted);">Event</th><th style="text-align:right;padding:9px 12px;color:var(--text-muted);">Sales</th><th style="text-align:right;padding:9px 12px;color:var(--text-muted);">Gross</th><th style="text-align:right;padding:9px 12px;color:var(--text-muted);">Commission</th><th style="text-align:right;padding:9px 12px;color:var(--text-muted);">Net</th><th style="text-align:right;padding:9px 12px;color:#a78bfa;">Refund Comp.</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
+        el2.innerHTML = '<div class="glass-panel" style="overflow:auto;margin-top:16px;"><table style="width:100%;border-collapse:collapse;font-size:0.85rem;"><thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left;padding:9px 12px;color:var(--text-muted);">Event</th><th style="text-align:right;padding:9px 12px;color:var(--text-muted);">Sales</th><th style="text-align:right;padding:9px 12px;color:var(--text-muted);">Gross</th><th style="text-align:right;padding:9px 12px;color:var(--text-muted);">Commission</th><th style="text-align:right;padding:9px 12px;color:var(--text-muted);">Net</th><th style="text-align:right;padding:9px 12px;color:var(--text-muted);">Refund Comp.</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
         
         renderChart(chartLabels, chartNetData);
       })
