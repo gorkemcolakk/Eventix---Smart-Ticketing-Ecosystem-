@@ -16,7 +16,7 @@
     <div class="auth-card glass-panel animate-up">
       
       <div class="auth-header">
-        <a href="index.html" style="display: inline-block; margin-bottom: 10px; color: var(--text-muted); text-decoration: none; font-size: 0.8rem;">← Back to Home</a>
+        <a href="index.html" style="display: inline-block; margin-bottom: 10px; color: var(--text-muted); text-decoration: none; font-size: 0.8rem;">← {{ t('back') }}</a>
         <a href="index.html" class="auth-logo logo">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="url(#gradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <defs>
@@ -31,40 +31,40 @@
           </svg>
           <span style="font-size: 1.5rem; text-decoration: none; color: var(--text);">EVENT<span class="logo-highlight">IX</span></span>
         </a>
-        <h1 class="auth-title">Join Us</h1>
-        <p class="auth-subtitle">Create your account in seconds and start buying tickets.</p>
+        <h1 class="auth-title">{{ t('register_title') }}</h1>
+        <p class="auth-subtitle">{{ t('register_desc') }}</p>
       </div>
 
       <form class="auth-form" id="registerForm">
         <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
           <div>
-            <label class="form-label" for="firstName">First Name</label>
+            <label class="form-label" for="firstName">{{ t('first_name') }}</label>
             <input type="text" id="firstName" class="form-control" placeholder="Gorkem" required>
           </div>
           <div>
-            <label class="form-label" for="lastName">Last Name</label>
+            <label class="form-label" for="lastName">{{ t('last_name') }}</label>
             <input type="text" id="lastName" class="form-control" placeholder="Yilmaz" required>
           </div>
         </div>
 
         <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
           <div>
-            <label class="form-label" for="phone">Phone</label>
+            <label class="form-label" for="phone">{{ t('phone_number') }}</label>
             <input type="tel" id="phone" class="form-control" placeholder="05XX XXX XX XX" required>
           </div>
           <div>
-            <label class="form-label" for="birthdate">Birth Date</label>
+            <label class="form-label" for="birthdate">{{ t('birth_date') }}</label>
             <input type="date" id="birthdate" class="form-control" required>
           </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="email">Email Address</label>
+          <label class="form-label" for="email">{{ t('email_address') }}</label>
           <input type="email" id="email" class="form-control" placeholder="example@mail.com" required>
         </div>
 
         <div class="form-group" style="margin-bottom: 20px;">
-          <label class="form-label" for="password">Create Password</label>
+          <label class="form-label" for="password">{{ t('password') }}</label>
           <div class="password-input-wrapper">
             <input type="password" id="password" class="form-control" placeholder="Min. 8 characters" required minlength="8">
             <button type="button" class="password-toggle" onclick="togglePassword('password')">
@@ -74,19 +74,19 @@
         </div>
 
         <div class="form-group" style="margin-bottom:20px;">
-          <label class="form-label" for="role">Account Type</label>
+          <label class="form-label" for="role">{{ t('account_type') }}</label>
           <select id="role" class="form-control" style="appearance:none;background:var(--bg-card);color:var(--text);cursor:pointer;">
-            <option value="customer">🎟 Customer — I want to buy tickets</option>
-            <option value="organizer">🎪 Organizer — I want to organize events</option>
+            <option value="customer">🎟 {{ t('customer') }}</option>
+            <option value="organizer">🎪 {{ t('organizer') }}</option>
           </select>
         </div>
 
-        <button type="submit" class="btn btn-primary auth-submit">Create Free Account</button>
+        <button type="submit" class="btn btn-primary auth-submit">{{ t('register') }}</button>
       </form>
       <!-- Social login completely removed -->
 
       <div class="auth-footer">
-        Already have an account? <a href="login.html" class="auth-link">Login</a>
+        {{ t('already_have_account') }} <a href="login.html" class="auth-link">{{ t('login') }}</a>
       </div>
 
     </div>
@@ -101,6 +101,14 @@
         input.type = 'password';
       }
     }
+  </script>
+  <script>
+      document.addEventListener("DOMContentLoaded", () => {
+          const langLabel = document.getElementById('currentLangLabel');
+          if(langLabel) {
+              langLabel.textContent = "{{ current_lang | upper }}";
+          }
+      });
   </script>
   <script src="./scripts/auth.js"></script>
 </body>

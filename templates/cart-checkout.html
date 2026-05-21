@@ -21,6 +21,19 @@
     .choice-card { background:var(--bg-card); border:1px solid var(--border-color); border-radius: 16px; padding: 28px 20px; cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; }
     .choice-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.3); }
     .choice-title { font-size: 1.15rem; font-weight: 700; color:var(--text); }
+    /* Summary event card */
+    .sum-event-card { border:1px solid rgba(139,92,246,0.3); border-radius:14px; overflow:hidden; margin-bottom:18px; background: linear-gradient(135deg, rgba(139,92,246,0.06), rgba(236,72,153,0.04)); }
+    .sum-event-header { display:flex; gap:14px; align-items:center; padding:16px; border-bottom:1px solid rgba(255,255,255,0.07); }
+    .sum-event-img { width:64px; height:64px; object-fit:cover; border-radius:10px; flex-shrink:0; }
+    .sum-event-title { font-size:1.05rem; font-weight:700; color:var(--text); margin-bottom:4px; }
+    .sum-event-meta { font-size:0.78rem; color:var(--text-muted); display:flex; flex-direction:column; gap:2px; }
+    .sum-ticket-row { padding:10px 16px; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between; align-items:center; gap:10px; }
+    .sum-ticket-row:last-child { border-bottom:none; }
+    .sum-ticket-left { display:flex; flex-direction:column; gap:3px; }
+    .sum-ticket-name { font-size:0.9rem; font-weight:600; color:var(--text); }
+    .sum-ticket-seat { font-size:0.78rem; color:var(--accent-teal); font-weight:600; }
+    .sum-ticket-price { font-size:0.95rem; font-weight:700; color:var(--accent-purple); white-space:nowrap; }
+    .sum-totals-box { border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:18px 20px; background:rgba(0,0,0,0.2); }
     
     /* PDF Generation Styles */
     .pdf-container { position: absolute; left: -9999px; top: -9999px; width: 595px; background: white; color: black; font-family: 'Inter', sans-serif; }
@@ -61,97 +74,113 @@
         <div class="checkout-panel active" id="step-0">
           <div style="text-align:center; margin-bottom:8px;">
             <div style="font-size:2.5rem; margin-bottom:12px;">🎟️</div>
-            <h2 style="font-size:1.5rem; margin-bottom:8px;">How would you like to proceed?</h2>
+            <h2 style="font-size:1.5rem; margin-bottom:8px;">{{ t('how_to_proceed') }}</h2>
           </div>
           <div class="guest-choice-grid">
             <div class="choice-card" style="border-color: rgba(139,92,246,0.4);" onclick="window.location.href='login.html?redirect='+encodeURIComponent(window.location.href)">
               <div style="font-size: 2.5rem;">🔐</div>
-              <div class="choice-title">Login</div>
+              <div class="choice-title">{{ t('login') }}</div>
             </div>
             <div class="choice-card" style="border-color: rgba(45,212,191,0.3);" onclick="showStep('guest')">
               <div style="font-size: 2.5rem;">👤</div>
-              <div class="choice-title">Continue as Guest</div>
+              <div class="choice-title">{{ t('continue_as_guest') }}</div>
             </div>
           </div>
         </div>
 
         <!-- STEP GUEST -->
         <div class="checkout-panel" id="step-guest">
-          <h2 style="margin-bottom:6px; font-size:1.4rem;">Guest Information</h2>
+          <h2 style="margin-bottom:6px; font-size:1.4rem;">{{ t('guest_information') }}</h2>
           <div style="display:flex; flex-direction:column; gap:16px;">
             <div style="display:flex; gap:12px;">
-              <div style="flex:1;"><label class="form-label">Name</label><input type="text" id="gName" class="form-control"></div>
-              <div style="flex:1;"><label class="form-label">Surname</label><input type="text" id="gSurname" class="form-control"></div>
+              <div style="flex:1;"><label class="form-label">{{ t('name_label') }}</label><input type="text" id="gName" class="form-control" placeholder="{{ t('name_placeholder') }}"></div>
+              <div style="flex:1;"><label class="form-label">{{ t('surname_label') }}</label><input type="text" id="gSurname" class="form-control" placeholder="{{ t('surname_placeholder') }}"></div>
             </div>
-            <div><label class="form-label">Email</label><input type="email" id="gEmail" class="form-control"></div>
+            <div><label class="form-label">{{ t('email_label') }}</label><input type="email" id="gEmail" class="form-control" placeholder="{{ t('email_placeholder') }}"></div>
           </div>
           <div class="checkout-actions">
-            <button class="btn btn-outline" onclick="showStep('choice')">Back</button>
-            <button class="btn btn-primary" onclick="confirmGuest()">Continue</button>
+            <button class="btn btn-outline" onclick="showStep('choice')">{{ t('go_back') }}</button>
+            <button class="btn btn-primary" onclick="confirmGuest()">{{ t('continue_btn') }}</button>
           </div>
         </div>
 
         <!-- STEP ATTENDEES -->
         <div class="checkout-panel" id="step-attendees">
-          <h2 style="margin-bottom: 20px; font-size: 1.5rem;">Ticket Holders</h2>
+          <h2 style="margin-bottom: 20px; font-size: 1.5rem;">{{ t('ticket_holders') }}</h2>
           <div id="attFormsContainer" style="display:flex; flex-direction:column; gap:20px;"></div>
           <div class="checkout-actions">
-            <button class="btn btn-primary" onclick="generateSummary()">Go to Summary &rarr;</button>
+            <button class="btn btn-primary" onclick="generateSummary()">{{ t('go_to_summary') }} &rarr;</button>
           </div>
         </div>
 
         <!-- STEP SUMMARY -->
         <div class="checkout-panel" id="step-summary">
-          <h2 style="margin-bottom: 6px; font-size: 1.5rem;">Order Summary</h2>
-          <div class="summary-box" id="sumList"></div>
-          <div class="summary-box">
-             <div class="summary-row total"><span>Total To Pay</span><span id="sumTotal" style="color:var(--accent-teal);"></span></div>
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+            <div style="width:36px; height:36px; background:rgba(139,92,246,0.2); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.1rem;">📋</div>
+            <div>
+              <h2 style="margin:0; font-size:1.4rem;">{{ t('order_summary') }}</h2>
+              <p style="margin:2px 0 0; font-size:0.8rem; color:var(--text-muted);">{{ t('review_before_payment') }}</p>
+            </div>
           </div>
+
+          <div id="sumList"></div>
+
+          <div class="sum-totals-box">
+            <div id="discountRow" style="display:none; justify-content:space-between; margin-bottom:10px; color:#6ee7b7; font-size:0.9rem;">
+              <span>🏷️ {{ t('discount') }}</span>
+              <span id="discountDisplay"></span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:1.1rem; font-weight:700;">{{ t('total_to_pay') }}</span>
+              <span id="sumTotal" style="font-size:1.4rem; font-weight:800; color:var(--accent-teal);"></span>
+            </div>
+          </div>
+
           <div class="checkout-actions">
-            <button class="btn btn-outline" id="summaryBackBtn" onclick="showStep('attendees')">Back</button>
-            <button class="btn btn-primary" onclick="showStep(2); generateSummary(true);">Go to Payment 💳</button>
+            <button class="btn btn-outline" id="summaryBackBtn" onclick="showStep('attendees')">{{ t('go_back') }}</button>
+            <button class="btn btn-primary" onclick="showStep(2); generateSummary(true);">{{ t('go_to_payment') }} 💳</button>
           </div>
         </div>
 
         <!-- STEP PAYMENT -->
         <div class="checkout-panel" id="step-2">
-          <h2 style="margin-bottom: 20px; font-size: 1.5rem;">Card Details</h2>
+          <h2 style="margin-bottom: 20px; font-size: 1.5rem;">{{ t('card_details') }}</h2>
           
           <div class="summary-box" style="padding: 15px 20px; margin-bottom: 20px;">
             <div style="display:flex;gap:10px;margin-bottom:15px;align-items:center;">
-               <input type="text" id="promoCodeInput" class="form-control" placeholder="Promo Code" style="text-transform:uppercase;flex:1;">
-               <button type="button" class="btn btn-outline" style="padding:10px 15px;" onclick="applyPromo()">Apply</button>
+               <input type="text" id="promoCodeInput" class="form-control" placeholder="{{ t('promo_code_placeholder') }}" style="text-transform:uppercase;flex:1;">
+               <button type="button" class="btn btn-outline" style="padding:10px 15px;" onclick="applyPromo()">{{ t('apply_promo') }}</button>
             </div>
             <div id="promoMessage" style="font-size:0.85rem;margin-bottom:10px;"></div>
             <div class="summary-row total" style="border-top:1px solid rgba(255,255,255,0.1); padding-top:15px; margin:0;">
-              <span>Amount to Pay</span>
+              <span>{{ t('amount_to_pay') }}</span>
               <span id="finalTotal" style="color:var(--accent-teal);">0 ₺</span>
             </div>
           </div>
 
           <form id="paymentForm">
             <div class="form-group">
-              <label class="form-label">Name on Card</label>
+              <label class="form-label">{{ t('name_on_card') }}</label>
               <input type="text" id="cName" class="form-control" placeholder="e.g.: John Doe" required>
             </div>
             <div class="form-group" style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:15px;">
               <div>
-                <label class="form-label">Card Number</label>
+                <label class="form-label">{{ t('card_number') }}</label>
                 <input type="text" id="cNum" class="form-control" placeholder="0000 0000 0000 0000" maxlength="19" required oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\d{4})(?=\d)/g, '$1 ');">
               </div>
               <div>
-                <label class="form-label">Expiry Date</label>
+                <label class="form-label">{{ t('expiry_date') }}</label>
                 <input type="text" id="cExp" class="form-control" placeholder="MM/YY" maxlength="5" required oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/^([2-9])$/g, '0$1').replace(/^(1[3-9])$/g, '01').replace(/^([0-1][0-9])([0-9]{1,2})$/g, '$1/$2');">
               </div>
               <div>
-                <label class="form-label">CVC</label>
+                <label class="form-label">{{ t('cvc') }}</label>
                 <input type="text" id="cCVC" class="form-control" placeholder="123" maxlength="4" required>
               </div>
             </div>
             
             <div class="checkout-actions">
-              <button type="button" class="btn btn-outline" onclick="showStep('summary')">← Back</button>
-              <button type="submit" class="btn btn-primary" id="payBtn">Complete Payment 🔒</button>
+              <button type="button" class="btn btn-outline" onclick="showStep('summary')">← {{ t('go_back') }}</button>
+              <button type="submit" class="btn btn-primary" id="payBtn">{{ t('complete_payment') }} 🔒</button>
             </div>
           </form>
         </div>
@@ -161,8 +190,8 @@
           <div class="checkout-step-icon">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
           </div>
-          <h2 style="margin-bottom: 10px; font-size: 1.75rem;">Payment Successful!</h2>
-          <p style="color:var(--text-muted); margin-bottom: 24px;">Your payment has been processed and your tickets are ready.</p>
+          <h2 style="margin-bottom: 10px; font-size: 1.75rem;">{{ t('payment_successful') }}</h2>
+          <p style="color:var(--text-muted); margin-bottom: 24px;">{{ t('payment_success_desc') }}</p>
           
           <div id="qrsContainer" style="display:flex; flex-wrap:wrap; gap:20px; justify-content:center; margin-bottom:20px;"></div>
           <div id="extraTicketsMsg" style="margin-bottom:20px;"></div>
@@ -171,13 +200,13 @@
           <div id="pdfDownloadRow" style="display:none; justify-content:center; margin-bottom:20px;">
             <button id="pdfDownloadBtn" onclick="downloadAllTicketsPDF()" class="btn btn-primary" style="gap:8px; padding: 12px 28px; background: linear-gradient(135deg,#10b981,#059669); border-color:#10b981;">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Download All Tickets as PDF
+              {{ t('download_pdf') }}
             </button>
           </div>
 
           <div class="checkout-actions" style="justify-content: center; margin-top:20px;">
-            <a href="dashboard.html" class="btn btn-primary" id="dashLink" style="flex:none; width:200px;">Go to My Tickets</a>
-            <a href="index.html" class="btn btn-outline" style="flex:none; width:200px;">Back to Homepage</a>
+            <a href="dashboard.html" class="btn btn-primary" id="dashLink" style="flex:none; width:200px;">{{ t('go_to_my_tickets') }}</a>
+            <a href="index.html" class="btn btn-outline" style="flex:none; width:200px;">{{ t('back_to_homepage') }}</a>
           </div>
         </div>
 
@@ -190,47 +219,47 @@
     <div class="pdf-ticket">
       <div class="pdf-header">
         <div class="pdf-logo">EVENT <span style="color:#fcd34d;">IX</span></div>
-        <div style="font-size:10px; margin-top:5px; opacity:0.9; font-weight:600;">OFFICIAL E-TICKET & CONFIRMATION</div>
+        <div style="font-size:10px; margin-top:5px; opacity:0.9; font-weight:600;">{{ t('official_eticket') }}</div>
       </div>
       <div class="pdf-body">
         <div class="pdf-title" id="pdfEventTitle">Event Name</div>
         <div class="pdf-info-grid">
           <div>
             <div class="pdf-field">
-              <div class="pdf-label">Date & Time</div>
+              <div class="pdf-label">{{ t('date_and_time') }}</div>
               <div class="pdf-value" id="pdfEventDate">...</div>
             </div>
             <div class="pdf-field">
-              <div class="pdf-label">Location</div>
+              <div class="pdf-label">{{ t('location') }}</div>
               <div class="pdf-value" id="pdfEventLocation">...</div>
             </div>
             <div class="pdf-field">
-              <div class="pdf-label">Attendee</div>
+              <div class="pdf-label">{{ t('attendee') }}</div>
               <div class="pdf-value" id="pdfAttendeeName">...</div>
             </div>
             <div class="pdf-field" id="pdfSeatField" style="display:none;">
-              <div class="pdf-label">Seat</div>
+              <div class="pdf-label">{{ t('seat') }}</div>
               <div class="pdf-value" id="pdfSeatInfo">-</div>
             </div>
             <div class="pdf-field">
-              <div class="pdf-label">Price</div>
+              <div class="pdf-label">{{ t('price') }}</div>
               <div class="pdf-value" id="pdfTicketPrice">...</div>
             </div>
           </div>
           <div class="pdf-qr-box">
             <img src="" id="pdfQrImage" class="pdf-qr-img" alt="QR Code">
-            <div class="pdf-label" style="margin-top:10px;">Ticket Key</div>
+            <div class="pdf-label" style="margin-top:10px;">{{ t('ticket_key') }}</div>
             <div style="font-family:monospace; font-weight:700; font-size:14px; letter-spacing:1px; color:#111; margin-top:5px;" id="pdfTicketKey">XXXX-XXXX</div>
           </div>
         </div>
         
         <div style="margin-top:40px; padding:20px; background:#f5f3ff; border-radius:12px; border:1px solid #ddd; text-align:center;">
-           <span style="display:block; font-size:10px; color:#7c3aed; font-weight:700; margin-bottom:5px; text-transform:uppercase;">IMPORTANT NOTE</span>
-           <span style="font-size:12px; color:#4b5563;">This ticket is personal. Please have the QR code scanned by the attendant at entry.</span>
-        </div>
+           <span style="display:block; font-size:10px; color:#7c3aed; font-weight:700; margin-bottom:5px; text-transform:uppercase;">{{ t('important_note') }}</span>
+           <span style="font-size:12px; color:#4b5563;">{{ t('ticket_is_personal') }}</span>
+         </div>
       </div>
       <div class="pdf-footer">
-        This document has been automatically generated by the EVENTIX Ticketing Platform.<br>It is protected against forgery. © 2026
+        {{ t('pdf_footer') | safe }}
       </div>
     </div>
   </div>
@@ -311,9 +340,9 @@
         cart.forEach((item, cIdx) => {
             cont.innerHTML += `<h3 style="margin-bottom:5px;">${item.title} (${item.qty} tickets)</h3>`;
             if(item.has_seating && (!item.tickets_info || item.tickets_info.length === 0 || !item.tickets_info[0].seat_id)) {
-                cont.innerHTML += `<p style="font-size:12px; color:#c4b5fd; margin-bottom:10px;">Seats will be assigned automatically for cart checkouts.</p>`;
+                cont.innerHTML += `<p style="font-size:12px; color:#c4b5fd; margin-bottom:10px;">{{ t('seats_assigned_auto') }}</p>`;
             } else if (item.has_seating && item.tickets_info && item.tickets_info[0].seat_id) {
-                cont.innerHTML += `<p style="font-size:12px; color:#10b981; margin-bottom:10px;">Seats successfully reserved for 10 minutes.</p>`;
+                cont.innerHTML += `<p style="font-size:12px; color:#10b981; margin-bottom:10px;">{{ t('seats_reserved_10m') }}</p>`;
             }
 
             for(let i=0; i<item.qty; i++) {
@@ -328,7 +357,7 @@
                 
                 cont.innerHTML += `
                     <div style="background:var(--bg-surface); padding:15px; border-radius:8px; border:1px solid var(--border-color);" class="att-form" data-cidx="${cIdx}" data-seat="${sid}">
-                        ${sid ? `<div style="margin-bottom:8px; font-size:0.8rem; color:var(--accent-purple);">Reserved Seat ID: ${sid}</div>` : ''}
+                        ${sid ? `<div style="margin-bottom:8px; font-size:0.8rem; color:var(--accent-purple);">{{ t('reserved_seat_id') }} ${sid}</div>` : ''}
                         <div style="display:flex; gap:10px;">
                             <div style="flex:1;"><input type="text" class="form-control a-name" placeholder="Name" value="${preName}" required></div>
                             <div style="flex:1;"><input type="text" class="form-control a-surname" placeholder="Surname" value="${preSurname}" required></div>
@@ -345,18 +374,63 @@
         forms.forEach(f => {
             if(!f.querySelector('.a-name').value || !f.querySelector('.a-surname').value) allValid = false;
         });
-        if(!allValid) return alert('Please enter all names');
+        if(!allValid) return alert("{{ t('enter_all_names') }}");
+
+        // Collect current attendee names from forms
+        const formData = [];
+        forms.forEach(f => {
+            formData.push({
+                cidx: parseInt(f.dataset.cidx),
+                seat: f.dataset.seat,
+                seatLabel: f.dataset.seatLabel || '',
+                name: f.querySelector('.a-name').value,
+                surname: f.querySelector('.a-surname').value
+            });
+        });
 
         const sumList = document.getElementById('sumList');
         sumList.innerHTML = '';
-        let t = 0;
-        cart.forEach(item => {
-            const m = item.price * item.qty;
-            t += m;
-            sumList.innerHTML += `<div class="summary-row"><span>${item.qty}x ${item.title}</span><span>${m.toLocaleString()} ₺</span></div>`;
+        let totalRaw = 0;
+
+        cart.forEach((item, cIdx) => {
+            const itemTotal = item.totalPrice != null ? item.totalPrice : (item.price * item.qty);
+            totalRaw += itemTotal;
+
+            const tickets = formData.filter(f => f.cidx === cIdx);
+
+            const fDate = ds => { try { const d = new Date(ds); return isNaN(d) ? ds : d.toLocaleDateString('{{ current_lang }}' === 'tr' ? 'tr-TR' : ('{{ current_lang }}' === 'de' ? 'de-DE' : 'en-US'), {day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'}); } catch { return ds; } };
+
+            const ticketRowsHtml = tickets.map(tk => {
+                const seatLabel = tk.seatLabel || (item.tickets_info && item.tickets_info[tk.formIdx] ? item.tickets_info[tk.formIdx].seatLabel : '') || '';
+                const seatDisplay = seatLabel ? `<span class="sum-ticket-seat">🪑 ${seatLabel}</span>` : '';
+                return `
+                    <div class="sum-ticket-row">
+                        <div class="sum-ticket-left">
+                            <span class="sum-ticket-name">👤 ${tk.name} ${tk.surname}</span>
+                            ${seatDisplay}
+                        </div>
+                        <span class="sum-ticket-price">${item.price.toLocaleString()} ₺</span>
+                    </div>`;
+            }).join('');
+
+            sumList.innerHTML += `
+                <div class="sum-event-card">
+                    <div class="sum-event-header">
+                        <img class="sum-event-img" src="${item.image || ''}" alt="" onerror="this.style.display='none'">
+                        <div style="flex:1; min-width:0;">
+                            <div class="sum-event-title">${item.title}</div>
+                            <div class="sum-event-meta">
+                                ${item.date ? `<span>📅 ${fDate(item.date)}</span>` : ''}
+                                ${item.location ? `<span>📍 ${item.location}</span>` : ''}
+                            </div>
+                        </div>
+                        <div style="font-size:1rem; font-weight:800; color:var(--accent-purple); white-space:nowrap; margin-left:8px;">${itemTotal.toLocaleString()} ₺</div>
+                    </div>
+                    ${ticketRowsHtml}
+                </div>`;
         });
-        
-        let finalVal = t;
+
+        let finalVal = totalRaw;
         if (currentDiscount.type === 'percentage') {
             finalVal -= Math.floor(finalVal * currentDiscount.value / 100);
         } else if (currentDiscount.type === 'fixed') {
@@ -364,16 +438,36 @@
         }
         if(finalVal < 0) finalVal = 0;
 
-        document.getElementById('sumTotal').textContent = t.toLocaleString() + ' ₺';
-        
+        // Show discount row if applicable
+        const discRow = document.getElementById('discountRow');
+        const discDisplay = document.getElementById('discountDisplay');
+        if (discRow && discDisplay) {
+            if (finalVal !== totalRaw) {
+                const saved = totalRaw - finalVal;
+                discDisplay.textContent = '- ' + saved.toLocaleString() + ' ₺';
+                discRow.style.display = 'flex';
+            } else {
+                discRow.style.display = 'none';
+            }
+        }
+
+        // Main total display
+        const sumTotalEl = document.getElementById('sumTotal');
+        if (finalVal !== totalRaw) {
+            sumTotalEl.innerHTML = `<span style="text-decoration:line-through;font-size:0.9rem;color:var(--text-muted);margin-right:8px;">${totalRaw.toLocaleString()} ₺</span>${finalVal.toLocaleString()} ₺`;
+        } else {
+            sumTotalEl.textContent = totalRaw.toLocaleString() + ' ₺';
+        }
+
         const finalTotalEl = document.getElementById('finalTotal');
         if(finalTotalEl) {
-            if(finalVal !== t) {
-                finalTotalEl.innerHTML = `<span style="text-decoration:line-through;font-size:0.9rem;color:var(--text-muted);margin-right:10px;">${t.toLocaleString()} ₺</span>${finalVal.toLocaleString()} ₺`;
+            if(finalVal !== totalRaw) {
+                finalTotalEl.innerHTML = `<span style="text-decoration:line-through;font-size:0.9rem;color:var(--text-muted);margin-right:10px;">${totalRaw.toLocaleString()} ₺</span>${finalVal.toLocaleString()} ₺`;
             } else {
                 finalTotalEl.textContent = finalVal.toLocaleString() + ' ₺';
             }
         }
+
         if (!stayOnStep) {
             showStep('summary');
         }
@@ -382,7 +476,7 @@
     document.getElementById('paymentForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('payBtn');
-        btn.disabled = true; btn.textContent = 'Processing...';
+        btn.disabled = true; btn.textContent = "{{ t('processing') }}";
 
         const forms = document.querySelectorAll('.att-form');
         let cartPayload = [];
@@ -466,11 +560,11 @@
             } else {
                 const err = await res.json();
                 alert(err.message);
-                btn.disabled = false; btn.textContent = 'Complete Payment 🔒';
+                btn.disabled = false; btn.textContent = '{{ t('complete_payment') }} 🔒';
             }
         } catch(e) {
             alert('Error connecting to server.');
-            btn.disabled = false; btn.textContent = 'Complete Payment 🔒';
+            btn.disabled = false; btn.textContent = '{{ t('complete_payment') }} 🔒';
         }
     });
 
@@ -480,7 +574,7 @@
         const msgCont = document.getElementById('promoMessage');
         if(!code) return;
         
-        msgCont.innerHTML = '<span style="color:var(--text-muted);">Checking...</span>';
+        msgCont.innerHTML = `<span style="color:var(--text-muted);">{{ t('checking') }}</span>`;
         
         // Just pick the first event in cart to validate
         if(cart.length === 0) return;
@@ -496,15 +590,15 @@
             
             if(r.ok && j.valid) {
                 currentDiscount = { type: j.discount_type, value: j.discount_value };
-                msgCont.innerHTML = `<span style="color:#6ee7b7;">Promo valid! ${j.discount_type === 'percentage' ? '%'+j.discount_value : j.discount_value+' ₺'} discount.</span>`;
+                msgCont.innerHTML = `<span style="color:#6ee7b7;">{{ t('promo_valid') }} ${j.discount_type === 'percentage' ? '%'+j.discount_value : j.discount_value+' ₺'} discount.</span>`;
                 generateSummary(true); // Recalculate
             } else {
                 currentDiscount = { type: null, value: 0 };
-                msgCont.innerHTML = `<span style="color:#ef4444;">Invalid or not applicable promo code.</span>`;
+                msgCont.innerHTML = `<span style="color:#ef4444;">{{ t('invalid_promo') }}</span>`;
                 generateSummary(true);
             }
         } catch(e) {
-            msgCont.innerHTML = `<span style="color:#ef4444;">Error checking code.</span>`;
+            msgCont.innerHTML = `<span style="color:#ef4444;">{{ t('error_checking_code') }}</span>`;
         }
     }
 
@@ -530,7 +624,7 @@
       
       const msg = document.getElementById('extraTicketsMsg');
       if (tickets.length > maxDisplay) {
-        msg.textContent = `+ ${tickets.length - maxDisplay} more tickets generated. Check your dashboard or download the PDF.`;
+        msg.textContent = `+ ${tickets.length - maxDisplay} {{ t('more_tickets_generated') }}`;
       } else {
         msg.textContent = '';
       }
@@ -541,13 +635,14 @@
       const tDiv = document.createElement('div');
       tDiv.innerHTML = tmpl;
       
-      const fDate = d => { try { return new Date(d).toLocaleDateString("en-US", {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'}); } catch { return d; } };
+      const langCode = "{{ current_lang }}" === 'tr' ? 'tr-TR' : ("{{ current_lang }}" === 'de' ? 'de-DE' : 'en-US');
+      const fDate = d => { try { return new Date(d).toLocaleDateString(langCode, {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'}); } catch { return d; } };
       
       tDiv.querySelector('#pdfEventTitle').textContent = ticket.eventTitle;
       tDiv.querySelector('#pdfEventDate').textContent = ticket.eventDate ? fDate(ticket.eventDate) : '-';
       tDiv.querySelector('#pdfEventLocation').textContent = ticket.eventLocation || '-';
       tDiv.querySelector('#pdfAttendeeName').textContent = ticket.name + ' ' + ticket.surname;
-      tDiv.querySelector('#pdfTicketPrice').textContent = ticket.price + ' ₺';
+      tDiv.querySelector('#pdfTicketPrice').textContent = (ticket.price ? ticket.price.toLocaleString(langCode) : '0') + ' ₺';
       tDiv.querySelector('#pdfTicketKey').textContent = ticket.ticket_key;
       tDiv.querySelector('#pdfQrImage').src = ticket.qr_code;
       
@@ -565,7 +660,7 @@
 
       const btn = document.getElementById('pdfDownloadBtn');
       const ogText = btn.innerHTML;
-      btn.innerHTML = 'Generating PDF... Please wait';
+      btn.innerHTML = "{{ t('generating_pdf') }}";
       btn.disabled = true;
 
       let combinedHtml = '<div style="background:white;width:595px;margin:0 auto;">';
@@ -590,9 +685,16 @@
         alert('An error occurred while generating the PDF.');
       }
       
-      btn.disabled = false;
       btn.innerHTML = ogText;
     }
+  </script>
+  <script>
+      document.addEventListener("DOMContentLoaded", () => {
+          const langLabel = document.getElementById('currentLangLabel');
+          if(langLabel) {
+              langLabel.textContent = "{{ current_lang | upper }}";
+          }
+      });
   </script>
 </body>
 </html>

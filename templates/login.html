@@ -16,7 +16,7 @@
     <div class="auth-card glass-panel animate-up">
       
       <div class="auth-header">
-        <a href="index.html" style="display: inline-block; margin-bottom: 10px; color: var(--text-muted); text-decoration: none; font-size: 0.8rem;">← Back to Home</a>
+        <a href="index.html" style="display: inline-block; margin-bottom: 10px; color: var(--text-muted); text-decoration: none; font-size: 0.8rem;">← {{ t('back') }}</a>
         <a href="index.html" class="auth-logo logo">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="url(#gradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <defs>
@@ -31,34 +31,34 @@
           </svg>
           <span style="font-size: 1.5rem; text-decoration: none; color: var(--text);">EVENT<span class="logo-highlight">IX</span></span>
         </a>
-        <h1 class="auth-title">Welcome Back!</h1>
-        <p class="auth-subtitle">Login to access your event keys.</p>
+        <h1 class="auth-title">{{ t('welcome_back') }}</h1>
+        <p class="auth-subtitle">{{ t('login_desc') }}</p>
       </div>
 
       <form class="auth-form" id="loginForm">
         <div class="form-group">
-          <label class="form-label" for="email">Email Address</label>
+          <label class="form-label" for="email">{{ t('email_address') }}</label>
           <input type="email" id="email" class="form-control" placeholder="example@mail.com" required>
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="password">Password</label>
+          <label class="form-label" for="password">{{ t('password') }}</label>
           <div class="password-input-wrapper">
             <input type="password" id="password" class="form-control" placeholder="••••••••" required>
             <button type="button" class="password-toggle" onclick="togglePassword('password')">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
             </button>
           </div>
-          <a href="#" class="forgot-password">Forgot Password</a>
+          <a href="#" class="forgot-password">{{ t('forgot_password') }}</a>
         </div>
 
-        <button type="submit" class="btn btn-primary auth-submit">Login</button>
+        <button type="submit" class="btn btn-primary auth-submit">{{ t('login') }}</button>
       </form>
 
       <!-- Social Login Removed as per request -->
 
       <div class="auth-footer">
-        Don't have an account? <a href="register.html" class="auth-link">Register</a>
+        {{ t('dont_have_account') }} <a href="register.html" class="auth-link">{{ t('register') }}</a>
       </div>
 
     </div>
@@ -73,6 +73,14 @@
         input.type = 'password';
       }
     }
+  </script>
+  <script>
+      document.addEventListener("DOMContentLoaded", () => {
+          const langLabel = document.getElementById('currentLangLabel');
+          if(langLabel) {
+              langLabel.textContent = "{{ current_lang | upper }}";
+          }
+      });
   </script>
   <script src="./scripts/auth.js"></script>
 </body>

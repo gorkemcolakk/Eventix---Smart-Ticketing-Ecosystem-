@@ -608,19 +608,19 @@
         <div class="checkout-panel" id="step-0">
           <div style="text-align:center; margin-bottom:8px;">
             <div style="font-size:2.5rem; margin-bottom:12px;">🎟️</div>
-            <h2 style="font-size:1.5rem; margin-bottom:8px;">How would you like to proceed?</h2>
+            <h2 style="font-size:1.5rem; margin-bottom:8px;">{{ t('how_to_proceed') }}</h2>
             <p style="color:var(--text-muted); font-size:0.9rem;">To purchase a ticket, you can log in or continue as a guest.</p>
           </div>
           <div class="guest-choice-grid">
             <div class="choice-card login-card" onclick="window.location.href='login.html?redirect='+encodeURIComponent(window.location.href)">
               <div class="choice-icon">🔐</div>
-              <div class="choice-title">Login</div>
+              <div class="choice-title">{{ t('login') }}</div>
               <div class="choice-desc">Log in to your account and track your tickets in the 'My Tickets' section.</div>
               <a href="register.html" onclick="event.stopPropagation()" style="font-size:0.78rem; color:var(--accent-purple); margin-top:4px;">Don't have an account? Register</a>
             </div>
             <div class="choice-card guest-card" onclick="showGuestInfoStep()">
               <div class="choice-icon">👤</div>
-              <div class="choice-title">Continue as Guest</div>
+              <div class="choice-title">{{ t('continue_as_guest') }}</div>
               <div class="choice-desc">Purchase without creating an account. Tickets will be sent to your email address.</div>
             </div>
           </div>
@@ -628,28 +628,28 @@
 
         <!-- STEP GUEST: Guest Info -->
         <div class="checkout-panel" id="step-guest">
-          <h2 style="margin-bottom:6px; font-size:1.4rem;">Guest Information</h2>
+          <h2 style="margin-bottom:6px; font-size:1.4rem;">{{ t('guest_information') }}</h2>
           <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:20px;">Your tickets will be sent to this email address.</p>
           <div style="display:flex; flex-direction:column; gap:16px;">
             <div style="display:flex; gap:12px; flex-wrap:wrap;">
               <div style="flex:1; min-width:140px;">
-                <label class="form-label">Name</label>
-                <input type="text" id="guestName" class="form-control" placeholder="Your name" autocomplete="given-name">
+                <label class="form-label">{{ t('name_label') }}</label>
+                <input type="text" id="guestName" class="form-control" placeholder="{{ t('name_placeholder') }}" autocomplete="given-name">
               </div>
               <div style="flex:1; min-width:140px;">
-                <label class="form-label">Surname</label>
-                <input type="text" id="guestSurname" class="form-control" placeholder="Your surname" autocomplete="family-name">
+                <label class="form-label">{{ t('surname_label') }}</label>
+                <input type="text" id="guestSurname" class="form-control" placeholder="{{ t('surname_placeholder') }}" autocomplete="family-name">
               </div>
             </div>
             <div>
-              <label class="form-label">Email Address</label>
-              <input type="email" id="guestEmail" class="form-control" placeholder="example@mail.com" autocomplete="email">
+              <label class="form-label">{{ t('email_address') }}</label>
+              <input type="email" id="guestEmail" class="form-control" placeholder="{{ t('email_placeholder') }}" autocomplete="email">
               <p style="font-size:0.75rem; color:var(--text-muted); margin-top:6px;">⚠️ Your tickets will be sent to this address. Make sure it's correct.</p>
             </div>
           </div>
           <div class="checkout-actions" style="margin-top:24px;">
-            <button class="btn btn-outline" onclick="showStep('choice')">← Back</button>
-            <button class="btn btn-primary" onclick="confirmGuestInfo()">Continue →</button>
+            <button class="btn btn-outline" onclick="showStep('choice')">← {{ t('go_back') }}</button>
+            <button class="btn btn-primary" onclick="confirmGuestInfo()">{{ t('continue_btn') }} →</button>
           </div>
         </div>
         <!-- STEP 1: Selection -->
@@ -658,7 +658,7 @@
 
           <!-- NON-SEATING: Simple layout -->
           <div id="eventContentSimple" style="display:none;">
-            <h2 style="margin-bottom: 20px; font-size: 1.5rem;">Ticket Selection</h2>
+            <h2 style="margin-bottom: 20px; font-size: 1.5rem;">{{ t('ticket_selection') }}</h2>
             <div class="event-preview">
               <img id="evImgSimple" src="" alt="Event Image" style="width:80px;height:80px;border-radius:10px;object-fit:cover;">
               <div>
@@ -668,17 +668,17 @@
               </div>
             </div>
             <div class="summary-box">
-              <div class="summary-row"><span>Unit Price</span><span id="evPriceSimple">0 ₺</span></div>
+              <div class="summary-row"><span>{{ t('unit_price') }}</span><span id="evPriceSimple">0 ₺</span></div>
               <div class="summary-row" style="align-items:center; margin-top:12px;">
-                <span>Quantity</span>
+                <span>{{ t('quantity') }}</span>
                 <input type="number" id="ticketQuantity" class="form-control" value="1" min="1" max="10" style="width:100px; text-align:center;">
               </div>
               <div class="summary-row total"><span>Subtotal</span><span id="evTotalSimple">0 ₺</span></div>
             </div>
-            <p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">100% Secure Payment Infrastructure</p>
+            <p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">{{ t('secure_payment') }}</p>
             <div class="checkout-actions">
-              <button class="btn btn-outline" onclick="history.back()">Go Back</button>
-              <button class="btn btn-primary" id="goStepAttendeeSimple">Continue &rarr;</button>
+              <button class="btn btn-outline" onclick="history.back()">{{ t('go_back') }}</button>
+              <button class="btn btn-primary" id="goStepAttendeeSimple">{{ t('continue_btn') }} &rarr;</button>
             </div>
           </div>
 
@@ -688,7 +688,7 @@
 
               <!-- LEFT: Seat Grid -->
               <div class="seat-left-panel">
-                <h2 style="margin-bottom:16px; font-size:1.4rem;" id="seatingStepTitle">Select Your Category</h2>
+                <h2 style="margin-bottom:16px; font-size:1.4rem;" id="seatingStepTitle">{{ t('category_selection') }}</h2>
                 <div id="reservationTimerBox" style="display:none; margin-bottom:16px;">
                   <span style="font-size:1.5rem;">⏳</span>
                   <div>
@@ -735,29 +735,29 @@
                   <div id="srpSeatsList"></div>
                 </div>
 
-                <!-- Order Summary -->
+                <!-- {{ t('order_summary') }} -->
                 <div class="srp-card" id="srpOrderCard" style="display:none;">
-                  <div style="font-size:0.82rem; font-weight:700; color:var(--text); margin-bottom:10px;">Order Summary</div>
+                  <div style="font-size:0.82rem; font-weight:700; color:var(--text); margin-bottom:10px;">{{ t('order_summary') }}</div>
                   <div id="srpOrderRows"></div>
                   <div class="srp-row total">
-                    <span>Total</span>
+                    <span>{{ t('total') }}</span>
                     <span id="srpTotal">0 ₺</span>
                   </div>
                 </div>
 
-                <!-- Unit Price (when no seats selected yet) -->
+                <!-- {{ t('unit_price') }} (when no seats selected yet) -->
                 <div class="srp-card" id="srpPriceCard">
                   <div class="srp-row" style="margin-bottom:0;">
-                    <span>Unit Price</span>
+                    <span>{{ t('unit_price') }}</span>
                     <span id="evPrice" style="color:var(--text); font-weight:700;">0 ₺</span>
                   </div>
                 </div>
 
                 <!-- Continue Button -->
                 <button class="srp-pay-btn" id="goStepAttendee" disabled>
-                  Continue to Attendees &rarr;
+                  {{ t('continue_to_attendees') }} &rarr;
                 </button>
-                <p style="font-size:0.72rem; color:var(--text-muted); text-align:center; margin-top:-6px;">🔒 100% Secure Payment Infrastructure</p>
+                <p style="font-size:0.72rem; color:var(--text-muted); text-align:center; margin-top:-6px;">🔒 {{ t('secure_payment') }}</p>
 
               </div>
             </div>
@@ -766,28 +766,28 @@
 
         <!-- STEP - ATTENDEES (Intermediate) -->
         <div class="checkout-panel" id="step-attendees">
-          <h2 style="margin-bottom: 20px; font-size: 1.5rem;">Ticket Holders</h2>
+          <h2 style="margin-bottom: 20px; font-size: 1.5rem;">{{ t('ticket_holders') }}</h2>
           <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 20px;">
-            Please enter the full name for each ticket.
+            {{ t('please_enter_full_name') }}
           </p>
           <div id="attendeesFormsContainer" style="display:flex; flex-direction:column; gap:20px; margin-bottom: 20px;">
              <!-- Will be filled dynamically -->
           </div>
           <div class="checkout-actions">
-            <button class="btn btn-outline" onclick="showStep(1)">Back</button>
-            <button class="btn btn-primary" id="goStep2FromAttendees">Go to Order Summary &rarr;</button>
+            <button class="btn btn-outline" onclick="showStep(1)">{{ t('go_back') }}</button>
+            <button class="btn btn-primary" id="goStep2FromAttendees">{{ t('go_to_summary') }} &rarr;</button>
           </div>
         </div>
 
-        <!-- STEP - SUMMARY: Order Summary -->
+        <!-- STEP - SUMMARY: {{ t('order_summary') }} -->
         <div class="checkout-panel" id="step-summary">
-          <h2 style="margin-bottom: 6px; font-size: 1.5rem;">📋 Order Summary</h2>
-          <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:20px;">Please check your details and approve the agreements.</p>
+          <h2 style="margin-bottom: 6px; font-size: 1.5rem;">📋 {{ t('order_summary') }}</h2>
+          <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:20px;">{{ t('order_summary_desc') }}</p>
 
-          <!-- Event Information -->
+          <!-- {{ t('event_information') }} -->
           <div class="summary-box" style="margin-bottom:16px;">
             <h4 style="margin:0 0 14px; color:var(--accent-purple); font-size:0.95rem; display:flex; align-items:center; gap:8px;">
-              🎭 Event Information
+              🎭 {{ t('event_information') }}
             </h4>
             <div id="summaryEventInfo" style="display:grid; grid-template-columns:1fr 1fr; gap:10px 20px; font-size:0.9rem;"></div>
           </div>
@@ -795,18 +795,17 @@
           <!-- Ticket Holders -->
           <div class="summary-box" style="margin-bottom:16px;">
             <h4 style="margin:0 0 14px; color:var(--accent-purple); font-size:0.95rem; display:flex; align-items:center; gap:8px;">
-              👥 Ticket Holders
+              👥 {{ t('ticket_holders') }}
             </h4>
             <div id="summaryTicketHolders" style="display:flex; flex-direction:column; gap:10px;"></div>
           </div>
 
-          <!-- Price Summary -->
-          <div class="summary-box" style="margin-bottom:20px;">
-            <h4 style="margin:0 0 14px; color:var(--accent-purple); font-size:0.95rem; display:flex; align-items:center; gap:8px;">
-              💰 Payment Details
-            </h4>
-            <div id="summaryPriceBreakdown" style="font-size:0.9rem;"></div>
-          </div>
+            <div class="summary-box" style="margin-bottom:20px;">
+              <h4 style="margin:0 0 14px; color:var(--accent-purple); font-size:0.95rem; display:flex; align-items:center; gap:8px;">
+                💰 {{ t('payment_details') }}
+              </h4>
+              <div id="summaryPriceBreakdown" style="font-size:0.9rem;"></div>
+            </div>
 
           <!-- Agreements -->
           <div style="background:linear-gradient(135deg, rgba(139,92,246,0.06), rgba(45,212,191,0.03)); border:1px solid rgba(139,92,246,0.2); border-radius:16px; padding:24px; margin-bottom:20px; position:relative; overflow:hidden;">
@@ -816,59 +815,68 @@
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 </div>
                 <div>
-                  <h4 style="margin:0; color:var(--text); font-size:1rem; font-weight:700;">Legal Notices</h4>
-                  <p style="margin:0; color:var(--text-muted); font-size:0.72rem;">You must approve all items to continue.</p>
+                  <h4 style="margin:0; color:var(--text); font-size:1rem; font-weight:700;">{{ t('legal_notices') }}</h4>
+                  <p style="margin:0; color:var(--text-muted); font-size:0.72rem;">{{ t('approve_all_to_continue') }}</p>
                 </div>
               </div>
               <span style="display:inline-flex; align-items:center; gap:6px; cursor:pointer; font-size:0.78rem; color:var(--accent-teal); font-weight:600; padding:6px 12px; border-radius:8px; border:1px solid rgba(45,212,191,0.2); background:rgba(45,212,191,0.05); transition:all 0.2s;"
                      onmouseover="this.style.background='rgba(45,212,191,0.15)'" onmouseout="this.style.background='rgba(45,212,191,0.05)'"
                      onclick="var c=!document.getElementById('agreeSales').checked; document.getElementById('agreeSales').checked=c; document.getElementById('agreePrivacy').checked=c; document.getElementById('agreeRules').checked=c;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                Approve All
+                {{ t('approve_all') }}
               </span>
             </div>
             
-            <label style="display:flex; align-items:flex-start; gap:14px; cursor:pointer; margin-bottom:12px; padding:14px 16px; border-radius:12px; background:rgba(0,0,0,0.25); border:1px solid var(--border-color); transition:all 0.25s ease;" 
+            <label style="display:flex; align-items:center; gap:14px; cursor:pointer; margin-bottom:12px; padding:14px 16px; border-radius:12px; background:rgba(0,0,0,0.25); border:1px solid var(--border-color); transition:all 0.25s ease;" 
                    onmouseover="this.style.borderColor='rgba(139,92,246,0.35)'; this.style.background='rgba(139,92,246,0.06)'" 
                    onmouseout="this.style.borderColor='rgba(255,255,255,0.06)'; this.style.background='rgba(0,0,0,0.25)'">
-              <input type="checkbox" id="agreeSales" style="margin-top:2px; accent-color:var(--accent-purple); width:18px; height:18px; flex-shrink:0;">
-              <div>
-                <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+              <input type="checkbox" id="agreeSales" style="accent-color:var(--accent-purple); width:18px; height:18px; flex-shrink:0;">
+              <div style="display:flex; align-items:center; justify-content:space-between; flex:1; min-width:0; flex-wrap:wrap; gap:10px;">
+                <div style="display:flex; align-items:center; gap:8px;">
                   <span style="background:rgba(139,92,246,0.15); color:var(--accent-purple); padding:2px 8px; border-radius:6px; font-size:0.68rem; font-weight:700; letter-spacing:0.5px;">ITEM 1</span>
-                  <strong style="color:var(--text); font-size:0.88rem;">Distance Sales Agreement</strong>
+                  <strong style="color:var(--text); font-size:0.88rem;">{{ t('distance_sales_agreement') }}</strong>
                 </div>
-                <span style="color:var(--text-muted); font-size:0.8rem; line-height:1.6; display:block;">
-                  I have read, understood and accepted this agreement within the scope of the Law on Protection of Consumers and the Regulation on Distance Contracts. I know that purchased tickets cannot be refunded unless the event is cancelled by the event organizer.
+                <span onclick="event.preventDefault(); event.stopPropagation(); openAgreement('sales');" 
+                      style="font-size:0.75rem; color:var(--accent-teal); font-weight:600; text-decoration:none; background:rgba(45,212,191,0.1); border:1px solid rgba(45,212,191,0.2); padding:4px 10px; border-radius:6px; transition:all 0.2s;"
+                      onmouseover="this.style.background='rgba(45,212,191,0.2)'"
+                      onmouseout="this.style.background='rgba(45,212,191,0.1)'">
+                  {{ t('read_agreement') }} →
                 </span>
               </div>
             </label>
 
-            <label style="display:flex; align-items:flex-start; gap:14px; cursor:pointer; margin-bottom:12px; padding:14px 16px; border-radius:12px; background:rgba(0,0,0,0.25); border:1px solid var(--border-color); transition:all 0.25s ease;"
+            <label style="display:flex; align-items:center; gap:14px; cursor:pointer; margin-bottom:12px; padding:14px 16px; border-radius:12px; background:rgba(0,0,0,0.25); border:1px solid var(--border-color); transition:all 0.25s ease;"
                    onmouseover="this.style.borderColor='rgba(139,92,246,0.35)'; this.style.background='rgba(139,92,246,0.06)'" 
                    onmouseout="this.style.borderColor='rgba(255,255,255,0.06)'; this.style.background='rgba(0,0,0,0.25)'">
-              <input type="checkbox" id="agreePrivacy" style="margin-top:2px; accent-color:var(--accent-purple); width:18px; height:18px; flex-shrink:0;">
-              <div>
-                <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+              <input type="checkbox" id="agreePrivacy" style="accent-color:var(--accent-purple); width:18px; height:18px; flex-shrink:0;">
+              <div style="display:flex; align-items:center; justify-content:space-between; flex:1; min-width:0; flex-wrap:wrap; gap:10px;">
+                <div style="display:flex; align-items:center; gap:8px;">
                   <span style="background:rgba(139,92,246,0.15); color:var(--accent-purple); padding:2px 8px; border-radius:6px; font-size:0.68rem; font-weight:700; letter-spacing:0.5px;">ITEM 2</span>
-                  <strong style="color:var(--text); font-size:0.88rem;">Privacy & GDPR Policy</strong>
+                  <strong style="color:var(--text); font-size:0.88rem;">{{ t('privacy_gdpr_policy') }}</strong>
                 </div>
-                <span style="color:var(--text-muted); font-size:0.8rem; line-height:1.6; display:block;">
-                  I have read the Clarification Text and Privacy Policy prepared within the scope of the Personal Data Protection Law. I consent to the processing of my personal data (name, surname, email, payment information) within the framework of ticket sales transactions and legal obligations.
+                <span onclick="event.preventDefault(); event.stopPropagation(); openAgreement('privacy');" 
+                      style="font-size:0.75rem; color:var(--accent-teal); font-weight:600; text-decoration:none; background:rgba(45,212,191,0.1); border:1px solid rgba(45,212,191,0.2); padding:4px 10px; border-radius:6px; transition:all 0.2s;"
+                      onmouseover="this.style.background='rgba(45,212,191,0.2)'"
+                      onmouseout="this.style.background='rgba(45,212,191,0.1)'">
+                  {{ t('read_agreement') }} →
                 </span>
               </div>
             </label>
 
-            <label style="display:flex; align-items:flex-start; gap:14px; cursor:pointer; padding:14px 16px; border-radius:12px; background:rgba(0,0,0,0.25); border:1px solid var(--border-color); transition:all 0.25s ease;"
+            <label style="display:flex; align-items:center; gap:14px; cursor:pointer; padding:14px 16px; border-radius:12px; background:rgba(0,0,0,0.25); border:1px solid var(--border-color); transition:all 0.25s ease;"
                    onmouseover="this.style.borderColor='rgba(139,92,246,0.35)'; this.style.background='rgba(139,92,246,0.06)'" 
                    onmouseout="this.style.borderColor='rgba(255,255,255,0.06)'; this.style.background='rgba(0,0,0,0.25)'">
-              <input type="checkbox" id="agreeRules" style="margin-top:2px; accent-color:var(--accent-purple); width:18px; height:18px; flex-shrink:0;">
-              <div>
-                <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+              <input type="checkbox" id="agreeRules" style="accent-color:var(--accent-purple); width:18px; height:18px; flex-shrink:0;">
+              <div style="display:flex; align-items:center; justify-content:space-between; flex:1; min-width:0; flex-wrap:wrap; gap:10px;">
+                <div style="display:flex; align-items:center; gap:8px;">
                   <span style="background:rgba(139,92,246,0.15); color:var(--accent-purple); padding:2px 8px; border-radius:6px; font-size:0.68rem; font-weight:700; letter-spacing:0.5px;">ITEM 3</span>
-                  <strong style="color:var(--text); font-size:0.88rem;">Event Participation Terms</strong>
+                  <strong style="color:var(--text); font-size:0.88rem;">{{ t('event_participation_terms') }}</strong>
                 </div>
-                <span style="color:var(--text-muted); font-size:0.8rem; line-height:1.6; display:block;">
-                  I accept and undertake that I will present my e-ticket with QR code at the entrance to the event area, that the organizer may perform identity checks for security reasons and that I will comply with the event rules.
+                <span onclick="event.preventDefault(); event.stopPropagation(); openAgreement('rules');" 
+                      style="font-size:0.75rem; color:var(--accent-teal); font-weight:600; text-decoration:none; background:rgba(45,212,191,0.1); border:1px solid rgba(45,212,191,0.2); padding:4px 10px; border-radius:6px; transition:all 0.2s;"
+                      onmouseover="this.style.background='rgba(45,212,191,0.2)'"
+                      onmouseout="this.style.background='rgba(45,212,191,0.1)'">
+                  {{ t('read_agreement') }} →
                 </span>
               </div>
             </label>
@@ -876,7 +884,7 @@
             <div style="display:flex; align-items:center; gap:8px; margin-top:16px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.06);">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
               <p style="margin:0; color:var(--text-muted); font-size:0.72rem; line-height:1.4;">
-                These agreements are regulated within the scope of relevant consumer protection and data privacy laws. Eventix Ticketing Platform &copy; 2026
+                {{ t('agreements_regulated_footer') }}
               </p>
             </div>
           </div>
@@ -885,55 +893,55 @@
             <button class="btn btn-outline" onclick="showStep('attendees')">← Back</button>
             <button class="btn btn-outline" style="background: rgba(139,92,246,0.1); border-color: rgba(139,92,246,0.5); color: #c4b5fd;" id="addToCartFromCheckoutBtn" onclick="addToCartFromCheckout()">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-              Add to Cart
+              {{ t('add_to_cart') }}
             </button>
-            <button class="btn btn-primary" id="goPaymentFromSummary">Go to Payment 💳</button>
+            <button class="btn btn-primary" id="goPaymentFromSummary">{{ t('go_to_payment') }} 💳</button>
           </div>
         </div>
 
         <!-- STEP 2: Payment -->
         <div class="checkout-panel" id="step-2">
-          <h2 style="margin-bottom: 20px; font-size: 1.5rem;">Card Details</h2>
+          <h2 style="margin-bottom: 20px; font-size: 1.5rem;">{{ t('card_details') }}</h2>
           
           <div class="summary-box" style="padding: 15px 20px; margin-bottom: 20px;">
             <div style="display:flex;gap:10px;margin-bottom:15px;align-items:center;">
-               <input type="text" id="promoCodeInput" class="form-control" placeholder="Promo Code" style="text-transform:uppercase;flex:1;">
-               <button type="button" class="btn btn-outline" style="padding:10px 15px;" onclick="applyPromo()">Apply</button>
+               <input type="text" id="promoCodeInput" class="form-control" placeholder="{{ t('promo_code') }}" style="text-transform:uppercase;flex:1;">
+               <button type="button" class="btn btn-outline" style="padding:10px 15px;" onclick="applyPromo()">{{ t('apply') }}</button>
             </div>
             <div id="promoMessage" style="font-size:0.85rem;margin-bottom:10px;"></div>
             <div class="summary-row total" style="border-top:1px solid rgba(255,255,255,0.1); padding-top:15px; margin:0;">
-              <span>Amount to Pay</span>
+              <span>{{ t('amount_to_pay') }}</span>
               <span id="finalTotal" style="color:var(--accent-teal);">0 ₺</span>
             </div>
           </div>
 
           <form id="paymentForm">
             <div class="form-group">
-              <label class="form-label">Name on Card</label>
+              <label class="form-label">{{ t('name_on_card') }}</label>
               <input type="text" id="cardName" class="form-control" placeholder="e.g.: John Doe" required>
             </div>
             <div class="form-group" style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:15px;">
               <div>
-                <label class="form-label">Card Number</label>
+                <label class="form-label">{{ t('card_number') }}</label>
                 <input type="text" id="cardNumber" class="form-control" placeholder="0000 0000 0000 0000" maxlength="19" required oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\d{4})(?=\d)/g, '$1 ');">
               </div>
               <div>
-                <label class="form-label">Expiry Date</label>
+                <label class="form-label">{{ t('expiry_date') }}</label>
                 <input type="text" id="cardExp" class="form-control" placeholder="MM/YY" maxlength="5" required oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/^([2-9])$/g, '0$1').replace(/^(1[3-9])$/g, '01').replace(/^([0-1][0-9])([0-9]{1,2})$/g, '$1/$2');">
               </div>
               <div>
-                <label class="form-label">CVC</label>
+                <label class="form-label">{{ t('cvc') }}</label>
                 <input type="text" id="cardCVC" class="form-control" placeholder="***" maxlength="4" required oninput="this.value = this.value.replace(/[^0-9]/g, '');">
               </div>
             </div>
              
              <p style="font-size:0.75rem;color:var(--text-muted);margin-top:20px;text-align:center;">
-               When the order is completed, your ticket will be securely created and sent to your email instantly.
+               {{ t('when_order_completed') }}
              </p>
 
             <div class="checkout-actions">
               <button type="button" class="btn btn-outline" onclick="showStep('summary')">Back</button>
-              <button type="submit" class="btn btn-primary" id="payBtn">Complete Payment 🔒</button>
+              <button type="submit" class="btn btn-primary" id="payBtn">{{ t('complete_payment') }} 🔒</button>
             </div>
           </form>
         </div>
@@ -943,8 +951,8 @@
           <div style="width:60px; height:60px; background:rgba(16,185,129,0.2); color:#10b981; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 20px;">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
           </div>
-          <h2 style="margin-bottom: 10px; font-size: 1.75rem;">Purchase Successful!</h2>
-          <p style="color:var(--text-muted); margin-bottom: 24px;">Your ticket information has been sent to your email.</p>
+          <h2 style="margin-bottom: 10px; font-size: 1.75rem;">{{ t('purchase_successful') }}</h2>
+          <p style="color:var(--text-muted); font-size:1rem; margin-bottom: 30px;">{{ t('ticket_info_sent') }}</p>
           
           <div id="qrsContainer" style="display:flex; flex-wrap:wrap; justify-content:center; gap:20px; margin-bottom: 24px;">
             <!-- QR code cards will be generated here dynamically -->
@@ -956,13 +964,13 @@
           <div id="pdfDownloadRow" style="display:none; justify-content:center; margin-bottom:20px;">
             <button onclick="downloadAllTicketsPDF()" class="btn btn-primary" style="gap:8px; padding: 12px 28px; background: linear-gradient(135deg,#10b981,#059669); border-color:#10b981;">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Download All Tickets as PDF
+              {{ t('download_all_tickets') }}
             </button>
           </div>
 
           <div class="checkout-actions" style="justify-content: center;">
-            <a href="dashboard.html" class="btn btn-primary" style="flex:none; width:200px;">Go to My Tickets</a>
-            <a href="index.html" class="btn btn-outline" style="flex:none; width:200px;">Homepage</a>
+            <a href="dashboard.html" class="btn btn-primary" style="flex:none; width:200px;">{{ t('go_to_my_tickets') }}</a>
+            <a href="index.html" class="btn btn-outline" style="flex:none; width:200px;">{{ t('homepage') }}</a>
           </div>
         </div>
       </div>
@@ -982,11 +990,11 @@
         <div class="pdf-info-grid">
           <div>
             <div class="pdf-field">
-              <div class="pdf-label">Date & Time</div>
+              <div class="pdf-label">{{ t('date_and_time') }}</div>
               <div class="pdf-value" id="pdfEventDate">...</div>
             </div>
             <div class="pdf-field">
-              <div class="pdf-label">Location</div>
+              <div class="pdf-label">{{ t('location') }}</div>
               <div class="pdf-value" id="pdfEventLocation">...</div>
             </div>
             <div class="pdf-field">
@@ -1087,13 +1095,128 @@
         return;
       }
 
-      if (!getToken()) {
+      // RESTORE CHECKOUT STATE
+      const savedStr = sessionStorage.getItem('checkoutState_' + evId);
+      if (savedStr) {
+          try {
+              const st = JSON.parse(savedStr);
+              if (st.step === '3' || st.step === 3) {
+                  if (!urlParams.has('step')) {
+                      // Fresh entry to checkout from homepage: clear completed state!
+                      sessionStorage.removeItem('checkoutState_' + evId);
+                      sessionStorage.removeItem('purchasedTickets_' + evId);
+                  } else {
+                      // Reload or language change on step 3: restore guestInfo/isGuest!
+                      if (st.selectedZone) selectedZone = st.selectedZone;
+                      if (st.selectedSeats) selectedSeats = st.selectedSeats;
+                      if (st.guestInfo) {
+                          guestInfo = st.guestInfo;
+                          isGuest = true;
+                      }
+                  }
+              } else {
+                  if (st.selectedZone) selectedZone = st.selectedZone;
+                  if (st.selectedSeats) selectedSeats = st.selectedSeats;
+                  if (st.guestInfo) {
+                      guestInfo = st.guestInfo;
+                      isGuest = true;
+                  }
+                  if (st.ticketQuantity && document.getElementById('ticketQuantity')) {
+                      document.getElementById('ticketQuantity').value = st.ticketQuantity;
+                  }
+                  if (st.attendees && st.attendees.length > 0) {
+                      window._savedAttendees = st.attendees;
+                  }
+                  if (st.step && !urlParams.has('step')) {
+                      urlParams.set('step', st.step);
+                      window.history.replaceState(null, '', '?' + urlParams.toString() + window.location.hash);
+                  }
+              }
+          } catch(e) {}
+      }
+
+      if (getToken()) {
+          isGuest = false;
+          guestInfo = { name: '', surname: '', email: '' };
+      }
+
+      const stepParam = urlParams.get('step');
+
+      if (!getToken() && !isGuest) {
         document.querySelector('.step-indicator').style.display = 'none';
-        showStep('choice');
+        showStep(stepParam || 'choice');
         loadEventData();
         return;
       }
       await loadEventData();
+      if (stepParam === '3') {
+          const savedTicketsStr = sessionStorage.getItem('purchasedTickets_' + evId);
+          if (savedTicketsStr) {
+              try {
+                  window._purchasedTickets = JSON.parse(savedTicketsStr);
+                  renderPurchasedTickets(window._purchasedTickets);
+              } catch(e) {}
+          }
+      }
+      if (stepParam) {
+          const s = isNaN(stepParam) ? stepParam : parseInt(stepParam);
+          if (s === 'attendees' || s === 'summary' || s === 2) {
+              const container = document.getElementById('attendeesFormsContainer');
+              if (container) {
+                  container.innerHTML = '';
+                  const q = evData.has_seating ? selectedSeats.length : (parseInt(document.getElementById('ticketQuantity').value) || 1);
+                  for (let i = 0; i < q; i++) {
+                      const saved = (window._savedAttendees && window._savedAttendees[i]) ? window._savedAttendees[i] : {name:'', surname:''};
+                      const seatHtml = (evData.has_seating && selectedSeats[i]) ? `<p style="font-size:0.8rem; margin:0 0 10px; color:#a78bfa;">${selectedSeats[i].zone} ${selectedSeats[i].row_label}-${selectedSeats[i].col_label}</p>` : '';
+                      const div = document.createElement('div');
+                      div.className = 'glass-panel attendee-form';
+                      div.style.padding = '15px';
+                      div.style.border = '1px solid rgba(255,255,255,0.1)';
+                      div.innerHTML = `
+                        <h4 style="margin: 0 0 5px; font-size: 1rem; color: var(--accent-purple);">Ticket ${i+1}</h4>
+                        ${seatHtml}
+                        <div style="display:flex; gap:10px;">
+                          <div style="flex:1;">
+                            <label class="form-label">{{ t('name_label') }}</label>
+                            <input type="text" class="form-control attendee-name" placeholder="{{ t('name_label') }}" value="${saved.name}" required>
+                          </div>
+                          <div style="flex:1;">
+                            <label class="form-label">{{ t('surname_label') }}</label>
+                            <input type="text" class="form-control attendee-surname" placeholder="{{ t('surname_label') }}" value="${saved.surname}" required>
+                          </div>
+                        </div>
+                      `;
+                      container.appendChild(div);
+                  }
+              }
+              if (s === 'summary' || s === 2) {
+                  setTimeout(() => { document.getElementById('goStep2FromAttendees').click(); }, 100);
+              }
+          }
+          showStep(s);
+      }
+    });
+
+    window.addEventListener('beforeunload', () => {
+        if (typeof evId === 'undefined' || !evId) return;
+        const activePanel = document.querySelector('.checkout-panel.active');
+        let step = activePanel ? activePanel.id.replace('step-', '') : null;
+        if (step === '0') step = 'choice';
+        const state = {
+            step: step,
+            selectedZone: typeof selectedZone !== 'undefined' ? selectedZone : null,
+            selectedSeats: typeof selectedSeats !== 'undefined' ? selectedSeats : [],
+            guestInfo: typeof guestInfo !== 'undefined' ? guestInfo : null,
+            ticketQuantity: document.getElementById('ticketQuantity') ? document.getElementById('ticketQuantity').value : null,
+            attendees: []
+        };
+        document.querySelectorAll('.attendee-form').forEach(f => {
+            state.attendees.push({
+                name: f.querySelector('.attendee-name').value,
+                surname: f.querySelector('.attendee-surname').value
+            });
+        });
+        sessionStorage.setItem('checkoutState_' + evId, JSON.stringify(state));
     });
 
     async function loadEventData() {
@@ -1382,7 +1505,9 @@
         });
         const seats = await res.json();
         evSeats = seats;
-        selectedZone = null;
+        if (!selectedZone) {
+            selectedZone = null;
+        }
         renderSeats(seats);
         updateTotals();
 
@@ -1416,7 +1541,7 @@
       if (!selectedZone) {
           container.classList.remove('wide');
           container.classList.add('medium');
-          document.getElementById('seatingStepTitle').textContent = 'Category Selection';
+          document.getElementById('seatingStepTitle').textContent = `{{ t('category_selection') }}`;
           const picker = document.createElement('div');
           picker.className = 'category-picker animate-up';
           
@@ -1448,11 +1573,11 @@
 
       container.classList.remove('medium');
       container.classList.add('wide');
-      document.getElementById('seatingStepTitle').textContent = selectedZone + ' - Seat Selection';
+      document.getElementById('seatingStepTitle').textContent = selectedZone + ' - {{ t('seat_selection') }}';
       
       const backBtn = document.createElement('div');
       backBtn.className = 'back-btn';
-      backBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back to Categories`;
+      backBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> {{ t('back_to_categories') }}`;
       backBtn.onclick = () => {
           selectedZone = null;
           renderSeats(seats);
@@ -1587,12 +1712,12 @@
       legend.style.cssText = 'display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-top:20px; padding:15px; background:var(--bg-surface); border:1px solid var(--border-color); border-radius:12px; width:100%;';
       
       const legendItems = [
-        { class: 'seat sold', html: '<span style="position:absolute; top:2px; right:3px; font-size:0.5rem; font-weight:900; line-height:1; opacity:0.8;">x</span>', label: 'Dolu' },
-        { class: 'seat mine', label: 'Sizin Biletiniz' },
-        { class: 'seat my-cart', text: '🛒', label: 'Sepetinizde' },
-        { class: 'seat selected', label: 'Seçili' },
-        { class: 'seat locked', label: 'Başkasının İşleminde' },
-        { class: 'seat available', label: 'Boş' }
+        { class: 'seat sold', html: '<span style="position:absolute; top:2px; right:3px; font-size:0.5rem; font-weight:900; line-height:1; opacity:0.8;">x</span>', label: "{{ t('legend_sold') }}" },
+        { class: 'seat mine', label: "{{ t('legend_yours') }}" },
+        { class: 'seat my-cart', text: '🛒', label: "{{ t('legend_cart') }}" },
+        { class: 'seat selected', label: "{{ t('legend_selected') }}" },
+        { class: 'seat locked', label: "{{ t('legend_locked') }}" },
+        { class: 'seat available', label: "{{ t('legend_empty') }}" }
       ];
 
       legendItems.forEach(item => {
@@ -1616,7 +1741,83 @@
       wrapper.appendChild(legend);
     }
 
+    function openAgreement(type) {
+      const win = window.open('', '_blank');
+      if (!win) {
+        alert("Pop-up blocker is active. Please enable pop-ups for this site.");
+        return;
+      }
+      let title = '';
+      let content = '';
+      if (type === 'sales') {
+        title = `{{ t('distance_sales_agreement') | safe }}`;
+        content = `{{ t('sales_agreement_desc') | safe }}`;
+      } else if (type === 'privacy') {
+        title = `{{ t('privacy_gdpr_policy') | safe }}`;
+        content = `{{ t('privacy_policy_desc') | safe }}`;
+      } else if (type === 'rules') {
+        title = `{{ t('event_participation_terms') | safe }}`;
+        content = `{{ t('event_rules_desc') | safe }}`;
+      }
+      win.document.write(`
+        <html>
+          <head>
+            <title>${title} - Eventix</title>
+            <meta charset="utf-8">
+            <style>
+              body {
+                background-color: #121214;
+                color: #e4e4e7;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                line-height: 1.8;
+                max-width: 800px;
+                margin: 60px auto;
+                padding: 0 24px;
+              }
+              h1 {
+                color: #ffffff;
+                border-bottom: 1px solid rgba(255,255,255,0.08);
+                padding-bottom: 16px;
+                margin-bottom: 28px;
+                font-size: 2rem;
+                font-weight: 700;
+              }
+              .content-box {
+                background: rgba(255,255,255,0.03);
+                border: 1px solid rgba(255,255,255,0.06);
+                border-radius: 16px;
+                padding: 32px;
+                font-size: 1.05rem;
+                color: #d4d4d8;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+              }
+              .footer {
+                margin-top: 60px;
+                font-size: 0.8rem;
+                color: #71717a;
+                border-top: 1px solid rgba(255,255,255,0.08);
+                padding-top: 20px;
+                text-align: center;
+              }
+            </style>
+          </head>
+          <body>
+            <h1>${title}</h1>
+            <div class="content-box">
+              ${content}
+            </div>
+            <div class="footer">Eventix Ticketing Platform © 2026</div>
+          </body>
+        </html>
+      `);
+      win.document.close();
+    }
+
     function showStep(s) {
+      const urlParams = new URLSearchParams(window.location.search);
+      urlParams.set('step', s);
+      window.history.replaceState(null, '', '?' + urlParams.toString() + window.location.hash);
+
       const container = document.querySelector('.checkout-container');
 
       const mapping = {
@@ -1693,12 +1894,12 @@
               <h4 style="margin: 0 0 10px; font-size: 1rem; color: var(--accent-purple);">Ticket ${i+1}</h4>
               <div style="display:flex; gap:10px;">
                 <div style="flex:1;">
-                  <label class="form-label">Name</label>
-                  <input type="text" class="form-control attendee-name" placeholder="Name" required>
+                  <label class="form-label">{{ t('name_label') }}</label>
+                  <input type="text" class="form-control attendee-name" placeholder="{{ t('name_label') }}" required>
                 </div>
                 <div style="flex:1;">
-                  <label class="form-label">Surname</label>
-                  <input type="text" class="form-control attendee-surname" placeholder="Surname" required>
+                  <label class="form-label">{{ t('surname_label') }}</label>
+                  <input type="text" class="form-control attendee-surname" placeholder="{{ t('surname_label') }}" required>
                 </div>
               </div>
             `;
@@ -1739,11 +1940,11 @@
             <h4 style="margin: 0 0 10px; font-size: 1rem; color: var(--accent-purple);">Ticket ${i+1} ${seatInfoText}</h4>
             <div style="display:flex; gap:10px;">
                 <div style="flex:1;">
-                   <label class="form-label">Name</label>
+                   <label class="form-label">{{ t('name_label') }}</label>
                    <input type="text" class="form-control attendee-name" placeholder="Name" required>
                 </div>
                 <div style="flex:1;">
-                   <label class="form-label">Surname</label>
+                   <label class="form-label">{{ t('surname_label') }}</label>
                    <input type="text" class="form-control attendee-surname" placeholder="Surname" required>
                 </div>
             </div>
@@ -1785,9 +1986,9 @@
       const eventInfoEl = document.getElementById('summaryEventInfo');
       eventInfoEl.innerHTML = `
         <div><span style="color:var(--text-muted);">Event</span><br><strong style="color:var(--text);">${evData.title}</strong></div>
-        <div><span style="color:var(--text-muted);">Date & Time</span><br><strong style="color:var(--text);">${fDate(evData.date)}</strong></div>
-        <div><span style="color:var(--text-muted);">Location</span><br><strong style="color:var(--text);">${evData.location}</strong></div>
-        <div><span style="color:var(--text-muted);">Ticket Quantity</span><br><strong style="color:var(--text);">${evData.has_seating ? selectedSeats.length : (parseInt(document.getElementById('ticketQuantity').value) || 1)} Qty</strong></div>
+        <div><span style="color:var(--text-muted);">{{ t('date_and_time') }}</span><br><strong style="color:var(--text);">${fDate(evData.date)}</strong></div>
+        <div><span style="color:var(--text-muted);">{{ t('location') }}</span><br><strong style="color:var(--text);">${evData.location}</strong></div>
+        <div><span style="color:var(--text-muted);">{{ t('ticket_quantity') }}</span><br><strong style="color:var(--text);">${evData.has_seating ? selectedSeats.length : (parseInt(document.getElementById('ticketQuantity').value) || 1)} Qty</strong></div>
       `;
 
       const holdersEl = document.getElementById('summaryTicketHolders');
@@ -1869,7 +2070,7 @@
       const c3 = document.getElementById('agreeRules').checked;
 
       if (!c1 || !c2 || !c3) {
-        alert('Please read and approve all agreements to continue.');
+        alert("{{ t('approve_all_required') }}");
         return;
       }
       showStep(2);
@@ -1882,7 +2083,7 @@
       const c3 = document.getElementById('agreeRules').checked;
 
       if (!c1 || !c2 || !c3) {
-        alert('Please read and approve all agreements to add to cart.');
+        alert("{{ t('approve_all_to_cart') }}");
         return;
       }
 
@@ -1928,7 +2129,7 @@
       );
 
       if (alreadyInCart) {
-        alert('Some of these seats are already in your cart!');
+        alert("{{ t('some_seats_in_cart') }}");
         btn.innerHTML = prevHtml;
         btn.disabled = false;
         return;
@@ -1974,7 +2175,7 @@
       e.preventDefault();
       
       const btn = document.getElementById('payBtn');
-      btn.innerHTML = '⌛ Processing... Please wait';
+      btn.innerHTML = '⌛ ' + "{{ t('processing') }}";
       btn.disabled = true;
 
       const forms = document.querySelectorAll('.attendee-form');
@@ -2034,36 +2235,10 @@
                };
              });
 
-             const cont = document.getElementById('qrsContainer');
-             cont.innerHTML = '';
-             let count = 0;
-             data.tickets.forEach((ticket, idx) => {
-                 if(count >= 3) return;
-                 
-                 const tBox = document.createElement('div');
-                 tBox.style.cssText = 'display:inline-flex; flex-direction:column; align-items:center; background:white; color:black; padding:20px; border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.5); text-align:center; width:200px;';
-                 
-                 tBox.innerHTML = `
-                    <p style="margin:0 0 4px; font-weight:700; font-size:0.9rem; color:#7c3aed;">${ticket.name} ${ticket.surname}</p>
-                    <img src="${ticket.qr_code}" alt="QR Code" style="width:160px; height:160px; display:block; margin:8px auto;">
-                    <p style="margin:0 0 3px; font-size:0.7rem; color:#6b7280;">Ticket Key</p>
-                    <p style="margin:0 0 12px; font-size:0.95rem; font-weight:700; letter-spacing:1px; color:#111;">${ticket.ticket_key}</p>
-                    <button onclick="downloadSingleTicketPDF(${idx})" style="background:linear-gradient(135deg,#7c3aed,#ec4899); color:var(--text); border:none; border-radius:8px; padding:8px 14px; font-size:0.78rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:5px; width:100%; justify-content:center;">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                      Download PDF
-                    </button>
-                 `;
-                 cont.appendChild(tBox);
-                 count++;
-             });
+             // Save purchased tickets to sessionStorage so they survive a reload/language change on step 3!
+             sessionStorage.setItem('purchasedTickets_' + evId, JSON.stringify(window._purchasedTickets));
              
-             document.getElementById('pdfDownloadRow').style.display = 'flex';
-
-             if(data.tickets.length > 3) {
-                 document.getElementById('extraTicketsMsg').innerHTML = `<p style="color:var(--text-muted); font-size:0.9rem;">+ ${data.tickets.length - 3} more tickets created.</p><p style="color:var(--text); font-size:0.95rem;">You can see all details in your email or in 'My Tickets'.</p>`;
-             } else {
-                 document.getElementById('extraTicketsMsg').innerHTML = `<p style="color:var(--text); font-size:0.95rem;">You can present this code to the venue staff.</p>`;
-             }
+             renderPurchasedTickets(window._purchasedTickets);
           }
           showStep(3);
           if (isGuest) {
@@ -2073,27 +2248,29 @@
             }
             const emailNote = document.createElement('p');
             emailNote.style.cssText = 'color:#6ee7b7; font-size:0.9rem; margin-bottom:12px;';
-            emailNote.innerHTML = `📧 Your tickets have been sent to <strong>${guestInfo.email}</strong>.`;
+            emailNote.innerHTML = `📧 {{ t('tickets_sent_to') }} <strong>${guestInfo.email}</strong>.`;
             document.getElementById('extraTicketsMsg').prepend(emailNote);
           }
         } else {
-          alert('Error: ' + data.message);
-          btn.innerHTML = 'Complete Payment 🔒';
+          alert("{{ t('error') }}: " + data.message);
+          btn.innerHTML = "{{ t('complete_payment') }} 🔒";
           btn.disabled = false;
         }
       } catch (err) {
-        alert('An error occurred during server communication.');
-        btn.innerHTML = 'Complete Payment 🔒';
+        alert("{{ t('server_error') }}");
+        btn.innerHTML = "{{ t('complete_payment') }} 🔒";
         btn.disabled = false;
       }
     });
 
     const generateTicketHTML = (ticket) => {
+      const langCode = "{{ current_lang }}" === 'tr' ? 'tr-TR' : ("{{ current_lang }}" === 'de' ? 'de-DE' : 'en-US');
+
       const fDate = ds => {
         try {
           const d = new Date(ds);
           if (isNaN(d)) return ds;
-          return d.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+          return d.toLocaleDateString(langCode, { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
         } catch { return ds; }
       };
       
@@ -2106,7 +2283,7 @@
       else if(ticket.owner_name && ticket.owner_surname) oName = ticket.owner_name + ' ' + ticket.owner_surname;
       else if(ticket.owner_name) oName = ticket.owner_name;
 
-      const oPrice = ticket.price ? ticket.price.toLocaleString('en-US') : (ticket.total_price ? ticket.total_price.toLocaleString('en-US') : '0');
+      const oPrice = ticket.price ? ticket.price.toLocaleString(langCode) : (ticket.total_price ? ticket.total_price.toLocaleString(langCode) : '0');
       
       let oSeatDisp = 'none';
       let oSeatVal = '-';
@@ -2124,7 +2301,7 @@
         <div style="width: 595px; background: white; color: black; font-family: 'Inter', 'Segoe UI', Arial, sans-serif; padding: 0; margin: 0 auto;">
           <div style="background: linear-gradient(135deg, #5a19a0, #8b5cf6); padding: 30px 40px; color:var(--text);">
             <div style="font-size: 28px; font-weight: 800; letter-spacing: 1px;">EVENT <span style="color:#fcd34d;">IX</span></div>
-            <div style="font-size:10px; margin-top:5px; opacity:0.9; font-weight:600;">OFFICIAL E-TICKET & CONFIRMATION</div>
+            <div style="font-size:10px; margin-top:5px; opacity:0.9; font-weight:600;">{{ t('official_eticket') }}</div>
           </div>
           <div style="padding: 40px;">
             <div style="font-size: 24px; font-weight: 800; margin-bottom: 30px; border-bottom: 2px solid #f3f4f6; padding-bottom: 15px; color: #111;">
@@ -2133,45 +2310,104 @@
             <div style="display: flex; justify-content: space-between; gap: 30px;">
               <div style="flex: 1;">
                 <div style="margin-bottom: 20px;">
-                  <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Date & Time</div>
+                  <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">{{ t('date_and_time') }}</div>
                   <div style="font-size: 16px; font-weight: 700; color: #111;">${oDate}</div>
                 </div>
                 <div style="margin-bottom: 20px;">
-                  <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Location</div>
+                  <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">{{ t('location') }}</div>
                   <div style="font-size: 16px; font-weight: 700; color: #111;">${oLoc}</div>
                 </div>
                 <div style="margin-bottom: 20px;">
-                  <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Attendee</div>
+                  <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">{{ t('attendee') }}</div>
                   <div style="font-size: 16px; font-weight: 700; color: #111;">${oName}</div>
                 </div>
                 <div style="margin-bottom: 20px; display: ${oSeatDisp};">
-                  <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Seat</div>
+                  <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">{{ t('seat') }}</div>
                   <div style="font-size: 16px; font-weight: 700; color: #111;">${oSeatVal}</div>
                 </div>
                 <div style="margin-bottom: 20px;">
-                  <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Price</div>
+                  <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">{{ t('price') }}</div>
                   <div style="font-size: 16px; font-weight: 700; color: #111;">${oPrice} ₺</div>
                 </div>
               </div>
               <div style="border: 1px solid #e5e7eb; padding: 15px; border-radius: 12px; text-align: center; width: 170px; height: 230px;">
                 <img src="${qrSrc}" alt="QR Code" style="width: 170px; height: 170px; display: block; margin: 0 auto; object-fit: contain;">
-                <div style="margin-top:10px; font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700;">Ticket Key</div>
+                <div style="margin-top:10px; font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700;">{{ t('ticket_key') }}</div>
                 <div style="font-family:monospace; font-weight:700; font-size:14px; letter-spacing:1px; color: #111; margin-top: 5px;">${ticket.ticket_key}</div>
               </div>
             </div>
             
             <div style="margin-top:40px; padding:20px; background:#f5f3ff; border-radius:12px; border:1px solid #ddd; text-align:center;">
-               <span style="display:block; font-size:10px; color:#7c3aed; font-weight:700; margin-bottom:5px;">IMPORTANT NOTE</span>
-               <span style="font-size:12px; color:#4b5563;">This ticket is personal. Please have the QR code scanned by the attendant at entry.</span>
+               <span style="display:block; font-size:10px; color:#7c3aed; font-weight:700; margin-bottom:5px;">{{ t('important_note') }}</span>
+               <span style="font-size:12px; color:#4b5563;">{{ t('ticket_is_personal') }}</span>
             </div>
           </div>
           <div style="background: #f9fafb; padding: 20px; text-align: center; font-size: 10px; color: #9ca3af; border-top: 1px dashed #e5e7eb;">
-            This document has been automatically generated by the EVENTIX Ticketing Platform.<br>It is protected against forgery. © 2026
+            {{ t('pdf_footer') | safe }}
           </div>
         </div>
       `;
     };
 
+    function renderPurchasedTickets(tickets) {
+         if (!tickets || tickets.length === 0) return;
+         const cont = document.getElementById('qrsContainer');
+         if (!cont) return;
+         cont.innerHTML = '';
+         let count = 0;
+         tickets.forEach((ticket, idx) => {
+             if(count >= 3) return;
+             
+             const tBox = document.createElement('div');
+             tBox.style.cssText = 'display:inline-flex; flex-direction:column; align-items:center; background:white; color:black; padding:20px; border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.5); text-align:center; width:200px;';
+             
+             tBox.innerHTML = `
+                <p style="margin:0 0 4px; font-weight:700; font-size:0.9rem; color:#7c3aed;">${ticket.name || ticket.owner_name} ${ticket.surname || ticket.owner_surname || ''}</p>
+                <img src="${ticket.qr_code}" alt="QR Code" style="width:160px; height:160px; display:block; margin:8px auto;">
+                <p style="margin:0 0 3px; font-size:0.7rem; color:#6b7280;">{{ t('ticket_key') }}</p>
+                <p style="margin:0 0 12px; font-size:0.95rem; font-weight:700; letter-spacing:1px; color:#111;">${ticket.ticket_key}</p>
+                <button onclick="downloadSingleTicketPDF(${idx})" style="background:linear-gradient(135deg,#7c3aed,#ec4899); color:var(--text); border:none; border-radius:8px; padding:8px 14px; font-size:0.78rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:5px; width:100%; justify-content:center;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  {{ t('download_single_ticket_pdf') }}
+                </button>
+             `;
+             cont.appendChild(tBox);
+             count++;
+         });
+         
+         const pdfBtnRow = document.getElementById('pdfDownloadRow');
+         if (pdfBtnRow) pdfBtnRow.style.display = 'flex';
+
+         const extraMsg = document.getElementById('extraTicketsMsg');
+         if (extraMsg) {
+             extraMsg.innerHTML = '';
+             if (isGuest && guestInfo && guestInfo.email) {
+                 const emailNote = document.createElement('p');
+                 emailNote.style.cssText = 'color:#6ee7b7; font-size:0.9rem; margin-bottom:12px;';
+                 emailNote.innerHTML = `📧 {{ t('tickets_sent_to') }} <strong>${guestInfo.email}</strong>.`;
+                 extraMsg.appendChild(emailNote);
+             }
+             if(tickets.length > 3) {
+                 const moreMsg = document.createElement('p');
+                 moreMsg.style.cssText = 'color:var(--text-muted); font-size:0.9rem;';
+                 moreMsg.innerHTML = `+ ${tickets.length - 3} {{ t('more_tickets_generated') }}`;
+                 extraMsg.appendChild(moreMsg);
+             } else {
+                 const showMsg = document.createElement('p');
+                 showMsg.style.cssText = 'color:var(--text); font-size:0.95rem;';
+                 showMsg.innerHTML = `{{ t('present_code_to_staff') }}`;
+                 extraMsg.appendChild(showMsg);
+             }
+         }
+
+         if (isGuest) {
+             const dashBtn = document.querySelector('a[href="dashboard.html"]');
+             if (dashBtn) {
+                 dashBtn.style.display = 'none';
+             }
+         }
+    }
+ 
     async function downloadSingleTicketPDF(index) {
       const tickets = window._purchasedTickets;
       if (!tickets || !tickets[index]) return;
@@ -2222,7 +2458,14 @@
         alert('An error occurred while generating the PDF.');
       }
     }
-
+  </script>
+  <script>
+      document.addEventListener("DOMContentLoaded", () => {
+          const langLabel = document.getElementById('currentLangLabel');
+          if(langLabel) {
+              langLabel.textContent = "{{ current_lang | upper }}";
+          }
+      });
   </script>
 </body>
 </html>

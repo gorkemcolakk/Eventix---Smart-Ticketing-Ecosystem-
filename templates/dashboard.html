@@ -37,7 +37,10 @@
 <body>
   <nav class="navbar">
     <div class="container nav-container">
-      <a href="index.html" class="logo"><span>EVENT<span class="logo-highlight">İX</span></span></a>
+      <a href="index.html" class="logo">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="url(#gd)" stroke-width="2"><defs><linearGradient id="gd" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#ec4899"/></linearGradient></defs><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+      <span>EVENT<span class="logo-highlight">IX</span></span>
+    </a>
       <div class="user-controls"></div>
     </div>
   </nav>
@@ -48,84 +51,84 @@
       <div class="dash-name" id="sidebarName">Loading...</div>
       <div class="dash-email" id="sidebarEmail">—</div>
       <nav class="dash-nav">
-        <button class="dash-nav-btn active" onclick="showTab('tickets',this)">🎟 My Tickets</button>
-        <button class="dash-nav-btn" onclick="showTab('wishlist',this)">❤ My Wishlist</button>
+        <button class="dash-nav-btn active" onclick="showTab('tickets',this)">🎟 {{ t('my_tickets') }}</button>
+        <button class="dash-nav-btn" onclick="showTab('wishlist',this)">❤ {{ t('my_wishlist') }}</button>
         <button class="dash-nav-btn" onclick="showTab('notifications',this)">
-          🔔 Notifications
+          🔔 {{ t('notifications') }}
           <span class="notif-badge" id="notifBadge" style="display:none;background:#ef4444;color:white;border-radius:50%;width:18px;height:18px;font-size:0.7rem;align-items:center;justify-content:center;margin-left:auto;"></span>
         </button>
-        <button class="dash-nav-btn" onclick="showTab('profile',this)">👤 My Profile</button>
+        <button class="dash-nav-btn" onclick="showTab('profile',this)">👤 {{ t('my_profile') }}</button>
       </nav>
-      <button onclick="logout()" class="btn" style="width:100%;margin-top:auto;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:var(--coral);padding:10px;">🚪 Logout</button>
+      <button onclick="logout()" class="btn" style="width:100%;margin-top:auto;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:var(--coral);padding:10px;">🚪 {{ t('logout') }}</button>
     </aside>
 
     <div class="dash-content">
 
       <!-- === TICKETS TAB === -->
       <section id="tab-tickets" class="dash-tab">
-        <h2 class="dash-section-title">My Tickets</h2>
-        <div id="ticketsList"><p class="loading-text">Loading...</p></div>
+        <h2 class="dash-section-title">{{ t('my_tickets') }}</h2>
+        <div id="ticketsList"><p class="loading-text">{{ t('loading') }}</p></div>
       </section>
 
       <!-- === WISHLIST TAB === -->
       <section id="tab-wishlist" class="dash-tab" style="display:none;">
-        <h2 class="dash-section-title">❤ My Wishlist</h2>
+        <h2 class="dash-section-title">❤ {{ t('my_wishlist') }}</h2>
         <div id="wishlistGrid" class="events-grid"></div>
       </section>
 
       <!-- === NOTIFICATIONS TAB === -->
       <section id="tab-notifications" class="dash-tab" style="display:none;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
-          <h2 class="dash-section-title" style="margin:0;">Notifications</h2>
-          <button class="btn btn-outline" style="font-size:0.8rem;padding:6px 14px;" onclick="markAllRead()">Mark All Read</button>
+          <h2 class="dash-section-title" style="margin:0;">{{ t('notifications') }}</h2>
+          <button class="btn btn-outline" style="font-size:0.8rem;padding:6px 14px;" onclick="markAllRead()">{{ t('mark_all_read') }}</button>
         </div>
-        <div id="notifList"><p class="loading-text">Loading...</p></div>
+        <div id="notifList"><p class="loading-text">{{ t('loading') }}</p></div>
       </section>
 
       <!-- === PROFILE TAB === -->
       <section id="tab-profile" class="dash-tab" style="display:none;">
-        <h2 class="dash-section-title">Update Profile</h2>
+        <h2 class="dash-section-title">{{ t('update_my_profile') }}</h2>
         <div class="glass-panel" style="max-width:480px;padding:28px;">
           <div id="profileFeedback"></div>
           <div class="form-group">
-            <label class="form-label">Full Name</label>
-            <input type="text" id="profileName" class="form-control" placeholder="Full Name">
+            <label class="form-label">{{ t('full_name') }}</label>
+            <input type="text" id="profileName" class="form-control" placeholder="{{ t('full_name') }}">
           </div>
           <div class="form-group">
-            <label class="form-label">Phone Number</label>
+            <label class="form-label">{{ t('phone_number_label') }}</label>
             <input type="tel" id="profilePhone" class="form-control" placeholder="05XX XXX XX XX">
           </div>
           <div class="form-group">
-            <label class="form-label">Birth Date</label>
+            <label class="form-label">{{ t('birth_date_label') }}</label>
             <input type="date" id="profileBirthdate" class="form-control">
           </div>
           <div class="form-group">
-            <label class="form-label">Email (cannot be changed)</label>
+            <label class="form-label">{{ t('email_no_change') }}</label>
             <input type="email" id="profileEmail" class="form-control" disabled style="opacity:0.6;">
           </div>
           <div class="form-group">
-            <label class="form-label">Role</label>
+            <label class="form-label">{{ t('role_label') }}</label>
             <input type="text" id="profileRole" class="form-control" disabled style="opacity:0.6;">
           </div>
-          <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;" onclick="saveProfile()">Save</button>
+          <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;" onclick="saveProfile()">{{ t('save') }}</button>
         </div>
 
-        <h2 class="dash-section-title" style="margin-top:32px;">Change Password</h2>
+        <h2 class="dash-section-title" style="margin-top:32px;">{{ t('change_my_password') }}</h2>
         <div class="glass-panel" style="max-width:480px;padding:28px;">
           <div id="passwordFeedback"></div>
           <div class="form-group">
-            <label class="form-label">Current Password</label>
+            <label class="form-label">{{ t('current_password') }}</label>
             <input type="password" id="currentPassword" class="form-control">
           </div>
           <div class="form-group">
-            <label class="form-label">New Password</label>
+            <label class="form-label">{{ t('new_password') }}</label>
             <input type="password" id="newPassword" class="form-control">
           </div>
           <div class="form-group">
-            <label class="form-label">New Password (Repeat)</label>
+            <label class="form-label">{{ t('confirm_password') }}</label>
             <input type="password" id="confirmPassword" class="form-control">
           </div>
-          <button class="btn btn-outline" style="width:100%;justify-content:center;padding:12px;border-color:var(--gold);color:var(--gold);margin-top:8px;" onclick="changePassword()">Update Password</button>
+          <button class="btn btn-outline" style="width:100%;justify-content:center;padding:12px;border-color:var(--gold);color:var(--gold);margin-top:8px;" onclick="changePassword()">{{ t('update_password') }}</button>
         </div>
       </section>
 
@@ -203,6 +206,12 @@
 
     // Tab switching
     function showTab(name, btn) {
+      try {
+        const url = new URL(window.location.href);
+        url.searchParams.set('tab', name);
+        window.history.replaceState(null, '', url.pathname + url.search);
+      } catch (e) {}
+
       document.querySelectorAll('.dash-tab').forEach(t => t.style.display = 'none');
       document.getElementById('tab-' + name).style.display = 'block';
       document.querySelectorAll('.dash-nav-btn').forEach(b => b.classList.remove('active'));
@@ -230,10 +239,10 @@
         const tickets = await res.json();
         window._myTickets = tickets;
 
-        if (!tickets.length) { el.innerHTML = '<p class="loading-text">You haven\'t bought any tickets yet.</p>'; return; }
+        if (!tickets.length) { el.innerHTML = `<p class="loading-text">{{ t('no_tickets_bought') }}</p>`; return; }
         el.innerHTML = tickets.map((t, idx) => {
           const statusColor = { valid: '#10b981', used: '#6b7280', refund_pending: '#f59e0b', refunded: '#8b5cf6', cancelled: '#ef4444' }[t.status] || '#6b7280';
-          const statusLabel = { valid: '✓ Valid', used: '✗ Used', refund_pending: '⏳ Refund Pending', refunded: '↩ Refunded', cancelled: '✕ Cancelled' }[t.status] || t.status;
+          const statusLabel = { valid: "{{ t('valid_status') }}", used: "{{ t('used_status') }}", refund_pending: "{{ t('refund_pending_status') }}", refunded: "{{ t('refunded_status') }}", cancelled: "{{ t('cancelled_status') }}" }[t.status] || t.status;
           
           const seatInfo = t.zone ? `(🪑 ${t.zone} ${t.row_label}-${t.col_label})` : '';
 
@@ -251,17 +260,17 @@
               </p>
               <p style="color:var(--text-muted);font-size:0.82rem;margin:0 0 2px;">📅 ${fDate(t.date)}</p>
               <p style="color:var(--text-muted);font-size:0.82rem;margin:0 0 8px;">📍 ${t.location}</p>
-              <p style="color:var(--text-muted);font-size:0.78rem;margin:0;">Ticket Code: <strong style="color:var(--text);font-family:monospace;">${t.ticket_key}</strong> &nbsp;|&nbsp; Price: ${(t.total_price || 0).toLocaleString('en-US')} ₺</p>
+              <p style="color:var(--text-muted);font-size:0.78rem;margin:0;">{{ t('ticket_code') }}: <strong style="color:var(--text);font-family:monospace;">${t.ticket_key}</strong> &nbsp;|&nbsp; {{ t('price') }}: ${(t.total_price || 0).toLocaleString('en-US')} ₺</p>
             </div>
             ${t.qr_code && t.status === 'valid' ? `
             <div style="flex-shrink:0;text-align:center;display:flex;flex-direction:column;gap:8px;justify-content:center;">
-              <button class="btn btn-outline" style="font-size:0.75rem;padding:6px 14px;" onclick="showQR('${t.qr_code}','${t.ticket_key.replace(/'/g,"\\'")}')" id="btn-qr-${t.id}">Show QR</button>
-              <button class="btn btn-primary" style="font-size:0.75rem;padding:6px 14px;background:var(--accent-purple);border-color:var(--accent-purple);" onclick="downloadPDF(${idx})" id="btn-pdf-${t.id}">Download PDF</button>
-              <button class="btn btn-outline" style="font-size:0.75rem;padding:6px 14px;border-color:#f59e0b;color:#f59e0b;" onclick="openRefundModal(${t.id}, ${t.total_price||0}, '${(t.title||'').replace(/'/g,"\\'")}'  )" id="btn-refund-${t.id}">↩ Refund</button>
+              <button class="btn btn-outline" style="font-size:0.75rem;padding:6px 14px;" onclick="showQR('${t.qr_code}','${t.ticket_key.replace(/'/g,"\\'")}')" id="btn-qr-${t.id}">{{ t('show_qr') }}</button>
+              <button class="btn btn-primary" style="font-size:0.75rem;padding:6px 14px;background:var(--accent-purple);border-color:var(--accent-purple);" onclick="downloadPDF(${idx})" id="btn-pdf-${t.id}">{{ t('download_ticket') }}</button>
+              <button class="btn btn-outline" style="font-size:0.75rem;padding:6px 14px;border-color:#f59e0b;color:#f59e0b;" onclick="openRefundModal(${t.id}, ${t.total_price||0}, '${(t.title||'').replace(/'/g,"\\'")}'  )" id="btn-refund-${t.id}">↩ ${"{{ t('request_refund') }}".replace(' Talep Et', '')}</button>
             </div>` : ''}
           </div>`;
         }).join('');
-      } catch { el.innerHTML = '<p class="loading-text" style="color:#f87171;">Could not load tickets.</p>'; }
+      } catch { el.innerHTML = `<p class="loading-text" style="color:#f87171;">{{ t('could_not_load_tickets') }}</p>`; }
     }
 
     // ── PDF GENERATION FOR DASHBOARD ───────────────────
@@ -303,7 +312,7 @@
         <div style="width: 595px; background: white; color: black; font-family: 'Inter', 'Segoe UI', Arial, sans-serif; padding: 0; margin: 0 auto;">
           <div style="background: linear-gradient(135deg, #5a19a0, #8b5cf6); padding: 30px 40px; color: white;">
             <div style="font-size: 28px; font-weight: 800; letter-spacing: 1px;">EVENT <span style="color:#fcd34d;">IX</span></div>
-            <div style="font-size:10px; margin-top:5px; opacity:0.9; font-weight:600;">OFFICIAL E-TICKET & CONFIRMATION</div>
+            <div style="font-size:10px; margin-top:5px; opacity:0.9; font-weight:600;">{{ t('official_eticket') }}</div>
           </div>
           <div style="padding: 40px;">
             <div style="font-size: 24px; font-weight: 800; margin-bottom: 30px; border-bottom: 2px solid #f3f4f6; padding-bottom: 15px; color: #111;">
@@ -312,40 +321,40 @@
             <div style="display: flex; justify-content: space-between; gap: 30px;">
               <div style="flex: 1;">
                 <div style="margin-bottom: 20px;">
-                  <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Date & Time</div>
+                  <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">{{ t('date_and_time') }}</div>
                   <div style="font-size: 16px; font-weight: 700; color: #111;">${oDate}</div>
                 </div>
                 <div style="margin-bottom: 20px;">
-                  <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Location</div>
+                  <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">{{ t('location') }}</div>
                   <div style="font-size: 16px; font-weight: 700; color: #111;">${oLoc}</div>
                 </div>
                 <div style="margin-bottom: 20px;">
-                  <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Attendee</div>
+                  <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">{{ t('attendee') }}</div>
                   <div style="font-size: 16px; font-weight: 700; color: #111;">${oName}</div>
                 </div>
                 <div style="margin-bottom: 20px; display: ${oSeatDisp};">
-                  <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Seat</div>
+                  <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">{{ t('seat') }}</div>
                   <div style="font-size: 16px; font-weight: 700; color: #111;">${oSeatVal}</div>
                 </div>
                 <div style="margin-bottom: 20px;">
-                  <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Price</div>
+                  <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">{{ t('price') }}</div>
                   <div style="font-size: 16px; font-weight: 700; color: #111;">${oPrice} ₺</div>
                 </div>
               </div>
               <div style="border: 1px solid #e5e7eb; padding: 15px; border-radius: 12px; text-align: center; width: 170px; height: 230px;">
                 <img src="${qrSrc}" alt="QR Code" style="width: 170px; height: 170px; display: block; margin: 0 auto; object-fit: contain;">
-                <div style="margin-top:10px; font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700;">Ticket Code</div>
+                <div style="margin-top:10px; font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700;">{{ t('ticket_code') }}</div>
                 <div style="font-family:monospace; font-weight:700; font-size:14px; letter-spacing:1px; color: #111; margin-top: 5px;">${t.ticket_key}</div>
               </div>
             </div>
             
             <div style="margin-top:40px; padding:20px; background:#f5f3ff; border-radius:12px; border:1px solid #ddd; text-align:center;">
-               <span style="display:block; font-size:10px; color:#7c3aed; font-weight:700; margin-bottom:5px;">IMPORTANT NOTE</span>
-               <span style="font-size:12px; color:#4b5563;">This ticket is personal. Please have the QR code scanned by the attendant at the entrance.</span>
+               <span style="display:block; font-size:10px; color:#7c3aed; font-weight:700; margin-bottom:5px;">{{ t('important_note') }}</span>
+               <span style="font-size:12px; color:#4b5563;">{{ t('ticket_is_personal') }}</span>
             </div>
           </div>
           <div style="background: #f9fafb; padding: 20px; text-align: center; font-size: 10px; color: #9ca3af; border-top: 1px dashed #e5e7eb;">
-            This document was automatically generated by the EVENTIX Ticketing Platform.<br>Protected against forgery. © 2026
+            {{ t('pdf_footer') | safe }}
           </div>
         </div>
       `;
@@ -362,7 +371,7 @@
         await html2pdf().set(opt).from(htmlStr).save();
       } catch (e) {
         console.error(e);
-        alert('An error occurred while downloading PDF.');
+        alert("{{ t('error_downloading_pdf') }}");
       }
     }
 
@@ -381,11 +390,11 @@
     // ── WISHLIST ──────────────────────────────────────────
     async function loadWishlist() {
       const el = document.getElementById('wishlistGrid');
-      el.innerHTML = '<p class="loading-text" style="grid-column:1/-1;">Loading...</p>';
+      el.innerHTML = `<p class="loading-text" style="grid-column:1/-1;">{{ t('loading') }}</p>`;
       try {
         const res = await fetch('/api/wishlist', { headers: authHeaders() });
         const items = await res.json();
-        if (!items.length) { el.innerHTML = '<p class="loading-text" style="grid-column:1/-1;">Your wishlist is empty.</p>'; return; }
+        if (!items.length) { el.innerHTML = `<p class="loading-text" style="grid-column:1/-1;">{{ t('wishlist_empty') }}</p>`; return; }
         el.innerHTML = items.map(e => `
           <div class="event-card glass-panel" style="cursor:pointer;" onclick="window.location.href='event-detail.html?id=${e.id}'">
             <div class="event-img-wrapper">
@@ -397,13 +406,13 @@
               <div class="event-location" style="display:flex;align-items:center;gap:4px;">📍 ${e.location}</div>
               <div class="event-footer">
                 <div class="event-price">${(e.price || 0).toLocaleString('en-US')} ₺</div>
-                <button class="btn btn-outline" style="font-size:0.8rem;padding:6px 12px;" onclick="event.stopPropagation();removeWish('${e.id}',this.closest('.event-card'))">❤ Remove</button>
+                <button class="btn btn-outline" style="font-size:0.8rem;padding:6px 12px;" onclick="event.stopPropagation();removeWish('${e.id}',this.closest('.event-card'))">❤ {{ t('remove') }}</button>
               </div>
             </div>
           </div>`).join('');
       } catch (err) { 
         console.error(err);
-        el.innerHTML = `<p class="loading-text" style="grid-column:1/-1;color:#f87171;">Could not load favorites: ${err.message || 'Unknown error'}</p>`; 
+        el.innerHTML = `<p class="loading-text" style="grid-column:1/-1;color:#f87171;">{{ t('could_not_load_favorites') }} ${err.message || 'Unknown error'}</p>`; 
       }
     }
 
@@ -417,7 +426,7 @@
     // ── NOTIFICATIONS ──────────────────────────────────────
     async function loadNotifications() {
       const el = document.getElementById('notifList');
-      el.innerHTML = '<p class="loading-text">Loading...</p>';
+      el.innerHTML = `<p class="loading-text">{{ t('loading') }}</p>`;
       try {
         const res = await fetch('/api/notifications', { headers: authHeaders() });
         const notifs = await res.json();
@@ -425,7 +434,7 @@
         const badge = document.getElementById('notifBadge');
         badge.style.display = unread > 0 ? 'inline-flex' : 'none';
         badge.textContent = unread;
-        if (!notifs.length) { el.innerHTML = '<p class="loading-text">No notifications.</p>'; return; }
+        if (!notifs.length) { el.innerHTML = `<p class="loading-text">{{ t('no_notifications') }}</p>`; return; }
         el.innerHTML = notifs.map(n => `
           <div class="glass-panel" style="padding:14px 18px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start;border-left:3px solid ${n.is_read ? 'transparent' : 'var(--gold)'};">
             <span style="font-size:1.2rem;flex-shrink:0;">${n.is_read ? '🔔' : '🔔'}</span>
@@ -433,9 +442,9 @@
               <p style="color:var(--text); opacity:${n.is_read ? '0.6' : '1'}; margin:0 0 4px; font-size:0.9rem;">${n.message}</p>
               <p style="color:var(--text-muted);font-size:0.75rem;margin:0;">${new Date(n.created_at).toLocaleString('en-US')}</p>
             </div>
-            ${!n.is_read ? `<button class="btn btn-outline" style="font-size:0.75rem;padding:4px 10px;flex-shrink:0;" onclick="readOne(${n.id},this)">Read</button>` : ''}
+            ${!n.is_read ? `<button class="btn btn-outline" style="font-size:0.75rem;padding:4px 10px;flex-shrink:0;" onclick="readOne(${n.id},this)">{{ t('mark_read') }}</button>` : ''}
           </div>`).join('');
-      } catch { el.innerHTML = '<p class="loading-text" style="color:#f87171;">Could not load notifications.</p>'; }
+      } catch { el.innerHTML = `<p class="loading-text" style="color:#f87171;">{{ t('could_not_load_notifications') }}</p>`; }
     }
 
     async function readOne(id, btn) {
@@ -470,7 +479,7 @@
         });
         const fb = document.getElementById('profileFeedback');
         if (res.ok) {
-          fb.innerHTML = '<p style="color:#6ee7b7;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);padding:10px 14px;border-radius:8px;margin-bottom:12px;">✓ Profile updated!</p>';
+          fb.innerHTML = `<p style="color:#6ee7b7;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);padding:10px 14px;border-radius:8px;margin-bottom:12px;">{{ t('profile_updated') }}</p>`;
           const u = getUser();
           u.fullname = fullname;
           u.phone = phone;
@@ -480,7 +489,7 @@
           document.getElementById('avatarInitials').textContent = fullname.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
           if (window.renderNav) renderNav();
         } else {
-          fb.innerHTML = '<p style="color:#fca5a5;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);padding:10px 14px;border-radius:8px;margin-bottom:12px;">⚠ An error occurred.</p>';
+          fb.innerHTML = `<p style="color:#fca5a5;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);padding:10px 14px;border-radius:8px;margin-bottom:12px;">{{ t('an_error_occurred') }}</p>`;
         }
       } catch {}
     }
@@ -492,15 +501,15 @@
       const fb = document.getElementById('passwordFeedback');
 
       if (!current_password || !new_password || !confirm_password) {
-        fb.innerHTML = '<p style="color:#fca5a5;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);padding:10px 14px;border-radius:8px;margin-bottom:12px;">⚠ Fill in all fields.</p>';
+        fb.innerHTML = `<p style="color:#fca5a5;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);padding:10px 14px;border-radius:8px;margin-bottom:12px;">{{ t('fill_all_fields') }}</p>`;
         return;
       }
       if (new_password.length < 6) {
-        fb.innerHTML = '<p style="color:#fca5a5;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);padding:10px 14px;border-radius:8px;margin-bottom:12px;">⚠ Password must be at least 6 characters.</p>';
+        fb.innerHTML = `<p style="color:#fca5a5;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);padding:10px 14px;border-radius:8px;margin-bottom:12px;">{{ t('password_min_6') }}</p>`;
         return;
       }
       if (new_password !== confirm_password) {
-        fb.innerHTML = '<p style="color:#fca5a5;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);padding:10px 14px;border-radius:8px;margin-bottom:12px;">⚠ New passwords do not match.</p>';
+        fb.innerHTML = `<p style="color:#fca5a5;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);padding:10px 14px;border-radius:8px;margin-bottom:12px;">{{ t('passwords_no_match') }}</p>`;
         return;
       }
 
@@ -512,15 +521,15 @@
         });
         const d = await res.json();
         if (res.ok) {
-          fb.innerHTML = '<p style="color:#6ee7b7;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);padding:10px 14px;border-radius:8px;margin-bottom:12px;">✓ Password updated successfully!</p>';
+          fb.innerHTML = `<p style="color:#6ee7b7;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);padding:10px 14px;border-radius:8px;margin-bottom:12px;">{{ t('password_updated') }}</p>`;
           document.getElementById('currentPassword').value = '';
           document.getElementById('newPassword').value = '';
           document.getElementById('confirmPassword').value = '';
         } else {
-          fb.innerHTML = `<p style="color:#fca5a5;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);padding:10px 14px;border-radius:8px;margin-bottom:12px;">⚠ ${d.message || 'Error occurred'}</p>`;
+          fb.innerHTML = `<p style="color:#fca5a5;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);padding:10px 14px;border-radius:8px;margin-bottom:12px;">⚠ ${d.message || "{{ t('an_error_occurred') }}"}</p>`;
         }
       } catch {
-        fb.innerHTML = '<p style="color:#fca5a5;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);padding:10px 14px;border-radius:8px;margin-bottom:12px;">⚠ Server error.</p>';
+        fb.innerHTML = `<p style="color:#fca5a5;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);padding:10px 14px;border-radius:8px;margin-bottom:12px;">{{ t('an_error_occurred') }}</p>`;
       }
     }
 
@@ -535,17 +544,17 @@
   <div id="refundModalOverlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);align-items:center;justify-content:center;" onclick="closeRefundModal(event)">
     <div class="glass-panel" style="width:min(94vw,440px);padding:28px;border-radius:20px;box-shadow:0 24px 60px rgba(0,0,0,0.6);animation:modalIn .25s cubic-bezier(.34,1.56,.64,1);" onclick="event.stopPropagation()">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
-        <h3 style="color:var(--text);margin:0;font-size:1.15rem;">↩ Refund Ticket</h3>
+        <h3 style="color:var(--text);margin:0;font-size:1.15rem;">{{ t('refund_ticket_title') }}</h3>
         <button onclick="closeRefundModal()" style="background:rgba(255,255,255,0.08);border:none;color:var(--text-muted);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;">✕</button>
       </div>
 
-      <div id="refundModalContent"><p style="color:var(--text-muted);text-align:center;">Checking eligibility...</p></div>
+      <div id="refundModalContent"><p style="color:var(--text-muted);text-align:center;">{{ t('checking_eligibility') }}</p></div>
 
       <div id="refundModalActions" style="display:none;margin-top:20px;display:flex;flex-direction:column;gap:10px;">
         <button id="refundConfirmBtn" class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;background:linear-gradient(135deg,#f59e0b,#ef4444);border:none;" onclick="confirmRefund()">
-          ✓ Confirm Refund
+          {{ t('confirm_refund') }}
         </button>
-        <button class="btn btn-outline" style="width:100%;justify-content:center;padding:10px;" onclick="closeRefundModal()">Cancel</button>
+        <button class="btn btn-outline" style="width:100%;justify-content:center;padding:10px;" onclick="closeRefundModal()">{{ t('cancel_btn') }}</button>
       </div>
     </div>
   </div>
@@ -566,52 +575,65 @@
       overlay.style.display = 'flex';
       document.body.style.overflow = 'hidden';
       actions.style.display = 'none';
-      content.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:20px 0;">⏳ Checking eligibility...</p>';
+      content.innerHTML = `<p style="color:var(--text-muted);text-align:center;padding:20px 0;">{{ t('checking_eligibility') }}</p>`;
 
       fetch(`/api/tickets/${ticketId}/refund-eligibility`, { headers: authHeaders() })
         .then(r => r.json())
         .then(d => {
           const p = d.refund_preview || {};
           const fmt = n => (n||0).toLocaleString('en-US');
+          
+          const formatTime = (h) => {
+            if (h === undefined || h === null) return '';
+            if (h < 0) return "{{ t('event_passed') }}";
+            if (h >= 24) {
+              const days = h / 24;
+              return `${days.toFixed(1)} {{ t('days_until_event') }}`;
+            }
+            return `${h.toFixed(1)} {{ t('until_event') }}`;
+          };
+
+          const remainingText = formatTime(d.hours_until_event);
+
           if (d.eligible) {
             content.innerHTML = `
               <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:12px;padding:16px;margin-bottom:16px;">
-                <p style="color:#6ee7b7;font-weight:600;margin:0 0 4px;">✓ Eligible for Refund</p>
-                <p style="color:var(--text-muted);font-size:0.82rem;margin:0;">${d.hours_until_event?.toFixed(1)}h until event (min 72h required)</p>
+                <p style="color:#6ee7b7;font-weight:600;margin:0 0 4px;">{{ t('eligible_for_refund') }}</p>
+                <p style="color:var(--text-muted);font-size:0.82rem;margin:0;">${remainingText}</p>
               </div>
               <p style="color:var(--text);font-weight:600;margin:0 0 12px;">📋 "${title}"</p>
               <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px;font-size:0.88rem;">
                 <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
-                  <span style="color:var(--text-muted);">Original Price</span>
+                  <span style="color:var(--text-muted);">{{ t('original_price') }}</span>
                   <span style="color:var(--text);font-weight:600;">${fmt(p.original_price)} ₺</span>
                 </div>
                 <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
-                  <span style="color:#6ee7b7;">↩ You will receive (80%)</span>
+                  <span style="color:#6ee7b7;">{{ t('you_will_receive') }}</span>
                   <span style="color:#6ee7b7;font-weight:700;">${fmt(p.refund_to_customer)} ₺</span>
                 </div>
                 <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
-                  <span style="color:var(--text-muted);">Organizer compensation (15%)</span>
+                  <span style="color:var(--text-muted);">{{ t('organizer_compensation') }}</span>
                   <span style="color:var(--text-muted);">${fmt(p.organizer_compensation)} ₺</span>
                 </div>
                 <div style="display:flex;justify-content:space-between;padding:6px 0;">
-                  <span style="color:var(--text-muted);">Platform fee (5%)</span>
+                  <span style="color:var(--text-muted);">{{ t('platform_fee') }}</span>
                   <span style="color:var(--text-muted);">${fmt(p.admin_fee)} ₺</span>
                 </div>
               </div>
-              <p style="color:#fca5a5;font-size:0.8rem;margin:12px 0 0;text-align:center;">⚠ This action is irreversible. 20% cancellation fee applies.</p>`;
+              <p style="color:#fca5a5;font-size:0.8rem;margin:12px 0 0;text-align:center;">{{ t('irreversible_action') }}</p>`;
             actions.style.display = 'flex';
           } else {
             content.innerHTML = `
               <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:12px;padding:16px;text-align:center;">
                 <div style="font-size:2rem;margin-bottom:8px;">⏰</div>
-                <p style="color:#fca5a5;font-weight:600;margin:0 0 6px;">Not Eligible for Refund</p>
-                <p style="color:var(--text-muted);font-size:0.85rem;margin:0;">${d.message}</p>
+                <p style="color:#fca5a5;font-weight:600;margin:0 0 6px;">{{ t('not_eligible_for_refund') }}</p>
+                <p style="color:var(--text-muted);font-size:0.85rem;margin:0;">${remainingText || d.message}</p>
               </div>
-              <button class="btn btn-outline" style="width:100%;justify-content:center;padding:10px;margin-top:16px;" onclick="closeRefundModal()">Close</button>`;
+              <button class="btn btn-outline" style="width:100%;justify-content:center;padding:10px;margin-top:16px;" onclick="closeRefundModal()">{{ t('close') }}</button>`;
           }
         })
         .catch(() => {
-          content.innerHTML = '<p style="color:#f87171;text-align:center;">Could not check eligibility.</p>';
+          content.innerHTML = `<p style="color:#f87171;text-align:center;">{{ t('could_not_check_eligibility') }}</p>`;
         });
     }
 
@@ -625,7 +647,7 @@
     async function confirmRefund() {
       if (!_refundTicketId) return;
       const btn = document.getElementById('refundConfirmBtn');
-      btn.textContent = 'Processing...';
+      btn.textContent = '⌛ ' + "{{ t('processing') }}";
       btn.disabled = true;
       try {
         const res = await fetch(`/api/tickets/${_refundTicketId}/refund`, {
@@ -642,23 +664,31 @@
           content.innerHTML = `
             <div style="text-align:center;padding:10px 0;">
               <div style="font-size:3rem;margin-bottom:12px;">✅</div>
-              <p style="color:#6ee7b7;font-weight:700;font-size:1.1rem;margin:0 0 6px;">Refund Successful!</p>
-              <p style="color:var(--text-muted);font-size:0.85rem;margin:0 0 16px;">Your ticket has been cancelled.</p>
+              <p style="color:#6ee7b7;font-weight:700;font-size:1.1rem;margin:0 0 6px;">{{ t('refund_successful') }}</p>
+              <p style="color:var(--text-muted);font-size:0.85rem;margin:0 0 16px;">{{ t('ticket_cancelled') }}</p>
               <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:14px;font-size:0.88rem;">
-                <p style="color:var(--text);margin:0 0 6px;">Amount refunded: <strong style="color:#6ee7b7;">${fmt(rd.refund_to_customer)} ₺</strong></p>
-                ${rd.seat_released ? `<p style="color:var(--text-muted);margin:0;font-size:0.82rem;">Seat <strong>${rd.seat_released}</strong> is now available again.</p>` : ''}
+                <p style="color:var(--text);margin:0 0 6px;">{{ t('amount_refunded') }} <strong style="color:#6ee7b7;">${fmt(rd.refund_to_customer)} ₺</strong></p>
+                ${rd.seat_released ? `<p style="color:var(--text-muted);margin:0;font-size:0.82rem;">{{ t('seat_released') }}</p>` : ''}
               </div>
-              <button class="btn btn-primary" style="margin-top:16px;width:100%;justify-content:center;" onclick="closeRefundModal(); loadTickets();">Close</button>
+              <button class="btn btn-primary" style="margin-top:16px;width:100%;justify-content:center;" onclick="closeRefundModal(); loadTickets();">{{ t('close') }}</button>
             </div>`;
         } else {
-          content.innerHTML = `<p style="color:#f87171;text-align:center;padding:20px 0;">${d.message || 'Refund failed.'}</p>
-            <button class="btn btn-outline" style="width:100%;justify-content:center;" onclick="closeRefundModal()">Close</button>`;
+          content.innerHTML = `<p style="color:#f87171;text-align:center;padding:20px 0;">${d.message || "{{ t('refund_failed') }}"}</p>
+            <button class="btn btn-outline" style="width:100%;justify-content:center;" onclick="closeRefundModal()">{{ t('close') }}</button>`;
         }
       } catch {
-        document.getElementById('refundModalContent').innerHTML = '<p style="color:#f87171;text-align:center;">Server error. Please try again.</p>';
-        btn.textContent = 'Confirm Refund'; btn.disabled = false;
+        document.getElementById('refundModalContent').innerHTML = `<p style="color:#f87171;text-align:center;">{{ t('an_error_occurred') }}</p>`;
+        btn.innerHTML = "{{ t('confirm_refund') }}"; btn.disabled = false;
       }
     }
+  </script>
+  <script>
+      document.addEventListener("DOMContentLoaded", () => {
+          const langLabel = document.getElementById('currentLangLabel');
+          if(langLabel) {
+              langLabel.textContent = "{{ current_lang | upper }}";
+          }
+      });
   </script>
 </body>
 </html>

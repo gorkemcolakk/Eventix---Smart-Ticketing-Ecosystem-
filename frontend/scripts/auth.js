@@ -91,10 +91,148 @@ const THEME_BTN = `
     <svg class="icon-sun"  width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
   </button>`;
 
+const getLangFromCookie = () => {
+    const match = document.cookie.match(new RegExp('(^| )lang=([^;]+)'));
+    return match ? match[2].toLowerCase() : 'tr';
+};
+
+const authI18n = {
+    tr: {
+        cart: 'Sepet',
+        my_tickets: '🎟 Biletlerim',
+        my_wishlist: '❤ Favorilerim',
+        notifications: '🔔 Bildirimler',
+        pending_approval: '⏳ Onay Bekleyenler',
+        users: '👥 Kullanıcılar',
+        all_events: '📋 Tüm Etkinlikler',
+        platform_revenue: '💰 Platform Geliri',
+        my_events: '🎪 Etkinliklerim',
+        create_event: '➕ Etkinlik Oluştur',
+        revenue_report: '💰 Gelir Raporu',
+        promotions: '🎫 Promosyonlar',
+        qr_validation: '🔍 QR Doğrulama',
+        logout: '🚪 Çıkış Yap',
+        login: 'Giriş Yap',
+        register: 'Kayıt Ol',
+        please_login_wishlist: 'Favorilere eklemek için lütfen giriş yapın.',
+        logging_in: 'Giriş yapılıyor...',
+        login_failed: 'Giriş başarısız',
+        server_error: 'Sunucuya bağlanılamadı',
+        password_length: 'Şifre en az 6 karakter olmalıdır',
+        register_success: 'Kayıt başarılı! Yönlendiriliyor...',
+        register_failed: 'Kayıt başarısız',
+        password_reset: 'Şifre Sıfırlama',
+        set_new_password: 'Yeni şifrenizi belirleyin.',
+        logging_in: 'Giriş yapılıyor...',
+        new_password: 'Yeni Şifre',
+        new_password_repeat: 'Yeni Şifre (Tekrar)',
+        update_password: 'Şifreyi Güncelle',
+        password_mismatch: 'Şifreler eşleşmiyor!',
+        updating: 'Güncelleniyor...',
+        password_updated: 'Şifreniz güncellendi! Girişe yönlendiriliyor...',
+        token_expired: 'Bir hata oluştu. Token süresi dolmuş olabilir.',
+        forgot_email_prompt: 'Şifre sıfırlama bağlantısı almak için kayıtlı e-posta adresinizi girin:',
+        success: 'Başarılı',
+        error_try_again: 'Bir hata oluştu. Lütfen tekrar deneyin.'
+    },
+    en: {
+        cart: 'Cart',
+        my_tickets: '🎟 My Tickets',
+        my_wishlist: '❤ My Wishlist',
+        notifications: '🔔 Notifications',
+        pending_approval: '⏳ Pending Approval',
+        users: '👥 Users',
+        all_events: '📋 All Events',
+        platform_revenue: '💰 Platform Revenue',
+        my_events: '🎪 My Events',
+        create_event: '➕ Create Event',
+        revenue_report: '💰 Revenue Report',
+        promotions: '🎫 Promotions',
+        qr_validation: '🔍 QR Validation',
+        logout: '🚪 Logout',
+        login: 'Login',
+        register: 'Register',
+        please_login_wishlist: 'Please login to add to favorites.',
+        logging_in: 'Logging in...',
+        login_failed: 'Login failed',
+        server_error: 'Could not connect to server',
+        password_length: 'Password must be at least 6 characters',
+        register_success: 'Registration successful! Redirecting...',
+        register_failed: 'Registration failed',
+        password_reset: 'Password Reset',
+        set_new_password: 'Set your new password.',
+        logging_in: 'Logging in...',
+        new_password: 'New Password',
+        new_password_repeat: 'New Password (Repeat)',
+        update_password: 'Update Password',
+        password_mismatch: 'Passwords do not match!',
+        updating: 'Updating...',
+        password_updated: 'Your password has been updated! Redirecting to login...',
+        token_expired: 'An error occurred. Token may have expired.',
+        forgot_email_prompt: 'Enter your registered email address to receive a password reset link:',
+        success: 'Success',
+        error_try_again: 'An error occurred. Please try again.'
+    },
+    de: {
+        cart: 'Warenkorb',
+        my_tickets: '🎟 Meine Tickets',
+        my_wishlist: '❤ Meine Wunschliste',
+        notifications: '🔔 Benachrichtigungen',
+        pending_approval: '⏳ Ausstehende Genehmigung',
+        users: '👥 Benutzer',
+        all_events: '📋 Alle Ereignisse',
+        platform_revenue: '💰 Plattformeinnahmen',
+        my_events: '🎪 Meine Events',
+        create_event: '➕ Event Erstellen',
+        revenue_report: '💰 Einnahmenbericht',
+        promotions: '🎫 Werbeaktionen',
+        qr_validation: '🔍 QR-Validierung',
+        logout: '🚪 Abmelden',
+        login: 'Anmelden',
+        register: 'Registrieren',
+        please_login_wishlist: 'Bitte melden Sie sich an, um zu Favoriten hinzuzufügen.',
+        logging_in: 'Anmelden...',
+        login_failed: 'Anmeldung fehlgeschlagen',
+        server_error: 'Verbindung zum Server konnte nicht hergestellt werden',
+        password_length: 'Das Passwort muss mindestens 6 Zeichen lang sein',
+        register_success: 'Registrierung erfolgreich! Weiterleitung...',
+        register_failed: 'Registrierung fehlgeschlagen',
+        password_reset: 'Passwort zurücksetzen',
+        set_new_password: 'Legen Sie Ihr neues Passwort fest.',
+        logging_in: 'Anmelden...',
+        new_password: 'Neues Passwort',
+        new_password_repeat: 'Neues Passwort (Wiederholung)',
+        update_password: 'Passwort aktualisieren',
+        password_mismatch: 'Passwörter stimmen nicht überein!',
+        updating: 'Aktualisieren...',
+        password_updated: 'Ihr Passwort wurde aktualisiert! Weiterleitung zur Anmeldung...',
+        token_expired: 'Ein Fehler ist aufgetreten. Token ist möglicherweise abgelaufen.',
+        forgot_email_prompt: 'Geben Sie Ihre registrierte E-Mail-Adresse ein, um einen Link zum Zurücksetzen des Passworts zu erhalten:',
+        success: 'Erfolg',
+        error_try_again: 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.'
+    }
+};
+
+const _lang = getLangFromCookie();
+const t = (key) => (authI18n[_lang] || authI18n['tr'])[key] || key;
+
+const LANG_BTN = `
+  <div class="lang-dropdown" style="position:relative; display:inline-block; margin-right:5px;">
+    <button class="btn btn-outline" style="padding:6px 12px; font-size:0.85rem; border-radius:8px; display:flex; align-items:center; gap:5px;" onclick="event.stopPropagation(); document.getElementById('langMenu').classList.toggle('active')">
+      🌐 <span id="currentLangLabel">${_lang.toUpperCase()}</span> ▾
+    </button>
+    <div id="langMenu" class="user-dropdown-menu" style="right:0; left:auto; top:120%;">
+      <a href="#" onclick="window.location.href='/set_language/tr?next=' + encodeURIComponent(window.location.href)" class="dropdown-item" style="text-decoration:none;">🇹🇷 TR</a>
+      <a href="#" onclick="window.location.href='/set_language/en?next=' + encodeURIComponent(window.location.href)" class="dropdown-item" style="text-decoration:none;">🇬🇧 EN</a>
+      <a href="#" onclick="window.location.href='/set_language/de?next=' + encodeURIComponent(window.location.href)" class="dropdown-item" style="text-decoration:none;">🇩🇪 DE</a>
+    </div>
+  </div>
+`;
+
 const CART_BTN = `
-  <a href="cart.html" class="nav-link cart-link-nav" style="position:relative; margin-right:15px; display:flex; align-items:center; gap:5px; text-decoration:none;">
+  <a href="cart.html" class="nav-link cart-link-nav" style="position:relative; margin-right:10px; display:flex; align-items:center; gap:5px; text-decoration:none;">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-    <span style="font-weight:600;">Cart</span> <span id="globalCartCount" style="background:#ec4899; color:white; border-radius:10px; padding:2px 6px; font-size:0.7rem; font-weight:bold; margin-left:4px; display:none;">0</span>
+    <span style="font-weight:600;" id="navCartText">${t('cart')}</span> <span id="globalCartCount" style="background:#ec4899; color:white; border-radius:10px; padding:2px 6px; font-size:0.7rem; font-weight:bold; margin-left:4px; display:none;">0</span>
   </a>
 `;
 
@@ -110,38 +248,39 @@ function renderNav() {
              let dropLinks = '';
             const commonLinks = `
               <hr style="border:0; border-top:1px solid var(--border); margin:4px 0;">
-              <a href="dashboard.html?tab=tickets" class="dropdown-item">🎟 My Tickets</a>
-              <a href="dashboard.html?tab=wishlist" class="dropdown-item">❤ My Wishlist</a>
-              <a href="dashboard.html?tab=notifications" class="dropdown-item">🔔 Notifications</a>
+              <a href="dashboard.html?tab=tickets" class="dropdown-item">${t('my_tickets')}</a>
+              <a href="dashboard.html?tab=wishlist" class="dropdown-item">${t('my_wishlist')}</a>
+              <a href="dashboard.html?tab=notifications" class="dropdown-item">${t('notifications')}</a>
             `;
 
             if (user.role === 'admin') {
               dropLinks = `
-                <a href="admin.html?tab=pending" class="dropdown-item">⏳ Pending Approval</a>
-                <a href="admin.html?tab=users" class="dropdown-item">👥 Users</a>
-                <a href="admin.html?tab=allevents" class="dropdown-item">📋 All Events</a>
-                <a href="admin.html?tab=revenue" class="dropdown-item">💰 Platform Revenue</a>
+                <a href="admin.html?tab=pending" class="dropdown-item">${t('pending_approval')}</a>
+                <a href="admin.html?tab=users" class="dropdown-item">${t('users')}</a>
+                <a href="admin.html?tab=allevents" class="dropdown-item">${t('all_events')}</a>
+                <a href="admin.html?tab=revenue" class="dropdown-item">${t('platform_revenue')}</a>
                 ${commonLinks}
               `;
             } else if (user.role === 'organizer') {
               dropLinks = `
-                <a href="organizer.html?tab=myevents" class="dropdown-item">🎪 My Events</a>
-                <a href="organizer.html?tab=create" class="dropdown-item">➕ Create Event</a>
-                <a href="organizer.html?tab=revenue" class="dropdown-item">💰 Revenue Report</a>
-                <a href="organizer.html?tab=promotions" class="dropdown-item">🎫 Promotions</a>
-                <a href="organizer.html?tab=validate" class="dropdown-item">🔍 QR Validation</a>
+                <a href="organizer.html?tab=myevents" class="dropdown-item">${t('my_events')}</a>
+                <a href="organizer.html?tab=create" class="dropdown-item">${t('create_event')}</a>
+                <a href="organizer.html?tab=revenue" class="dropdown-item">${t('revenue_report')}</a>
+                <a href="organizer.html?tab=promotions" class="dropdown-item">${t('promotions')}</a>
+                <a href="organizer.html?tab=validate" class="dropdown-item">${t('qr_validation')}</a>
                 ${commonLinks}
               `;
             } else {
               dropLinks = `
-                <a href="dashboard.html?tab=tickets" class="dropdown-item">🎟 My Tickets</a>
-                <a href="dashboard.html?tab=wishlist" class="dropdown-item">❤ My Wishlist</a>
-                <a href="dashboard.html?tab=notifications" class="dropdown-item">🔔 Notifications</a>
+                <a href="dashboard.html?tab=tickets" class="dropdown-item">${t('my_tickets')}</a>
+                <a href="dashboard.html?tab=wishlist" class="dropdown-item">${t('my_wishlist')}</a>
+                <a href="dashboard.html?tab=notifications" class="dropdown-item">${t('notifications')}</a>
               `;
             }
 
             ctrl.innerHTML = `
               ${CART_BTN}
+              ${LANG_BTN}
               ${THEME_BTN}
               <div class="user-dropdown-wrapper">
                 <div style="display:flex; align-items:center; gap:8px;">
@@ -156,15 +295,16 @@ function renderNav() {
                 <div id="userDropdown" class="user-dropdown-menu">
                   ${dropLinks}
                   <hr style="border:0; border-top:1px solid var(--border); margin:4px 0;">
-                  <button onclick="logout()" class="dropdown-item" style="width:100%; border:0; background:none; cursor:pointer; color:var(--coral); text-align:left;">🚪 Logout</button>
+                  <button onclick="logout()" class="dropdown-item" style="width:100%; border:0; background:none; cursor:pointer; color:var(--coral); text-align:left;">${t('logout')}</button>
                 </div>
               </div>`;
         } else {
             ctrl.innerHTML = `
               ${CART_BTN}
+              ${LANG_BTN}
               ${THEME_BTN}
-              <a href="login.html" class="btn btn-outline" style="font-size:.85rem;">Login</a>
-              <a href="register.html" class="btn btn-primary" style="font-size:.85rem;">Register</a>`;
+              <a href="login.html" class="btn btn-outline" style="font-size:.85rem;">${t('login')}</a>
+              <a href="register.html" class="btn btn-primary" style="font-size:.85rem;">${t('register')}</a>`;
         }
     });
 
@@ -176,24 +316,24 @@ function renderNav() {
             const dashBase = user.role === 'admin' ? 'admin.html' : user.role === 'organizer' ? 'organizer.html' : 'dashboard.html';
             mobileAuthArea.innerHTML = `
               <a href="cart.html" class="btn btn-outline mobile-link" style="justify-content:center; gap:8px;">
-                🛒 Cart
+                🛒 ${t('cart')}
               </a>
               <a href="${dashBase}?tab=profile" class="btn btn-outline mobile-link" style="justify-content:center; gap:6px;">
                 👤 ${firstName}
               </a>
               <a href="${dashBase}?tab=tickets" class="btn btn-outline mobile-link" style="justify-content:center;">
-                🎟 My Tickets
+                ${t('my_tickets')}
               </a>
               <button onclick="logout()" class="btn btn-danger mobile-link" style="justify-content:center; border-color:rgba(239,68,68,0.4);">
-                🚪 Logout
+                ${t('logout')}
               </button>`;
         } else {
             mobileAuthArea.innerHTML = `
               <a href="cart.html" class="btn btn-outline mobile-link" style="justify-content:center; gap:8px;">
-                🛒 Cart
+                🛒 ${t('cart')}
               </a>
-              <a href="login.html" class="btn btn-outline mobile-link" style="justify-content:center;">Login</a>
-              <a href="register.html" class="btn btn-primary mobile-link" style="justify-content:center;">Register</a>`;
+              <a href="login.html" class="btn btn-outline mobile-link" style="justify-content:center;">${t('login')}</a>
+              <a href="register.html" class="btn btn-primary mobile-link" style="justify-content:center;">${t('register')}</a>`;
         }
     }
 
@@ -205,34 +345,28 @@ function renderNav() {
 
     document.addEventListener('click', () => {
         document.getElementById('userDropdown')?.classList.remove('active');
+        document.getElementById('langMenu')?.classList.remove('active');
     });
     // Ensure theme toggle is present even if .user-controls is missing
     if (ctrls.length === 0) {
         if (!document.querySelector('.theme-toggle')) {
             const wrapper = document.createElement('div');
-            wrapper.innerHTML = THEME_BTN;
-            const btn = wrapper.firstElementChild;
+            wrapper.style.display = 'flex';
+            wrapper.style.alignItems = 'center';
+            wrapper.style.gap = '10px';
+            wrapper.innerHTML = LANG_BTN + THEME_BTN;
             
             const navC = document.querySelector('.navbar .container');
             if (navC) {
-                btn.style.marginLeft = 'auto'; // push to the right
-                navC.appendChild(btn);
+                wrapper.style.marginLeft = 'auto'; // push to the right
+                navC.appendChild(wrapper);
             } else {
                 // No navbar exists (e.g. login/register), float it top right
-                btn.style.position = 'absolute';
-                btn.style.top = '25px';
-                btn.style.right = '25px';
-                btn.style.zIndex = '9999';
-                btn.style.background = 'var(--bg-card)';
-                btn.style.border = '1px solid var(--border-color)';
-                btn.style.borderRadius = '50%';
-                btn.style.width = '42px';
-                btn.style.height = '42px';
-                btn.style.display = 'flex';
-                btn.style.alignItems = 'center';
-                btn.style.justifyContent = 'center';
-                btn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
-                document.body.appendChild(btn);
+                wrapper.style.position = 'absolute';
+                wrapper.style.top = '25px';
+                wrapper.style.right = '25px';
+                wrapper.style.zIndex = '9999';
+                document.body.appendChild(wrapper);
             }
         }
     }
@@ -255,7 +389,7 @@ async function loadWishlistIds() {
 }
 
 window.toggleWishlist = async (eventId, btn) => {
-    if (!getToken()) { alert('Please login to add to favorites.'); return goToLogin(); }
+    if (!getToken()) { alert(t('please_login_wishlist')); return goToLogin(); }
     const inList = wishlistIds.has(eventId);
     try {
         const r = await fetch(`/api/wishlist/${eventId}`, { method: inList ? 'DELETE' : 'POST', headers: authHeaders() });
@@ -297,7 +431,7 @@ function initLoginForm() {
     form.addEventListener('submit', async e => {
         e.preventDefault();
         const btn = form.querySelector('[type=submit]'), orig = btn.textContent;
-        btn.textContent = 'Logging in...'; btn.disabled = true;
+        btn.textContent = t('logging_in'); btn.disabled = true;
         try {
             const r = await fetch('/api/auth/login', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -310,8 +444,8 @@ function initLoginForm() {
                 
                 // Giriş yapınca yeni sepet anahtarı devreye girecek
                 window.location.href = d.user.role === 'admin' ? 'admin.html' : d.user.role === 'organizer' ? 'organizer.html' : 'index.html';
-            } else { setFeedback(form, d.message || 'Login failed', 'error'); btn.textContent = orig; btn.disabled = false; }
-        } catch { setFeedback(form, 'Could not connect to server', 'error'); btn.textContent = orig; btn.disabled = false; }
+            } else { setFeedback(form, d.message || t('login_failed'), 'error'); btn.textContent = orig; btn.disabled = false; }
+        } catch { setFeedback(form, t('server_error'), 'error'); btn.textContent = orig; btn.disabled = false; }
     });
 }
 
@@ -323,7 +457,7 @@ function initRegisterForm() {
         const btn = form.querySelector('[type=submit]'), orig = btn.textContent;
         const password = document.getElementById('password').value;
         if (password.length < 6) {
-          setFeedback(form, 'Password must be at least 6 characters', 'error');
+          setFeedback(form, t('password_length'), 'error');
           btn.textContent = orig; btn.disabled = false;
           return;
         }
@@ -340,9 +474,9 @@ function initRegisterForm() {
                 })
             });
             const d = await r.json();
-            if (r.ok) { setFeedback(form, 'Registration successful! Redirecting...', 'success'); setTimeout(() => { window.location.href = 'login.html'; }, 1500); }
-            else { setFeedback(form, d.message || 'Registration failed', 'error'); btn.textContent = orig; btn.disabled = false; }
-        } catch { setFeedback(form, 'Could not connect to server', 'error'); btn.textContent = orig; btn.disabled = false; }
+            if (r.ok) { setFeedback(form, t('register_success'), 'success'); setTimeout(() => { window.location.href = 'login.html'; }, 1500); }
+            else { setFeedback(form, d.message || t('register_failed'), 'error'); btn.textContent = orig; btn.disabled = false; }
+        } catch { setFeedback(form, t('server_error'), 'error'); btn.textContent = orig; btn.disabled = false; }
     });
 }
 
@@ -382,12 +516,12 @@ function initPasswordReset() {
         // Başlıkları güncelle
         const title = document.querySelector('.auth-title');
         const subtitle = document.querySelector('.auth-subtitle');
-        if (title) title.textContent = 'Password Reset';
-        if (subtitle) subtitle.textContent = 'Set your new password.';
+        if (title) title.textContent = t('password_reset');
+        if (subtitle) subtitle.textContent = t('set_new_password');
 
         form.innerHTML = `
             <div class="form-group">
-                <label class="form-label">New Password</label>
+                <label class="form-label">${t('new_password')}</label>
                 <div class="password-input-wrapper">
                     <input type="password" id="new_password" class="form-control" placeholder="••••••••" required minlength="6">
                     <button type="button" class="password-toggle" onclick="togglePassword('new_password')">
@@ -396,12 +530,12 @@ function initPasswordReset() {
                 </div>
             </div>
             <div class="form-group">
-                <label class="form-label">New Password (Repeat)</label>
+                <label class="form-label">${t('new_password_repeat')}</label>
                 <div class="password-input-wrapper">
                     <input type="password" id="new_password_confirm" class="form-control" placeholder="••••••••" required minlength="6">
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary auth-submit">Update Password</button>
+            <button type="submit" class="btn btn-primary auth-submit">${t('update_password')}</button>
         `;
 
         // Social login ve divider'ı gizle
@@ -419,16 +553,16 @@ function initPasswordReset() {
             const confirmPass = newForm.querySelector('#new_password_confirm').value;
 
             if (newPass.length < 6) {
-                setFeedback(newForm, 'Password must be at least 6 characters!', 'error');
+                setFeedback(newForm, t('password_length'), 'error');
                 return;
             }
 
             if (newPass !== confirmPass) {
-                setFeedback(newForm, 'Passwords do not match!', 'error');
+                setFeedback(newForm, t('password_mismatch'), 'error');
                 return;
             }
 
-            btn.textContent = 'Updating...';
+            btn.textContent = t('updating');
             btn.disabled = true;
             try {
                 const res = await fetch('/api/auth/reset-password', {
@@ -438,15 +572,15 @@ function initPasswordReset() {
                 });
                 const d = await res.json();
                 if (res.ok) {
-                    setFeedback(newForm, 'Your password has been updated! Redirecting to login...', 'success');
+                    setFeedback(newForm, t('password_updated'), 'success');
                     setTimeout(() => { window.location.href = 'login.html'; }, 2000);
                 } else {
-                    setFeedback(newForm, d.message || 'An error occurred. Token may have expired.', 'error');
+                    setFeedback(newForm, d.message || t('token_expired'), 'error');
                     btn.textContent = orig;
                     btn.disabled = false;
                 }
             } catch (err) {
-                setFeedback(newForm, 'Server connection error', 'error');
+                setFeedback(newForm, t('server_error'), 'error');
                 btn.textContent = orig;
                 btn.disabled = false;
             }
@@ -459,15 +593,15 @@ function initPasswordReset() {
     if (forgotLink) {
         forgotLink.onclick = (e) => {
             e.preventDefault();
-            const email = prompt('Enter your registered email address to receive a password reset link:');
+            const email = prompt(t('forgot_email_prompt'));
             if (email) {
                 fetch('/api/auth/forgot-password', {
                     method: 'POST', headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({email})
                 })
                 .then(r => r.json())
-                .then(d => alert(d.message || 'Success'))
-                .catch(() => alert('An error occurred. Please try again.'));
+                .then(d => alert(d.message || t('success')))
+                .catch(() => alert(t('error_try_again')));
             }
         };
     }

@@ -75,7 +75,7 @@
         <span>EVENT<span class="logo-highlight">IX</span></span>
       </a>
       <ul class="nav-links">
-        <li><a href="index.html" class="nav-link">Explore</a></li>
+        <li><a href="index.html" class="nav-link">{{ t('explore') }}</a></li>
       </ul>
       <div class="user-controls">
         <span id="navAuthArea"></span>
@@ -84,7 +84,7 @@
   </nav>
 
   <main class="container cart-page">
-    <h1 style="margin-bottom: 30px; font-size: 2rem;">Your Cart</h1>
+    <h1 style="margin-bottom: 30px; font-size: 2rem;">{{ t('your_cart') }}</h1>
     
     <div class="cart-container" id="cartContainer" style="display: none;">
       <div class="cart-items" id="cartItemsList">
@@ -92,23 +92,23 @@
       </div>
       
       <div class="cart-summary">
-        <h3 style="margin-bottom: 20px;">Order Summary</h3>
+        <h3 style="margin-bottom: 20px;">{{ t('order_summary') }}</h3>
         <div id="summaryRows"></div>
         <div class="summary-row summary-total">
-          <span>Total</span>
+          <span>{{ t('total') }}</span>
           <span id="cartTotal" style="color:var(--accent-teal);">0 ₺</span>
         </div>
         <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 20px; padding: 14px;" onclick="proceedToCheckout()">
-          Proceed to Checkout &rarr;
+          {{ t('checkout') }} &rarr;
         </button>
       </div>
     </div>
 
     <div id="emptyCart" style="text-align: center; padding: 60px 20px; background: var(--bg-surface); border-radius: 16px; display: none;">
       <div style="font-size: 4rem; margin-bottom: 20px; filter: grayscale(1) opacity(0.5);">🛒</div>
-      <h2>Your cart is empty</h2>
-      <p style="color: var(--text-muted); margin-bottom: 30px;">Looks like you haven't added any tickets yet.</p>
-      <a href="index.html" class="btn btn-primary" style="display: inline-flex;">Discover Events</a>
+      <h2>{{ t('empty_cart') }}</h2>
+      <p style="color: var(--text-muted); margin-bottom: 30px;">{{ t('empty_cart_desc') }}</p>
+      <a href="index.html" class="btn btn-primary" style="display: inline-flex;">{{ t('explore') }}</a>
     </div>
   </main>
 
@@ -181,7 +181,7 @@
           clearInterval(cartTimerIntervals[idx]);
           timerEl.textContent = '00:00';
           timerBox.classList.add('expired');
-          timerBox.querySelector('.timer-label').textContent = 'Reservation expired!';
+          timerBox.querySelector('.timer-label').textContent = "{{ t('reservation_expired') }}!";
           // Expired item'ı sepetten kaldır
           setTimeout(async () => {
             const cart = window.getCart();
@@ -206,7 +206,7 @@
               cart.splice(idx, 1);
               window.saveCart(cart);
               renderCart();
-              alert('A seat reservation in your cart has expired and was removed.');
+              alert("{{ t('reservation_expired_removed') }}");
             }
           }, 1500);
           return;
@@ -263,11 +263,11 @@
             timerHtml = `
               <div id="cart-timer-box-${idx}" class="reservation-timer">
                 <span>⏳</span>
-                <span class="timer-label" style="font-size:0.8rem; color:rgba(251,191,36,0.9); font-weight:600;">Seats reserved for</span>
+                <span class="timer-label" style="font-size:0.8rem; color:rgba(251,191,36,0.9); font-weight:600;">{{ t('seats_reserved_for') }}</span>
                 <span id="cart-timer-${idx}" class="timer-count">${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}</span>
               </div>`;
           } else {
-            timerHtml = `<div class="reservation-timer expired"><span>⚠️</span><span style="font-size:0.8rem; color:#ef4444;">Reservation expired</span></div>`;
+            timerHtml = `<div class="reservation-timer expired"><span>⚠️</span><span style="font-size:0.8rem; color:#ef4444;">{{ t('reservation_expired') }}</span></div>`;
           }
         }
 
@@ -280,20 +280,20 @@
             <img src="${item.image}" alt="" style="${!isSelected ? 'filter: grayscale(0.8);' : ''}">
             <div class="cart-item-details">
               <div class="cart-item-title">${item.title}</div>
-              <div class="cart-item-meta">Unit Price: ${item.price.toLocaleString()} ₺</div>
-              ${item.has_seating ? '<div class="cart-item-meta" style="color:var(--accent-purple); font-weight:700; margin-bottom:10px;">🎟️ Seated Event</div>' : ''}
+              <div class="cart-item-meta">{{ t('price_col') }}: ${item.price.toLocaleString()} ₺</div>
+              ${item.has_seating ? '<div class="cart-item-meta" style="color:var(--accent-purple); font-weight:700; margin-bottom:10px;">🎟️ ' + "{{ t('seated_event') }}" + '</div>' : ''}
               ${item.tickets_info && item.tickets_info.length > 0 ? 
                 `<ul style="list-style:none; padding:0; margin:10px 0; display:flex; flex-direction:column; gap:8px;">
                   ${item.tickets_info.map(t => `
                     <li style="font-weight:600; font-size:0.9rem; padding:10px 14px; background:var(--bg-surface); border:1px solid var(--border-color); border-left:4px solid var(--accent-purple); border-radius:8px; color:var(--text); display:flex; align-items:center; flex-wrap:wrap; gap:8px;">
-                      <span style="color:var(--accent-teal); white-space:nowrap;">🪑 Seat: ${t.seatLabel || 'N/A'}</span> 
+                      <span style="color:var(--accent-teal); white-space:nowrap;">🪑 {{ t('seat_label') }}: ${t.seatLabel || 'N/A'}</span> 
                       <span style="opacity:0.3; margin:0 2px;">|</span> 
-                      <span style="white-space:nowrap;">👤 Reserved: ${t.name} ${t.surname}</span>
+                      <span style="white-space:nowrap;">👤 {{ t('attendee_name_label') }}: ${t.name} ${t.surname}</span>
                     </li>
                   `).join('')}
                  </ul>
                  <div class="cart-qty-control" style="margin-top:12px;">
-                   <span style="font-weight:600; background:var(--bg-surface); border:1px solid var(--border-color); padding:6px 14px; border-radius:6px; color:var(--text);">Quantity: ${item.qty}</span>
+                   <span style="font-weight:600; background:var(--bg-surface); border:1px solid var(--border-color); padding:6px 14px; border-radius:6px; color:var(--text);">{{ t('quantity') }}: ${item.qty}</span>
                  </div>` 
                 : 
                 `<div class="cart-qty-control">
@@ -344,14 +344,14 @@
       });
 
       if (selectedIndices.length === 0) {
-         alert("Please select at least one item to proceed to checkout.");
+         alert("{{ t('select_at_least_one') }}");
          return;
       }
 
       // Süresi dolmuş koltuklu kalemleri kontrol et (sadece seçili olanlar)
       const expiredItem = cart.find((item, idx) => selectedIndices.includes(idx) && item.has_seating && item.reservationExpiry && item.reservationExpiry < Date.now());
       if (expiredItem) {
-        alert(`The seat reservation for "${expiredItem.title}" has expired. Please reselect your seats.`);
+        alert(`"${expiredItem.title}" {{ t('reselect_seats') }}`);
         return;
       }
       
@@ -359,6 +359,14 @@
       window.location.href = 'cart-checkout.html';
     }
     window.renderCart = renderCart;
+  </script>
+  <script>
+      document.addEventListener("DOMContentLoaded", () => {
+          const langLabel = document.getElementById('currentLangLabel');
+          if(langLabel) {
+              langLabel.textContent = "{{ current_lang | upper }}";
+          }
+      });
   </script>
 </body>
 </html>

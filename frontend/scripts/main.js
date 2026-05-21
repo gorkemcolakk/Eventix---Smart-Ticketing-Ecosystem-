@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ── RENDER EVENTS ──────────────────────────────────────────
    function getCategoryName(cat) {
-    return { concert: 'Concert', workshop: 'Workshop', theater: 'Theater' }[cat] || cat;
+    return { concert: window.I18N?.concerts || 'Concert', workshop: window.I18N?.workshops || 'Workshop', theater: window.I18N?.theater || 'Theater' }[cat] || cat;
   }
   function getCategoryClass(cat) {
     return { concert: 'category-concert', workshop: 'category-workshop', theater: 'category-theater' }[cat] || '';
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!eventsGrid) return;
     eventsGrid.innerHTML = '';
     if (events.length === 0) {
-      eventsGrid.innerHTML = `<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:60px;">No events found matching these criteria.</p>`;
+      eventsGrid.innerHTML = `<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:60px;">${window.I18N?.noEvents || 'No events found matching these criteria.'}</p>`;
       return;
     }
     events.forEach((event, index) => {
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       card.innerHTML = `
         <div class="event-img-wrapper">
           <div class="event-category-badge ${getCategoryClass(event.category)}">${getCategoryName(event.category)}</div>
-          ${event.featured ? '<div class="featured-badge">⭐ Featured</div>' : ''}
+          ${event.featured ? `<div class="featured-badge">⭐ ${window.I18N?.featured || 'Featured'}</div>` : ''}
           <img src="${event.image}" alt="${event.title}" class="event-img" loading="lazy">
           <button class="wish-btn ${isWished ? 'wished' : ''}" title="${isWished ? 'Remove from wishlist' : 'Add to wishlist'}"
             onclick="event.stopPropagation(); toggleWishlist('${event.id}', this)">
@@ -92,12 +92,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="capacity-bar-track">
               <div class="capacity-bar-fill" style="width:${Math.min(100, Math.round(event.sold_count / event.capacity * 100))}%"></div>
             </div>
-            <span class="capacity-label">${isFull ? '<span style="color:#ef4444">Sold Out</span>' : remaining + ' tickets left'}</span>
+            <span class="capacity-label">${isFull ? `<span style="color:#ef4444">${window.I18N?.soldOut || 'Sold Out'}</span>` : remaining + ' ' + (window.I18N?.ticketsLeft || 'tickets left')}</span>
           </div>` : ''}
           <div class="event-footer">
             <div class="event-price">${event.price.toLocaleString('tr-TR')} ₺</div>
             <button class="btn btn-primary buy-btn" data-id="${event.id}" ${isFull ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>
-              ${isFull ? 'Sold Out' : 'Buy Tickets'}
+              ${isFull ? (window.I18N?.soldOut || 'Sold Out') : (window.I18N?.buyTickets || 'Buy Tickets')}
             </button>
           </div>
         </div>

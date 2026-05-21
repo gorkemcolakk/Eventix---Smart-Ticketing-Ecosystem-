@@ -41,6 +41,18 @@
     }
     .filter-toggle-btn.active { background: var(--accent-purple) !important; border-color: var(--accent-purple) !important; }
   </style>
+  <script>
+    window.I18N = {
+      concerts: "{{ t('concerts') }}",
+      workshops: "{{ t('workshops') }}",
+      theater: "{{ t('theater') }}",
+      featured: "{{ t('featured_badge') }}",
+      soldOut: "{{ t('sold_out') }}",
+      ticketsLeft: "{{ t('tickets_left') }}",
+      buyTickets: "{{ t('buy_tickets') }}",
+      noEvents: "{{ t('no_events_found') }}"
+    };
+  </script>
 </head>
 <body>
 
@@ -58,10 +70,10 @@
       </a>
 
       <ul class="nav-links">
-        <li><a href="#events-section" class="nav-link" onclick="document.getElementById('events-section').scrollIntoView({behavior:'smooth'}); return false;">Explore</a></li>
-        <li><a href="#" class="nav-link" onclick="setFilter('concert'); return false;">Concerts</a></li>
-        <li><a href="#" class="nav-link" onclick="setFilter('theater'); return false;">Theater</a></li>
-        <li><a href="#" class="nav-link" onclick="setFilter('workshop'); return false;">Workshops</a></li>
+        <li><a href="#events-section" class="nav-link" onclick="document.getElementById('events-section').scrollIntoView({behavior:'smooth'}); return false;">{{ t('explore') }}</a></li>
+        <li><a href="#" class="nav-link" onclick="setFilter('concert'); return false;">{{ t('concerts') }}</a></li>
+        <li><a href="#" class="nav-link" onclick="setFilter('theater'); return false;">{{ t('theater') }}</a></li>
+        <li><a href="#" class="nav-link" onclick="setFilter('workshop'); return false;">{{ t('workshops') }}</a></li>
       </ul>
 
       <div class="user-controls" id="navUserControls">
@@ -80,10 +92,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
     </button>
     <ul class="nav-links" style="display:flex; flex-direction:column; text-align:center; gap:8px;">
-      <li><a href="#events-section" class="nav-link mobile-link" onclick="document.getElementById('mobileNav').classList.remove('active'); document.getElementById('events-section').scrollIntoView({behavior:'smooth'}); return false;">Explore</a></li>
-      <li><a href="#" class="nav-link mobile-link" onclick="document.getElementById('mobileNav').classList.remove('active'); setFilter('concert'); return false;">Concerts</a></li>
-      <li><a href="#" class="nav-link mobile-link" onclick="document.getElementById('mobileNav').classList.remove('active'); setFilter('theater'); return false;">Theater</a></li>
-      <li><a href="#" class="nav-link mobile-link" onclick="document.getElementById('mobileNav').classList.remove('active'); setFilter('workshop'); return false;">Workshops</a></li>
+      <li><a href="#events-section" class="nav-link mobile-link" onclick="document.getElementById('mobileNav').classList.remove('active'); document.getElementById('events-section').scrollIntoView({behavior:'smooth'}); return false;">{{ t('explore') }}</a></li>
+      <li><a href="#" class="nav-link mobile-link" onclick="document.getElementById('mobileNav').classList.remove('active'); setFilter('concert'); return false;">{{ t('concerts') }}</a></li>
+      <li><a href="#" class="nav-link mobile-link" onclick="document.getElementById('mobileNav').classList.remove('active'); setFilter('theater'); return false;">{{ t('theater') }}</a></li>
+      <li><a href="#" class="nav-link mobile-link" onclick="document.getElementById('mobileNav').classList.remove('active'); setFilter('workshop'); return false;">{{ t('workshops') }}</a></li>
     </ul>
     <div id="mobileNavAuth" style="display:flex; flex-direction:column; gap:12px; width:100%; max-width:280px;">
       <!-- auth.js tarafından dinamik doldurulur -->
@@ -94,9 +106,9 @@
   <header class="hero">
     <div class="hero-bg-collage"></div>
     <div class="container hero-content">
-      <h1 class="hero-title animate-up">It's Entertainment Time!</h1>
+      <h1 class="hero-title animate-up">{{ t('hero_title') }}</h1>
       <p class="hero-desc animate-up delay-1">
-        Concerts, theater, workshops and more... All popular events and tickets are waiting for you on a single platform.
+        {{ t('hero_desc') }}
       </p>
       
       <!-- Biletix style large search bar -->
@@ -104,50 +116,50 @@
         <div class="hero-search-box">
           <div class="search-input-group">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" id="searchInput" placeholder="Search events, artists or venues...">
+            <input type="text" id="searchInput" placeholder="{{ t('search_placeholder') }}">
           </div>
-          <button id="filterToggleBtn" class="btn btn-outline filter-toggle-btn" onclick="toggleAdvancedFilters()" style="border-radius:30px; color:var(--text); background:rgba(0,0,0,0.5);">Filters ⚙️</button>
-          <button class="btn btn-primary search-submit-btn" onclick="executeServerFiltering()">Find Tickets</button>
+          <button id="filterToggleBtn" class="btn btn-outline filter-toggle-btn" onclick="toggleAdvancedFilters()" style="border-radius:30px; color:var(--text); background:rgba(0,0,0,0.5);">{{ t('filters') }}</button>
+          <button class="btn btn-primary search-submit-btn" onclick="executeServerFiltering()">{{ t('find_tickets') }}</button>
         </div>
         
         <!-- Advanced Filters Box -->
         <div id="advFilterBox" class="adv-filter-box text-left">
           <div class="filter-grid">
             <div class="filter-col">
-               <label>Start Date</label>
+               <label>{{ t('start_date') }}</label>
                <input type="date" id="filterStart" class="form-control">
             </div>
             <div class="filter-col">
-               <label>End Date</label>
+               <label>{{ t('end_date') }}</label>
                <input type="date" id="filterEnd" class="form-control">
             </div>
             <div class="filter-col">
-               <label>Location</label>
+               <label>{{ t('location') }}</label>
                <select id="filterLocation" class="form-control">
-                 <option value="all">Global (Any Location)</option>
+                 <option value="all">{{ t('all_locations') }}</option>
                </select>
             </div>
             <div class="filter-col">
-               <label>Min Price</label>
+               <label>{{ t('min_price') }}</label>
                <input type="number" id="filterMinP" class="form-control" placeholder="0 ₺">
             </div>
             <div class="filter-col">
-               <label>Max Price</label>
+               <label>{{ t('max_price') }}</label>
                <input type="number" id="filterMaxP" class="form-control" placeholder="Any">
             </div>
             <div class="filter-col">
-               <label>Sort By</label>
+               <label>{{ t('sort_by') }}</label>
                <select id="filterSort" class="form-control">
-                 <option value="date_asc">🗓 Upcoming First</option>
-                 <option value="date_desc">🗓 Latest First</option>
-                 <option value="price_asc">💰 Price: Low to High</option>
-                 <option value="price_desc">💰 Price: High to Low</option>
+                 <option value="date_asc">{{ t('sort_date_asc') }}</option>
+                 <option value="date_desc">{{ t('sort_date_desc') }}</option>
+                 <option value="price_asc">{{ t('sort_price_asc') }}</option>
+                 <option value="price_desc">{{ t('sort_price_desc') }}</option>
                </select>
             </div>
           </div>
           <div style="text-align:right; margin-top:15px;">
-             <button class="btn btn-outline" style="padding:6px 15px; font-size:0.85rem; margin-right:10px" onclick="clearFilters()">Reset</button>
-             <button class="btn btn-primary" style="padding:6px 15px; font-size:0.85rem; background: var(--accent-teal); color:black;" onclick="executeServerFiltering()">Apply Filters</button>
+             <button class="btn btn-outline" style="padding:6px 15px; font-size:0.85rem; margin-right:10px" onclick="clearFilters()">{{ t('reset') }}</button>
+             <button class="btn btn-primary" style="padding:6px 15px; font-size:0.85rem; background: var(--accent-teal); color:black;" onclick="executeServerFiltering()">{{ t('apply_filters') }}</button>
           </div>
         </div>
       </div>
@@ -156,19 +168,19 @@
       <div class="hero-categories animate-up delay-3">
         <div class="hero-cat-item cat-active" data-filter="all" onclick="setFilter('all')">
            <div class="cat-icon">✨</div>
-           <span class="cat-name">All</span>
+           <span class="cat-name">{{ t('all') }}</span>
         </div>
         <div class="hero-cat-item" data-filter="concert" onclick="setFilter('concert')">
            <div class="cat-icon">🎸</div>
-           <span class="cat-name">Concerts</span>
+           <span class="cat-name">{{ t('concerts') }}</span>
         </div>
         <div class="hero-cat-item" data-filter="theater" onclick="setFilter('theater')">
            <div class="cat-icon">🎭</div>
-           <span class="cat-name">Theater</span>
+           <span class="cat-name">{{ t('theater') }}</span>
         </div>
         <div class="hero-cat-item" data-filter="workshop" onclick="setFilter('workshop')">
            <div class="cat-icon">🎨</div>
-           <span class="cat-name">Workshops</span>
+           <span class="cat-name">{{ t('workshops') }}</span>
         </div>
       </div>
     </div>
@@ -178,8 +190,8 @@
   <main class="container" id="events-section">
     <div class="section-header">
       <div>
-        <h2 class="section-title">Popular Events</h2>
-        <p style="color:var(--text-muted);margin-top:8px;">Book your place now, don't miss out on limited tickets!</p>
+        <h2 class="section-title">{{ t('popular_events') }}</h2>
+        <p style="color:var(--text-muted);margin-top:8px;">{{ t('popular_events_desc') }}</p>
       </div>
       <div style="display: none;">
         <!-- Hidden old filters to prevent JS errors if they are queried anywhere -->
@@ -203,16 +215,22 @@
     <div class="container footer-content">
       <div class="logo" style="font-size:1.25rem;"><span>EVENT<span class="logo-highlight">IX</span></span></div>
       <div class="footer-links" style="display:flex;gap:20px;">
-        <a href="#" style="color:var(--text-muted);">FAQ</a>
-        <a href="#" style="color:var(--text-muted);">Contact</a>
-        <a href="#" style="color:var(--text-muted);">Privacy</a>
+        <a href="#" style="color:var(--text-muted);">{{ t('faq') }}</a>
+        <a href="#" style="color:var(--text-muted);">{{ t('contact') }}</a>
+        <a href="#" style="color:var(--text-muted);">{{ t('privacy') }}</a>
       </div>
     </div>
-    <div class="container footer-text">&copy; 2026 EVENTIX Platform. All rights reserved.</div>
+    <div class="container footer-text">{{ t('rights_reserved') }}</div>
   </footer>
 
-
-
+  <script>
+      document.addEventListener("DOMContentLoaded", () => {
+          const langLabel = document.getElementById('currentLangLabel');
+          if(langLabel) {
+              langLabel.textContent = "{{ current_lang | upper }}";
+          }
+      });
+  </script>
   <script src="./scripts/auth.js"></script>
   <script src="./scripts/main.js"></script>
   <script>
