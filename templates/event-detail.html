@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="./styles/home.css">
   <link rel="stylesheet" href="./styles/detail.css">
 </head>
-<body>
+<body class="page-layout">
 
   <!-- Navigation -->
   <nav class="navbar">
@@ -176,14 +176,7 @@
     </div>
   </main>
 
-  <!-- Footer -->
-  <footer>
-    <div class="container footer-content">
-      <div class="logo" style="font-size:1.25rem;"><span>EVENT<span class="logo-highlight">IX</span></span></div>
-      <div style="display:flex;gap:20px;"><a href="#" style="color:var(--text-muted);">{{ t('faq') }}</a><a href="#" style="color:var(--text-muted);">{{ t('contact') }}</a></div>
-    </div>
-    <div class="container footer-text">{{ t('rights_reserved') }}</div>
-  </footer>
+  {% include 'partials/site_footer.html' %}
 
   <!-- Lightbox Modal for Seating Plan -->
   <div id="seatingModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.92); z-index:9999; justify-content:center; align-items:center; backdrop-filter:blur(8px); animation:fadeIn 0.3s ease;">
@@ -208,6 +201,14 @@
   <script src="./scripts/auth.js"></script>
   <script>
     let currentDetailedEvent = null;
+    const langCode = "{{ current_lang }}" === 'tr' ? 'tr-TR' : ("{{ current_lang }}" === 'de' ? 'de-DE' : 'en-US');
+    const formatDate = (ds) => {
+      try {
+        const d = new Date(ds);
+        if (isNaN(d)) return ds;
+        return d.toLocaleDateString(langCode, { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      } catch (e) { return ds; }
+    };
 
     // Mobile nav
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
@@ -226,7 +227,7 @@
       const pct = Math.min(100, Math.round(sold_count / capacity * 100));
       const info = document.getElementById('capacityInfo');
       if (info) info.style.display = '';
-      document.getElementById('capacityText').textContent = `${sold_count.toLocaleString('en-US')} / ${capacity.toLocaleString('en-US')}`;
+      document.getElementById('capacityText').textContent = `${sold_count.toLocaleString(langCode)} / ${capacity.toLocaleString(langCode)}`;
       document.getElementById('capacityFill').style.width = pct + '%';
       const rt = document.getElementById('remainingText');
       if (remaining <= 0) {
@@ -236,7 +237,7 @@
         document.getElementById('buyDetailBtn').textContent = "{{ t('sold_out') }}";
         document.getElementById('buyDetailBtn').style.opacity = '0.5';
       } else {
-        rt.textContent = `${remaining.toLocaleString('en-US')} ` + "{{ t('tickets_left') }}";
+        rt.textContent = `${remaining.toLocaleString(langCode)} ` + "{{ t('tickets_left') }}";
         rt.style.color = remaining < 20 ? '#f59e0b' : '#2dd4bf';
       }
     }
@@ -282,22 +283,14 @@
         document.getElementById('d-img').alt = event.title;
 
         // Badge
-        const badgeMap = { concert: ['Concert','139,92,246'], theater: ['Theater','236,72,153'], workshop: ['Workshop','14,165,233'] };
-        const [bName, bColor] = badgeMap[event.category] || ['Event','139,92,246'];
+        const badgeMap = { concert: ["{{ t('concert_option') }}",'139,92,246'], theater: ["{{ t('theater_option') }}",'236,72,153'], workshop: ["{{ t('workshop_option') }}",'14,165,233'] };
+        const [bName, bColor] = badgeMap[event.category] || [event.category,'139,92,246'];
         const badge = document.getElementById('d-badge');
         badge.textContent = bName;
         badge.style.background = `rgba(${bColor},0.8)`;
         badge.style.borderColor = `rgb(${bColor})`;
 
         // Title, date
-        const formatDate = (ds) => {
-            try {
-                const d = new Date(ds);
-                if (isNaN(d)) return ds;
-                return d.toLocaleDateString("en-US", { weekday: 'long', day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
-            } catch(e) { return ds; }
-        };
-
         document.getElementById('d-title').textContent = event.title;
         document.getElementById('d-date').textContent = formatDate(event.date);
         document.getElementById('d-loc').textContent = event.location;
@@ -332,7 +325,7 @@
         document.getElementById('mapIframe').src = `https://maps.google.com/maps?q=${mapsQuery}&t=m&z=15&ie=UTF8&iwloc=&output=embed`;
 
         // Price
-        document.getElementById('d-price').textContent = event.price.toLocaleString('en-US') + ' ₺';
+        document.getElementById('d-price').textContent = event.price.toLocaleString(langCode) + ' ₺';
 
 
         // Description

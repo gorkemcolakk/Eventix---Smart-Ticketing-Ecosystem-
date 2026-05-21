@@ -451,7 +451,12 @@
         const r = await fetch('/api/admin/all-events', { headers: authHeaders() });
         const events = await r.json();
         const sColor = s => ({ active:'#14b8a6', pending:'#f59e0b', cancelled:'#ef4444', rejected:'#6b7280' }[s] || '#6b7280');
-        const sLabel = s => ({ active:'Active', pending:'Pending', cancelled:'Cancelled', rejected:'Rejected' }[s] || s);
+        const sLabel = s => ({
+            active: "{{ t('status_active') }}",
+            pending: "{{ t('status_pending') }}",
+            cancelled: "{{ t('status_cancelled') }}",
+            rejected: "{{ t('status_rejected') }}"
+        }[s] || s);
         const fDate = ds => {
           try {
             const d = new Date(ds);
@@ -504,25 +509,25 @@
         
         let html = `
         <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:30px;">
+          <div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid #3b82f6;">
+            <div style="font-size:1.6rem;font-weight:700;color:#3b82f6;">${d.total_tickets || 0}</div>
+            <div style="color:var(--text-muted);font-size:0.8rem;margin-top:4px;">{{ t('tickets_sold') }}</div>
+          </div>
           <div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid var(--gold);">
             <div style="font-size:1.6rem;font-weight:700;color:var(--gold);">${(d.total_revenue || 0).toLocaleString('en-US')} ₺</div>
-            <div style="color:var(--text-muted);font-size:0.8rem;margin-top:4px;">{{ t('platform_revenue') }}</div>
+            <div style="color:var(--text-muted);font-size:0.8rem;margin-top:4px;">{{ t('tickets_sold_revenue') }}</div>
           </div>
           <div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid #ef4444;">
             <div style="font-size:1.6rem;font-weight:700;color:#ef4444;">${(d.commission || 0).toLocaleString('en-US')} ₺</div>
             <div style="color:var(--text-muted);font-size:0.8rem;margin-top:4px;white-space:nowrap;">{{ t('platform_commission') }} (%${((d.commission_rate || 0.1)*100).toFixed(0)})</div>
           </div>
-          <div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid #14b8a6;">
-            <div style="font-size:1.6rem;font-weight:700;color:#14b8a6;">${(d.platform_net_income || 0).toLocaleString('en-US')} ₺</div>
-            <div style="color:var(--text-muted);font-size:0.8rem;margin-top:4px;">{{ t('net_revenue') }}</div>
-          </div>
-          <div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid #3b82f6;">
-            <div style="font-size:1.6rem;font-weight:700;color:#3b82f6;">${d.total_tickets || 0}</div>
-            <div style="color:var(--text-muted);font-size:0.8rem;margin-top:4px;">{{ t('capacity') }}</div>
-          </div>
           <div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid #8b5cf6;box-shadow:0 4px 20px rgba(139,92,246,0.15);">
             <div style="font-size:1.6rem;font-weight:700;background:linear-gradient(135deg,#8b5cf6,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">${(d.total_admin_refund_fee || 0).toLocaleString('en-US')} ₺</div>
-            <div style="color:var(--text-muted);font-size:0.8rem;margin-top:4px;white-space:nowrap;">{{ t('refunds') }} (%5)</div>
+            <div style="color:var(--text-muted);font-size:0.8rem;margin-top:4px;white-space:nowrap;">{{ t('refund_revenue') }} (%5)</div>
+          </div>
+          <div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid #14b8a6;">
+            <div style="font-size:1.6rem;font-weight:700;color:#14b8a6;">${(d.platform_net_income || 0).toLocaleString('en-US')} ₺</div>
+            <div style="color:var(--text-muted);font-size:0.8rem;margin-top:4px;">{{ t('net_platform_revenue') }}</div>
           </div>
         </div>
 
@@ -536,25 +541,25 @@
             <div style="overflow-x:auto;">
               <table style="width:100%;border-collapse:collapse;font-size:0.88rem;">
                 <thead><tr style="border-bottom:1px solid var(--border);text-align:left;">
-                  <th style="padding:12px;color:var(--text-muted);font-weight:500;">{{ t('organizer') }}</th>
-                  <th style="padding:12px;color:var(--text-muted);font-weight:500;">{{ t('capacity') }}</th>
-                  <th style="padding:12px;color:var(--text-muted);font-weight:500;text-align:right;">{{ t('platform_revenue') }}</th>
-                  <th style="padding:12px;color:var(--text-muted);font-weight:500;text-align:right;">{{ t('platform_commission') }}</th>
-                  <th style="padding:12px;color:var(--text-muted);font-weight:500;text-align:right;">{{ t('net_revenue') }}</th>
-                  <th style="padding:12px;color:var(--text-muted);font-weight:500;text-align:right;">{{ t('refunds') }}</th>
+                  <th style="padding:12px 8px;color:var(--text-muted);font-weight:500;">{{ t('organizer') }}</th>
+                  <th title="{{ t('th_tickets_sold_tip') }}" style="padding:12px 8px;color:var(--text-muted);font-weight:500;white-space:nowrap;">{{ t('th_tickets_sold') }}</th>
+                  <th title="{{ t('th_sales_amount_tip') }}" style="padding:12px 8px;color:var(--text-muted);font-weight:500;text-align:right;white-space:nowrap;">{{ t('th_sales_amount') }}</th>
+                  <th title="{{ t('th_commission_tip') }}" style="padding:12px 8px;color:var(--text-muted);font-weight:500;text-align:right;white-space:nowrap;">{{ t('th_commission_short') }} %${((d.commission_rate || 0.1)*100).toFixed(0)}</th>
+                  <th title="{{ t('th_refund_fee_tip') }}" style="padding:12px 8px;color:var(--text-muted);font-weight:500;text-align:right;white-space:nowrap;">{{ t('th_refund_fee_short') }} %5</th>
+                  <th title="{{ t('th_net_payout_tip') }}" style="padding:12px 8px;color:var(--text-muted);font-weight:500;text-align:right;white-space:nowrap;">{{ t('th_net_payout') }}</th>
                 </tr></thead>
                 <tbody>
                   ${d.organizer_breakdown.map(o => `
                     <tr style="border-bottom:1px solid var(--border);">
-                      <td style="padding:14px 12px;">
+                      <td style="padding:14px 8px;">
                         <div style="color:var(--text);font-weight:600;">${o.name}</div>
                         <div style="font-size:0.75rem;color:var(--text-muted);">${o.email}</div>
                       </td>
-                      <td style="padding:14px 12px;color:var(--text-sub);">${o.total_tickets}</td>
-                      <td style="padding:14px 12px;color:var(--text);font-weight:600;text-align:right;">${o.gross_revenue.toLocaleString('en-US')} ₺</td>
-                      <td style="padding:14px 12px;color:var(--coral);text-align:right;font-weight:500;">-${o.commission.toLocaleString('en-US')} ₺</td>
-                      <td style="padding:14px 12px;color:var(--teal);text-align:right;font-weight:700;font-family:'Space Mono';">${o.net_revenue.toLocaleString('en-US')} ₺</td>
-                      <td style="padding:14px 12px;text-align:right;font-weight:600;color:#a78bfa;">${(o.admin_refund_fee||0) > 0 ? '+' + (o.admin_refund_fee||0).toLocaleString('en-US') + ' ₺' : '0 ₺'}</td>
+                      <td style="padding:14px 8px;color:var(--text-sub);white-space:nowrap;">${o.total_tickets}</td>
+                      <td style="padding:14px 8px;color:var(--text);font-weight:600;text-align:right;white-space:nowrap;">${o.gross_revenue.toLocaleString('en-US')} ₺</td>
+                      <td style="padding:14px 8px;color:var(--coral);text-align:right;font-weight:500;white-space:nowrap;">-${o.commission.toLocaleString('en-US')} ₺</td>
+                      <td style="padding:14px 8px;text-align:right;font-weight:600;color:#a78bfa;white-space:nowrap;">${(o.admin_refund_fee||0) > 0 ? '+' + (o.admin_refund_fee||0).toLocaleString('en-US') + ' ₺' : '0 ₺'}</td>
+                      <td style="padding:14px 8px;color:var(--teal);text-align:right;font-weight:700;font-family:'Space Mono';white-space:nowrap;">${o.net_revenue.toLocaleString('en-US')} ₺</td>
                     </tr>
                   `).join('')}
                 </tbody>
@@ -571,31 +576,36 @@
             <div style="overflow-x:auto;">
               <table style="width:100%;border-collapse:collapse;font-size:0.88rem;">
                 <thead><tr style="border-bottom:1px solid var(--border);text-align:left;">
-                  <th style="padding:12px;color:var(--text-muted);font-weight:500;">{{ t('event_col') }}</th>
-                  <th style="padding:12px;color:var(--text-muted);font-weight:500;">{{ t('organizer') }}</th>
-                  <th style="padding:12px;color:var(--text-muted);font-weight:500;">{{ t('status') }}</th>
-                  <th style="padding:12px;color:var(--text-muted);font-weight:500;">{{ t('capacity') }}</th>
-                  <th style="padding:12px;color:var(--text-muted);font-weight:500;text-align:right;">{{ t('platform_revenue') }}</th>
-                  <th style="padding:12px;color:var(--text-muted);font-weight:500;text-align:right;">{{ t('platform_commission') }}</th>
-                  <th style="padding:12px;color:var(--text-muted);font-weight:500;text-align:right;">{{ t('net_revenue') }}</th>
-                  <th style="padding:12px;color:var(--text-muted);font-weight:500;text-align:right;">{{ t('refunds') }}</th>
+                  <th style="padding:12px 8px;color:var(--text-muted);font-weight:500;">{{ t('event_col') }}</th>
+                  <th style="padding:12px 8px;color:var(--text-muted);font-weight:500;">{{ t('organizer') }}</th>
+                  <th style="padding:12px 8px;color:var(--text-muted);font-weight:500;">{{ t('status') }}</th>
+                  <th style="padding:12px 8px;color:var(--text-muted);font-weight:500;white-space:nowrap;">{{ t('capacity') }}</th>
+                  <th title="{{ t('th_sales_amount_tip') }}" style="padding:12px 8px;color:var(--text-muted);font-weight:500;text-align:right;white-space:nowrap;">{{ t('th_sales_amount') }}</th>
+                  <th title="{{ t('th_commission_tip') }}" style="padding:12px 8px;color:var(--text-muted);font-weight:500;text-align:right;white-space:nowrap;">{{ t('th_commission_short') }} %${((d.commission_rate || 0.1)*100).toFixed(0)}</th>
+                  <th title="{{ t('th_refund_fee_tip') }}" style="padding:12px 8px;color:var(--text-muted);font-weight:500;text-align:right;white-space:nowrap;">{{ t('th_refund_fee_short') }} %5</th>
+                  <th title="{{ t('th_net_payout_tip') }}" style="padding:12px 8px;color:var(--text-muted);font-weight:500;text-align:right;white-space:nowrap;">{{ t('th_net_payout') }}</th>
                 </tr></thead>
                 <tbody>
                   ${d.breakdown.map(ev => {
-                    const statusLabel = { active:'Active', pending:'Pending', cancelled:'Cancelled', rejected:'Rejected' }[ev.status] || ev.status;
+                    const statusLabel = {
+                        active: "{{ t('status_active') }}",
+                        pending: "{{ t('status_pending') }}",
+                        cancelled: "{{ t('status_cancelled') }}",
+                        rejected: "{{ t('status_rejected') }}"
+                    }[ev.status] || ev.status;
                     const statusColor = { active:'#14b8a6', pending:'#f59e0b', cancelled:'#ef4444' }[ev.status] || '#6b7280';
                     return `
                     <tr style="border-bottom:1px solid var(--border);">
-                      <td style="padding:14px 12px;color:var(--text);font-weight:600;">${ev.title}</td>
-                      <td style="padding:14px 12px;color:var(--text-sub);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> ${ev.organizer_name || 'Unknown'}</td>
-                      <td style="padding:14px 12px;">
+                      <td style="padding:14px 8px;color:var(--text);font-weight:600;">${ev.title}</td>
+                      <td style="padding:14px 8px;color:var(--text-sub);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> ${ev.organizer_name || 'Unknown'}</td>
+                      <td style="padding:14px 8px;">
                         <span style="color:${statusColor};font-size:0.75rem;font-weight:600;">● ${statusLabel}</span>
                       </td>
-                      <td style="padding:14px 12px;color:var(--text-sub);">${ev.sold_count} / ${ev.capacity}</td>
-                      <td style="padding:14px 12px;color:var(--text);text-align:right;">${ev.gross_revenue.toLocaleString('en-US')} ₺</td>
-                      <td style="padding:14px 12px;color:var(--coral);text-align:right;">${ev.commission.toLocaleString('en-US')} ₺</td>
-                      <td style="padding:14px 12px;color:var(--teal);text-align:right;font-weight:600;">${ev.net_revenue.toLocaleString('en-US')} ₺</td>
-                      <td style="padding:14px 12px;text-align:right;font-weight:600;color:#a78bfa;">${(ev.admin_fee||0) > 0 ? '+' + (ev.admin_fee||0).toLocaleString('en-US') + ' ₺' : '0 ₺'}</td>
+                      <td style="padding:14px 8px;color:var(--text-sub);white-space:nowrap;">${ev.sold_count} / ${ev.capacity}</td>
+                      <td style="padding:14px 8px;color:var(--text);font-weight:600;text-align:right;white-space:nowrap;">${ev.gross_revenue.toLocaleString('en-US')} ₺</td>
+                      <td style="padding:14px 8px;color:var(--coral);text-align:right;font-weight:500;white-space:nowrap;">-${ev.commission.toLocaleString('en-US')} ₺</td>
+                      <td style="padding:14px 8px;text-align:right;font-weight:600;color:#a78bfa;white-space:nowrap;">${(ev.admin_fee||0) > 0 ? '+' + (ev.admin_fee||0).toLocaleString('en-US') + ' ₺' : '0 ₺'}</td>
+                      <td style="padding:14px 8px;color:var(--teal);text-align:right;font-weight:700;font-family:'Space Mono';white-space:nowrap;">${ev.net_revenue.toLocaleString('en-US')} ₺</td>
                     </tr>`;
                   }).join('')}
                 </tbody>

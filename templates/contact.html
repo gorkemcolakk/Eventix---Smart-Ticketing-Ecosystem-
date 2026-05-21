@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="{{ current_lang }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ t('info_contact_title') }} | EVENTIX</title>
+  <link rel="stylesheet" href="./styles/main.css">
+  <link rel="stylesheet" href="./styles/components.css">
+  <link rel="stylesheet" href="./styles/info.css">
+</head>
+<body class="page-layout">
+
+  {% include 'partials/site_nav_minimal.html' %}
+
+  <main class="container site-page">
+    <div class="info-page-header animate-up">
+      <h1>{{ t('info_contact_title') }}</h1>
+      <p>{{ t('info_contact_sub') }}</p>
+    </div>
+    <div class="contact-grid animate-up delay-1">
+      <div class="contact-cards">
+        <div class="contact-card">
+          <h3>{{ t('contact_email_label') }}</h3>
+          <p><a href="mailto:{{ t('footer_contact_email') }}">{{ t('footer_contact_email') }}</a></p>
+        </div>
+        <div class="contact-card">
+          <h3>{{ t('contact_hours_label') }}</h3>
+          <p>{{ t('footer_contact_hours') }}</p>
+        </div>
+        <div class="contact-card">
+          <h3>{{ t('contact_location_label') }}</h3>
+          <p>{{ t('contact_location_value') }}</p>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h2 style="font-size:1.1rem;margin-bottom:20px;">{{ t('contact_form_title') }}</h2>
+        <form class="contact-form" id="contactForm">
+          <div class="form-group">
+            <label class="form-label" for="c-name">{{ t('contact_form_name') }}</label>
+            <input type="text" id="c-name" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="c-email">{{ t('contact_form_email') }}</label>
+            <input type="email" id="c-email" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="c-subject">{{ t('contact_form_subject') }}</label>
+            <input type="text" id="c-subject" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="c-message">{{ t('contact_form_message') }}</label>
+            <textarea id="c-message" class="form-control" rows="5" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" id="contactSubmitBtn" style="width:100%;justify-content:center;">{{ t('contact_form_send') }}</button>
+          <div class="contact-form-success" id="contactSuccess">{{ t('contact_form_success') }}</div>
+          <div class="contact-form-error" id="contactError">{{ t('contact_form_error') }}</div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  {% include 'partials/site_footer.html' %}
+
+  <script src="./scripts/auth.js"></script>
+  <script>
+    document.getElementById('contactForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('contactSubmitBtn');
+      const ok = document.getElementById('contactSuccess');
+      const err = document.getElementById('contactError');
+      ok?.classList.remove('show');
+      err?.classList.remove('show');
+      if (btn) { btn.disabled = true; btn.textContent = "{{ t('contact_form_sending') }}"; }
+      try {
+        const res = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: document.getElementById('c-name').value.trim(),
+            email: document.getElementById('c-email').value.trim(),
+            subject: document.getElementById('c-subject').value.trim(),
+            message: document.getElementById('c-message').value.trim()
+          })
+        });
+        if (res.ok) {
+          ok?.classList.add('show');
+          e.target.reset();
+        } else {
+          err?.classList.add('show');
+        }
+      } catch {
+        err?.classList.add('show');
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = "{{ t('contact_form_send') }}"; }
+      }
+    });
+    window.addEventListener('scroll', () => document.querySelector('.navbar')?.classList.toggle('scrolled', window.scrollY > 50));
+  </script>
+</body>
+</html>

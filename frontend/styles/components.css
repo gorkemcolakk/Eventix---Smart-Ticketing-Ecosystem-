@@ -531,3 +531,13 @@ textarea.form-control { resize: vertical; min-height: 90px; }
 }
 .dropdown-item:hover { background: var(--gold-glow); color: var(--gold); }
 
+.lang-flag {
+  width: 20px;
+  height: 15px;
+  object-fit: cover;
+  border-radius: 3px;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+.lang-option .lang-flag { width: 22px; height: 16px; }
+

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="{{ current_lang }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ t('info_privacy_title') }} | EVENTIX</title>
+  <link rel="stylesheet" href="./styles/main.css">
+  <link rel="stylesheet" href="./styles/components.css">
+  <link rel="stylesheet" href="./styles/info.css">
+</head>
+<body class="page-layout">
+
+  {% include 'partials/site_nav_minimal.html' %}
+
+  <main class="container site-page">
+    <div class="info-page-header animate-up">
+      <h1>{{ t('info_privacy_title') }}</h1>
+      <p>{{ t('info_privacy_sub') }}</p>
+    </div>
+    <div class="info-panel animate-up delay-1">
+      <div class="privacy-content">
+        {{ t('privacy_policy_desc') | safe }}
+      </div>
+      <p class="privacy-footer-note">{{ t('agreements_regulated_footer') }}</p>
+    </div>
+  </main>
+
+  {% include 'partials/site_footer.html' %}
+
+  <script src="./scripts/auth.js"></script>
+  <script>window.addEventListener('scroll', () => document.querySelector('.navbar')?.classList.toggle('scrolled', window.scrollY > 50));</script>
+</body>
+</html>

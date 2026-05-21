@@ -1,7 +1,7 @@
 import uuid
 from flask import Blueprint, request, jsonify, g
 from database import get_db_connection
-from utils import token_required, make_qr_base64, make_qr_bytes, create_notification, sign_ticket_data, verify_ticket_signature, send_email, send_ticket_confirmation_email, limiter, sanitize_html, cache, SECRET_KEY
+from utils import token_required, make_qr_base64, make_qr_bytes, create_notification, sign_ticket_data, verify_ticket_signature, send_email, send_ticket_confirmation_email, get_request_lang, limiter, sanitize_html, cache, SECRET_KEY
 import jwt
 from datetime import datetime, timedelta
 
@@ -156,7 +156,7 @@ def guest_buy_ticket():
     
     cache.clear()
     try:
-        send_ticket_confirmation_email(guest_email, guest_fullname, event, gen_tix, total_price, seat_labels_str)
+        send_ticket_confirmation_email(guest_email, guest_fullname, event, gen_tix, total_price, seat_labels_str, lang=get_request_lang(data))
     except: pass
 
     return jsonify({'message': 'Success!', 'tickets': gen_tix, 'total_price': total_price}), 201
@@ -368,7 +368,7 @@ def buy_ticket():
     
     cache.clear()
     try:
-        send_ticket_confirmation_email(g.user['email'], g.user['fullname'], event, gen_tix, total_price, seat_labels_str)
+        send_ticket_confirmation_email(g.user['email'], g.user['fullname'], event, gen_tix, total_price, seat_labels_str, lang=get_request_lang(data))
     except: pass
     return jsonify({'message': 'Success!', 'tickets': gen_tix}), 201
 
@@ -494,7 +494,7 @@ def cart_buy():
             ev_price = sum(t['price'] for t in ev_tix)
             seat_labels_list = [t['seat_label'] for t in ev_tix if t.get('seat_label')]
             seat_labels_str = ", ".join(seat_labels_list) if seat_labels_list else ""
-            send_ticket_confirmation_email(g.user['email'], g.user['fullname'], ev, ev_tix, ev_price, seat_labels_str)
+            send_ticket_confirmation_email(g.user['email'], g.user['fullname'], ev, ev_tix, ev_price, seat_labels_str, lang=get_request_lang(data))
     except Exception as e:
         pass
 
@@ -615,7 +615,7 @@ def guest_cart_buy():
             ev_price = sum(t['price'] for t in ev_tix)
             seat_labels_list = [t['seat_label'] for t in ev_tix if t.get('seat_label')]
             seat_labels_str = ", ".join(seat_labels_list) if seat_labels_list else ""
-            send_ticket_confirmation_email(guest_email, guest_name + " " + guest_surname, ev, ev_tix, ev_price, seat_labels_str)
+            send_ticket_confirmation_email(guest_email, guest_name + " " + guest_surname, ev, ev_tix, ev_price, seat_labels_str, lang=get_request_lang(data))
     except Exception as e:
         pass
 

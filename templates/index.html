@@ -54,7 +54,7 @@
     };
   </script>
 </head>
-<body>
+<body class="page-layout">
 
   <!-- Navigation -->
   <nav class="navbar">
@@ -210,18 +210,7 @@
     </div>
   </main>
 
-  <!-- Footer -->
-  <footer>
-    <div class="container footer-content">
-      <div class="logo" style="font-size:1.25rem;"><span>EVENT<span class="logo-highlight">IX</span></span></div>
-      <div class="footer-links" style="display:flex;gap:20px;">
-        <a href="#" style="color:var(--text-muted);">{{ t('faq') }}</a>
-        <a href="#" style="color:var(--text-muted);">{{ t('contact') }}</a>
-        <a href="#" style="color:var(--text-muted);">{{ t('privacy') }}</a>
-      </div>
-    </div>
-    <div class="container footer-text">{{ t('rights_reserved') }}</div>
-  </footer>
+  {% include 'partials/site_footer.html' %}
 
   <script>
       document.addEventListener("DOMContentLoaded", () => {

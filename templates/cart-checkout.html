@@ -501,6 +501,7 @@
 
         const body = {
             cart_items: cartPayload,
+            lang: (document.cookie.match(/(^| )lang=([^;]+)/) || [])[2] || '{{ current_lang }}',
             card_name: document.getElementById('cName').value,
             card_number: document.getElementById('cNum').value,
             card_exp: document.getElementById('cExp').value,

@@ -32,6 +32,7 @@ from routes.notifications import notifications_bp
 from routes.organizer import organizer_bp
 from routes.admin import admin_bp
 from routes.upload import upload_bp
+from routes.contact import contact_bp
 
 app = Flask(__name__, static_folder=None, template_folder=os.path.join(BASE_DIR, 'templates'))
 CORS(app)
@@ -49,6 +50,7 @@ app.register_blueprint(notifications_bp)
 app.register_blueprint(organizer_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(upload_bp)
+app.register_blueprint(contact_bp)
 
 @app.errorhandler(429)
 def ratelimit_handler(e):

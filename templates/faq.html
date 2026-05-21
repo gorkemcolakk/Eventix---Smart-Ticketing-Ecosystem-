@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="{{ current_lang }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ t('info_faq_title') }} | EVENTIX</title>
+  <link rel="stylesheet" href="./styles/main.css">
+  <link rel="stylesheet" href="./styles/components.css">
+  <link rel="stylesheet" href="./styles/info.css">
+</head>
+<body class="page-layout">
+
+  {% include 'partials/site_nav_minimal.html' %}
+
+  <main class="container site-page">
+    <div class="info-page-header animate-up">
+      <h1>{{ t('info_faq_title') }}</h1>
+      <p>{{ t('info_faq_sub') }}</p>
+    </div>
+    <div class="info-panel animate-up delay-1">
+      <div class="faq-list">
+        <details class="faq-item" open>
+          <summary>{{ t('faq_q1') }}</summary>
+          <div class="faq-answer">{{ t('faq_a1') }}</div>
+        </details>
+        <details class="faq-item">
+          <summary>{{ t('faq_q2') }}</summary>
+          <div class="faq-answer">{{ t('faq_a2') }}</div>
+        </details>
+        <details class="faq-item">
+          <summary>{{ t('faq_q3') }}</summary>
+          <div class="faq-answer">{{ t('faq_a3') }}</div>
+        </details>
+        <details class="faq-item">
+          <summary>{{ t('faq_q4') }}</summary>
+          <div class="faq-answer">{{ t('faq_a4') }}</div>
+        </details>
+        <details class="faq-item">
+          <summary>{{ t('faq_q5') }}</summary>
+          <div class="faq-answer">{{ t('faq_a5') }}</div>
+        </details>
+      </div>
+    </div>
+  </main>
+
+  {% include 'partials/site_footer.html' %}
+
+  <script src="./scripts/auth.js"></script>
+  <script>window.addEventListener('scroll', () => document.querySelector('.navbar')?.classList.toggle('scrolled', window.scrollY > 50));</script>
+</body>
+</html>

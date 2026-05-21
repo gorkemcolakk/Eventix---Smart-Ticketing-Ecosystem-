@@ -229,9 +229,22 @@ document.addEventListener('DOMContentLoaded', async () => {
       } catch(e){}
   }
 
+  const urlCat = new URLSearchParams(window.location.search).get('category');
+  if (urlCat && ['concert', 'theater', 'workshop', 'all'].includes(urlCat)) {
+    activeCategory = urlCat;
+    document.querySelectorAll('.hero-cat-item').forEach(b => {
+      b.classList.toggle('cat-active', b.getAttribute('data-filter') === urlCat);
+    });
+  }
+
   await loadWishlistIds();
   await loadLocations();
   await fetchEvents(1, false);
+
+  if (urlCat && urlCat !== 'all') {
+    const target = document.getElementById('events-section');
+    if (target) target.scrollIntoView({ behavior: 'smooth' });
+  }
 
   loadNotifBadge();
 });

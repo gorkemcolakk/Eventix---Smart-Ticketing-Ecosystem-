@@ -219,21 +219,75 @@
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    .seat-map-viewport {
+      width: 100%;
+      max-height: min(68vh, 540px);
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      background: var(--bg-surface);
+      cursor: grab;
+      position: relative;
+      touch-action: none;
+      margin-bottom: 16px;
+    }
+    .seat-map-viewport.is-dragging { cursor: grabbing; }
+    .seat-map-stage {
+      transform-origin: 0 0;
+      display: inline-block;
+      padding: 20px;
+      will-change: transform;
+    }
+    .seat-map-controls {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 5;
+    }
+    .seat-map-zoom-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      color: var(--text);
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-card);
+      transition: var(--transition);
+    }
+    .seat-map-zoom-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+    .seat-map-hint {
+      position: absolute;
+      left: 12px;
+      bottom: 12px;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      z-index: 5;
+      pointer-events: none;
+      max-width: 55%;
+      line-height: 1.4;
+    }
      .seat-grid { 
       display: flex; 
       flex-direction: column; 
       gap: 0; 
-      align-items: flex-start; /* CRITICAL: Must be flex-start to allow scroll from index 1 */
-      width: 100%; 
-      overflow-x: auto; 
-      padding: 15px 0; 
-      margin-bottom: 25px;
-      scrollbar-width: thin;
-      scrollbar-color: var(--accent-purple) rgba(255,255,255,0.05);
+      align-items: flex-start;
+      width: max-content;
+      overflow: visible;
+      padding: 0;
+      margin-bottom: 0;
     }
-    .seat-grid::-webkit-scrollbar { height: 8px; }
-    .seat-grid::-webkit-scrollbar-thumb { background: var(--accent-purple); border-radius: 10px; }
-    .seat-grid::-webkit-scrollbar-track { background:var(--bg-surface); }
 
     /* ── KOLTUK DURUM STİLLERİ ── */
     .seat {
@@ -585,7 +639,7 @@
     <div class="container nav-container" style="justify-content: center;">
       <a href="index.html" class="logo">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="url(#gd)" stroke-width="2"><defs><linearGradient id="gd" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#ec4899"/></linearGradient></defs><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-        <span>EVENT<span class="logo-highlight">IX</span> - Secure Payment</span>
+        <span>EVENT<span class="logo-highlight">IX</span> - {{ t('footer_secure') }}</span>
       </a>
     </div>
   </nav>
@@ -692,8 +746,8 @@
                 <div id="reservationTimerBox" style="display:none; margin-bottom:16px;">
                   <span style="font-size:1.5rem;">⏳</span>
                   <div>
-                    <div style="font-size:0.75rem; color:rgba(251,191,36,0.8); font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:2px;">Seat Reserved</div>
-                    <div id="timerMsg" style="font-size:0.8rem; color:var(--text-muted);">Your selected seats are reserved for</div>
+                    <div style="font-size:0.75rem; color:rgba(251,191,36,0.8); font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:2px;">{{ t('seat_reserved') }}</div>
+                    <div id="timerMsg" style="font-size:0.8rem; color:var(--text-muted);">{{ t('seats_reserved_msg') }}</div>
                   </div>
                   <div id="timerDisplay" style="margin-left:auto;">10:00</div>
                 </div>
@@ -718,7 +772,7 @@
                 <!-- Reservation Timer -->
                 <div class="srp-timer" id="srpTimerBox" style="display:none;">
                   <div>
-                    <div class="srp-timer-label">⏱ Reservation Time</div>
+                    <div class="srp-timer-label">⏱ {{ t('reservation_time') }}</div>
                   </div>
                   <div class="srp-timer-val" id="srpTimerDisplay">10:00</div>
                 </div>
@@ -726,10 +780,10 @@
                 <!-- Selected Seats -->
                 <div class="srp-card" id="srpSelectedBox" style="display:none;">
                   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <span style="font-size:0.82rem; font-weight:700; color:var(--text);">Selected Seats (<span id="srpSeatCount">0</span>)</span>
+                    <span style="font-size:0.82rem; font-weight:700; color:var(--text);">{{ t('selected_seats') }} (<span id="srpSeatCount">0</span>)</span>
                     <button onclick="removeAllSeats()" style="background:none; border:none; color:#f87171; font-size:0.78rem; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:4px;">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
-                      Remove All
+                      {{ t('remove_all') }}
                     </button>
                   </div>
                   <div id="srpSeatsList"></div>
@@ -1043,6 +1097,12 @@
     let guestInfo = { name: '', surname: '', email: '' };
 
     let mySessionId = window.getOrCreateSessionId();
+    const langCode = "{{ current_lang }}" === 'tr' ? 'tr-TR' : ("{{ current_lang }}" === 'de' ? 'de-DE' : 'en-US');
+    const checkoutI18n = {
+      reservationExpiredMsg: "{{ t('reservation_expired_msg') }}",
+      reservationExpiredAlert: "{{ t('reservation_expired_alert') }}",
+      legendLocked: "{{ t('legend_locked') }}"
+    };
 
     // Rezervasyon Sayacı
     let reservationExpiryTime = null; // ms timestamp
@@ -1068,12 +1128,12 @@
           if (box) { box.classList.add('expired'); box.style.display = 'none'; }
           if (srpBox) srpBox.style.display = 'none';
           const msgEl = document.getElementById('timerMsg');
-          if (msgEl) msgEl.textContent = 'Reservation expired! Please reselect your seats.';
+          if (msgEl) msgEl.textContent = checkoutI18n.reservationExpiredMsg;
           selectedSeats = [];
           reservationExpiryTime = null;
           updateSidebar();
           if (evData && evData.has_seating) loadSeats();
-          alert('Your 10-minute seat reservation has expired. Please reselect your seats.');
+          alert(checkoutI18n.reservationExpiredAlert);
           return;
         }
         const mins = Math.floor(remaining / 60000);
@@ -1173,16 +1233,16 @@
                       div.style.padding = '15px';
                       div.style.border = '1px solid rgba(255,255,255,0.1)';
                       div.innerHTML = `
-                        <h4 style="margin: 0 0 5px; font-size: 1rem; color: var(--accent-purple);">Ticket ${i+1}</h4>
+                        <h4 style="margin: 0 0 5px; font-size: 1rem; color: var(--accent-purple);">{{ t('ticket') }} ${i+1}</h4>
                         ${seatHtml}
                         <div style="display:flex; gap:10px;">
                           <div style="flex:1;">
                             <label class="form-label">{{ t('name_label') }}</label>
-                            <input type="text" class="form-control attendee-name" placeholder="{{ t('name_label') }}" value="${saved.name}" required>
+                            <input type="text" class="form-control attendee-name" placeholder="{{ t('name_placeholder') }}" value="${saved.name}" required>
                           </div>
                           <div style="flex:1;">
                             <label class="form-label">{{ t('surname_label') }}</label>
-                            <input type="text" class="form-control attendee-surname" placeholder="{{ t('surname_label') }}" value="${saved.surname}" required>
+                            <input type="text" class="form-control attendee-surname" placeholder="{{ t('surname_placeholder') }}" value="${saved.surname}" required>
                           </div>
                         </div>
                       `;
@@ -1239,7 +1299,7 @@
           try {
             const d = new Date(ds);
             if(isNaN(d)) return ds;
-            return d.toLocaleDateString("en-US", {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
+            return d.toLocaleDateString(langCode, {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
           } catch { return ds; }
         };
 
@@ -1525,6 +1585,108 @@
       }
     }
 
+    function initSeatMapPanZoom(viewport, stage) {
+      let scale = 1, tx = 20, ty = 20;
+      let drag = null;
+
+      const apply = () => {
+        stage.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+      };
+
+      const zoomAt = (cx, cy, delta) => {
+        const rect = viewport.getBoundingClientRect();
+        const mx = cx - rect.left;
+        const my = cy - rect.top;
+        const ns = Math.min(2.5, Math.max(0.55, scale + delta));
+        const r = ns / scale;
+        tx = mx - r * (mx - tx);
+        ty = my - r * (my - ty);
+        scale = ns;
+        apply();
+      };
+
+      viewport.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        zoomAt(e.clientX, e.clientY, e.deltaY > 0 ? -0.1 : 0.1);
+      }, { passive: false });
+
+      viewport.addEventListener('mousedown', (e) => {
+        if (e.button !== 0 || e.target.closest('.seat-map-controls')) return;
+        window.__seatMapMoved = false;
+        drag = { x: e.clientX, y: e.clientY, tx, ty };
+      });
+
+      const onMove = (e) => {
+        if (!drag) return;
+        const dx = e.clientX - drag.x;
+        const dy = e.clientY - drag.y;
+        if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+          window.__seatMapMoved = true;
+          viewport.classList.add('is-dragging');
+        }
+        tx = drag.tx + dx;
+        ty = drag.ty + dy;
+        apply();
+      };
+      const onUp = () => {
+        drag = null;
+        viewport.classList.remove('is-dragging');
+        setTimeout(() => { window.__seatMapMoved = false; }, 0);
+      };
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onUp);
+
+      let touchDrag = null;
+      viewport.addEventListener('touchstart', (e) => {
+        if (e.touches.length !== 1 || e.target.closest('.seat-map-controls')) return;
+        window.__seatMapMoved = false;
+        const t = e.touches[0];
+        touchDrag = { x: t.clientX, y: t.clientY, tx, ty };
+        viewport.classList.add('is-dragging');
+      }, { passive: true });
+      viewport.addEventListener('touchmove', (e) => {
+        if (!touchDrag || e.touches.length !== 1) return;
+        const t = e.touches[0];
+        const dx = t.clientX - touchDrag.x;
+        const dy = t.clientY - touchDrag.y;
+        if (Math.abs(dx) > 4 || Math.abs(dy) > 4) window.__seatMapMoved = true;
+        tx = touchDrag.tx + dx;
+        ty = touchDrag.ty + dy;
+        apply();
+      }, { passive: true });
+      viewport.addEventListener('touchend', () => {
+        touchDrag = null;
+        viewport.classList.remove('is-dragging');
+        setTimeout(() => { window.__seatMapMoved = false; }, 0);
+      });
+
+      viewport.querySelectorAll('.seat-map-zoom-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const z = btn.dataset.zoom;
+          const rect = viewport.getBoundingClientRect();
+          const cx = rect.left + rect.width / 2;
+          const cy = rect.top + rect.height / 2;
+          if (z === 'in') zoomAt(cx, cy, 0.2);
+          else if (z === 'out') zoomAt(cx, cy, -0.2);
+          else { scale = 1; tx = 20; ty = 20; apply(); }
+        });
+      });
+
+      requestAnimationFrame(() => {
+        const vw = viewport.clientWidth - 40;
+        const sw = stage.scrollWidth;
+        if (sw > vw) {
+          scale = Math.max(0.55, Math.min(1, vw / sw));
+          tx = 20;
+          ty = 20;
+          apply();
+        } else {
+          apply();
+        }
+      });
+    }
+
     function renderSeats(seats) {
       const wrapper = document.getElementById('seatsWrapper');
       wrapper.innerHTML = '';
@@ -1561,7 +1723,7 @@
                 <div class="category-price">${zInfo.price.toLocaleString('en-US')} ₺</div>
                 <div class="category-stats">
                   <span class="availability-badge ${isFull ? 'full' : ''}">
-                    ${isFull ? 'Sold Out' : zInfo.available + ' Available Seats'}
+                    ${isFull ? "{{ t('sold_out') }}" : zInfo.available + " {{ t('available_seats') }}"}
                   </span>
                 </div>
               `;
@@ -1583,6 +1745,19 @@
           renderSeats(seats);
       };
       wrapper.appendChild(backBtn);
+
+      const seatViewport = document.createElement('div');
+      seatViewport.className = 'seat-map-viewport';
+      seatViewport.innerHTML = `
+        <div class="seat-map-hint">🖱️ {{ t('seat_map_hint') }}</div>
+        <div class="seat-map-controls">
+          <button type="button" class="seat-map-zoom-btn" data-zoom="in" aria-label="Zoom in">+</button>
+          <button type="button" class="seat-map-zoom-btn" data-zoom="out" aria-label="Zoom out">−</button>
+          <button type="button" class="seat-map-zoom-btn" data-zoom="reset" aria-label="Reset" style="font-size:0.75rem;">⟲</button>
+        </div>
+      `;
+      const seatStage = document.createElement('div');
+      seatStage.className = 'seat-map-stage';
 
       const zSeats = zones[selectedZone].seats;
       const grid = document.createElement('div');
@@ -1638,7 +1813,7 @@
             // Başkasının rezervasyonu — soluk sarı, tıklanamaz, zamanlayıcı GÖSTERILMEZ
             sEl.className = 'seat locked';
             sEl.textContent = s.col_label;
-            sEl.title = '🔒 Reserved by someone else';
+            sEl.title = '🔒 ' + checkoutI18n.legendLocked;
             sEl.style.cursor = 'not-allowed';
           } else if (s.status === 'sold' && s.is_mine) {
             // Bu koltuk mevcut kullanıcı tarafından satın alınmış — yeşil göster
@@ -1657,6 +1832,7 @@
             if (isSelectedNow) sEl.classList.add('selected');
 
             sEl.onclick = async () => {
+              if (window.__seatMapMoved) return;
               const idx = selectedSeats.findIndex(sel => sel.id === s.id);
               if (idx > -1) {
                 // Zaten seçiliyse ÇIKAR ve veritabanından kilidi kaldır
@@ -1704,7 +1880,10 @@
         });
         grid.appendChild(rowDiv);
       });
-      wrapper.appendChild(grid);
+      seatStage.appendChild(grid);
+      seatViewport.appendChild(seatStage);
+      wrapper.appendChild(seatViewport);
+      initSeatMapPanZoom(seatViewport, seatStage);
 
       // Legend Ekleme
       const legend = document.createElement('div');
@@ -1891,15 +2070,15 @@
             div.style.padding = '15px';
             div.style.border = '1px solid rgba(255,255,255,0.1)';
             div.innerHTML = `
-              <h4 style="margin: 0 0 10px; font-size: 1rem; color: var(--accent-purple);">Ticket ${i+1}</h4>
+              <h4 style="margin: 0 0 10px; font-size: 1rem; color: var(--accent-purple);">{{ t('ticket') }} ${i+1}</h4>
               <div style="display:flex; gap:10px;">
                 <div style="flex:1;">
                   <label class="form-label">{{ t('name_label') }}</label>
-                  <input type="text" class="form-control attendee-name" placeholder="{{ t('name_label') }}" required>
+                  <input type="text" class="form-control attendee-name" placeholder="{{ t('name_placeholder') }}" required>
                 </div>
                 <div style="flex:1;">
                   <label class="form-label">{{ t('surname_label') }}</label>
-                  <input type="text" class="form-control attendee-surname" placeholder="{{ t('surname_label') }}" required>
+                  <input type="text" class="form-control attendee-surname" placeholder="{{ t('surname_placeholder') }}" required>
                 </div>
               </div>
             `;
@@ -1937,15 +2116,15 @@
          div.style.padding = '15px';
          div.style.border = '1px solid rgba(255,255,255,0.1)';
          div.innerHTML = `
-            <h4 style="margin: 0 0 10px; font-size: 1rem; color: var(--accent-purple);">Ticket ${i+1} ${seatInfoText}</h4>
+            <h4 style="margin: 0 0 10px; font-size: 1rem; color: var(--accent-purple);">{{ t('ticket') }} ${i+1} ${seatInfoText}</h4>
             <div style="display:flex; gap:10px;">
                 <div style="flex:1;">
                    <label class="form-label">{{ t('name_label') }}</label>
-                   <input type="text" class="form-control attendee-name" placeholder="Name" required>
+                   <input type="text" class="form-control attendee-name" placeholder="{{ t('name_placeholder') }}" required>
                 </div>
                 <div style="flex:1;">
                    <label class="form-label">{{ t('surname_label') }}</label>
-                   <input type="text" class="form-control attendee-surname" placeholder="Surname" required>
+                   <input type="text" class="form-control attendee-surname" placeholder="{{ t('surname_placeholder') }}" required>
                 </div>
             </div>
          `;
@@ -1979,7 +2158,7 @@
         try {
           const d = new Date(ds);
           if(isNaN(d)) return ds;
-          return d.toLocaleDateString("en-US", {day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'});
+          return d.toLocaleDateString(langCode, {day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'});
         } catch { return ds; }
       };
 
@@ -2025,7 +2204,7 @@
 
       let priceHTML = `
         <div style="display:flex; justify-content:space-between; margin-bottom:8px; color:var(--text-muted);">
-          <span>${q} x Ticket</span>
+          <span>${q} x {{ t('ticket') }}</span>
           <span>${totalValue.toLocaleString('en-US')} TL</span>
         </div>
       `;
@@ -2036,16 +2215,17 @@
         finalVal -= discAmt;
         priceHTML += `
           <div style="display:flex; justify-content:space-between; margin-bottom:8px; color:#6ee7b7;">
-            <span>Discount (%${currentDiscount.value})</span>
+            <span>{{ t('promo_discount') }} (%${currentDiscount.value})</span>
             <span>-${discAmt.toLocaleString('en-US')} TL</span>
           </div>
         `;
       } else if (currentDiscount.type === 'fixed') {
-        finalVal -= currentDiscount.value;
+        const discAmt = Math.min(finalVal, currentDiscount.value);
+        finalVal -= discAmt;
         priceHTML += `
           <div style="display:flex; justify-content:space-between; margin-bottom:8px; color:#6ee7b7;">
-            <span>Discount</span>
-            <span>-${currentDiscount.value.toLocaleString('en-US')} TL</span>
+            <span>{{ t('promo_discount') }}</span>
+            <span>-${discAmt.toLocaleString('en-US')} TL</span>
           </div>
         `;
       }
@@ -2192,6 +2372,7 @@
         event_id: evData.id,
         promo_code: validatedPromoCode,
         tickets_info: ticketsInfo,
+        lang: (document.cookie.match(/(^| )lang=([^;]+)/) || [])[2] || '{{ current_lang }}',
         card_name: document.getElementById('cardName').value,
         card_number: document.getElementById('cardNumber').value,
         card_exp: document.getElementById('cardExp').value,

@@ -216,15 +216,28 @@ const authI18n = {
 const _lang = getLangFromCookie();
 const t = (key) => (authI18n[_lang] || authI18n['tr'])[key] || key;
 
+const LANG_OPTIONS = [
+  { code: 'tr', label: 'TR', flag: 'tr' },
+  { code: 'en', label: 'EN', flag: 'gb' },
+  { code: 'de', label: 'DE', flag: 'de' },
+];
+
+function langFlagImg(flagCode) {
+  return `<img src="./images/flags/${flagCode}.svg" alt="" class="lang-flag" width="20" height="15" loading="lazy" decoding="async">`;
+}
+
+const _currentLang = LANG_OPTIONS.find(l => l.code === _lang) || LANG_OPTIONS[0];
+const _langMenuItems = LANG_OPTIONS.map(l =>
+  `<a href="#" onclick="window.location.href='/set_language/${l.code}?next=' + encodeURIComponent(window.location.href)" class="dropdown-item lang-option" style="text-decoration:none;">${langFlagImg(l.flag)}<span>${l.label}</span></a>`
+).join('');
+
 const LANG_BTN = `
   <div class="lang-dropdown" style="position:relative; display:inline-block; margin-right:5px;">
-    <button class="btn btn-outline" style="padding:6px 12px; font-size:0.85rem; border-radius:8px; display:flex; align-items:center; gap:5px;" onclick="event.stopPropagation(); document.getElementById('langMenu').classList.toggle('active')">
-      🌐 <span id="currentLangLabel">${_lang.toUpperCase()}</span> ▾
+    <button class="btn btn-outline" style="padding:6px 12px; font-size:0.85rem; border-radius:8px; display:flex; align-items:center; gap:6px;" onclick="event.stopPropagation(); document.getElementById('langMenu').classList.toggle('active')">
+      ${langFlagImg(_currentLang.flag)}<span id="currentLangLabel">${_currentLang.label}</span> ▾
     </button>
     <div id="langMenu" class="user-dropdown-menu" style="right:0; left:auto; top:120%;">
-      <a href="#" onclick="window.location.href='/set_language/tr?next=' + encodeURIComponent(window.location.href)" class="dropdown-item" style="text-decoration:none;">🇹🇷 TR</a>
-      <a href="#" onclick="window.location.href='/set_language/en?next=' + encodeURIComponent(window.location.href)" class="dropdown-item" style="text-decoration:none;">🇬🇧 EN</a>
-      <a href="#" onclick="window.location.href='/set_language/de?next=' + encodeURIComponent(window.location.href)" class="dropdown-item" style="text-decoration:none;">🇩🇪 DE</a>
+      ${_langMenuItems}
     </div>
   </div>
 `;
