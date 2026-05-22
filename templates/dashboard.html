@@ -239,7 +239,15 @@
     const _dateLocale = "{{ 'tr-TR' if current_lang == 'tr' else ('de-DE' if current_lang == 'de' else 'en-US') }}";
     function fDate(ds) {
       try {
-        const d = new Date(ds);
+        if (!ds) return ds;
+        // Turso'dan gelen tarihler UTC'de ama 'Z' işareti olmadan geliyor.
+        // Tarayıcı bunları lokal saat gibi yorumluyor → 3 saat kayıyor.
+        // 'Z' veya offset yoksa UTC olarak işaretle.
+        let s = String(ds).trim();
+        if (!s.endsWith('Z') && !/[+\-]\d{2}:\d{2}$/.test(s)) {
+          s = s.replace(' ', 'T') + 'Z';
+        }
+        const d = new Date(s);
         if (isNaN(d)) return ds;
         return d.toLocaleString(_dateLocale, { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
       } catch { return ds; }
