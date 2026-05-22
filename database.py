@@ -21,13 +21,23 @@ TURSO_AUTH_TOKEN = os.getenv('TURSO_AUTH_TOKEN')
 DB_PATH = os.path.join(_BASE_DIR, 'database.db')
 
 USING_TURSO = False
-try:
-    if TURSO_DB_URL and TURSO_AUTH_TOKEN:
+if TURSO_DB_URL and TURSO_AUTH_TOKEN:
+    try:
         import libsql_client
-        _client = libsql_client.create_client_sync(url=TURSO_DB_URL, auth_token=TURSO_AUTH_TOKEN)
         USING_TURSO = True
-except Exception as e:
-    print("Turso init_db error:", e)
+    except ImportError:
+        pass
+
+import threading
+_local_data = threading.local()
+
+def get_turso_client():
+    if not USING_TURSO:
+        return None
+    if not hasattr(_local_data, 'client') or _local_data.client is None:
+        import libsql_client
+        _local_data.client = libsql_client.create_client_sync(url=TURSO_DB_URL, auth_token=TURSO_AUTH_TOKEN)
+    return _local_data.client
 
 class TursoRowFakeDict:
     def __init__(self, libsql_row, columns):
@@ -54,7 +64,8 @@ class TursoCursor:
     def execute(self, sql, parameters=()):
         args = list(parameters) if parameters else []
         try:
-            self._result = _client.execute(sql, args)
+            client = get_turso_client()
+            self._result = client.execute(sql, args)
             if hasattr(self._result, 'rows_affected') and self._result.rows_affected > 0:
                 self.lastrowid = self._result.last_insert_rowid
         except Exception as e:
@@ -66,11 +77,12 @@ class TursoCursor:
         from libsql_client import Statement
         stmts = [Statement(sql, list(p)) for p in seq_of_parameters]
         try:
+            client = get_turso_client()
             # Execute in batches if it's too large (Turso might have limits)
             batch_size = 500
             for i in range(0, len(stmts), batch_size):
                 chunk = stmts[i:i + batch_size]
-                _client.batch(chunk)
+                client.batch(chunk)
         except Exception as e:
             raise sqlite3.OperationalError(str(e))
         return self
@@ -123,13 +135,14 @@ def get_db_connection():
 def init_db():
     if USING_TURSO:
         try:
+            client = get_turso_client()
             # Hızlı kontrol: Eğer users tablosu ve tickets.owner_name kolonu varsa,
             # veritabanı zaten kuruludur, 25 tane ayrı HTTP isteği atmaya gerek yok.
-            _client.execute("SELECT id FROM users LIMIT 1", [])
-            _client.execute("SELECT owner_name FROM tickets LIMIT 1", [])
+            client.execute("SELECT id FROM users LIMIT 1", [])
+            client.execute("SELECT owner_name FROM tickets LIMIT 1", [])
             # Refunds tablosunu da kontrol et - yoksa oluşturmaya izin ver
             try:
-                _client.execute("SELECT id FROM refunds LIMIT 1", [])
+                client.execute("SELECT id FROM refunds LIMIT 1", [])
                 return  # Veritabanı hazır, hızlıca çık
             except Exception:
                 pass  # refunds tablosu yok, aşağıdan oluştur
