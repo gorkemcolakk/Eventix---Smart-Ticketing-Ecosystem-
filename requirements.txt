@@ -3,7 +3,7 @@ Flask-Cors==4.0.1
 PyJWT==2.8.0
 Werkzeug==3.0.3
 qrcode[pil]
-libsql-client
+requests
 python-dotenv
 Flask-Limiter
 Flask-Caching

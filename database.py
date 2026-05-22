@@ -20,28 +20,63 @@ TURSO_AUTH_TOKEN = os.getenv('TURSO_AUTH_TOKEN')
 
 DB_PATH = os.path.join(_BASE_DIR, 'database.db')
 
-USING_TURSO = False
-if TURSO_DB_URL and TURSO_AUTH_TOKEN:
-    try:
-        import libsql_client
-        USING_TURSO = True
-    except ImportError:
-        pass
+USING_TURSO = bool(TURSO_DB_URL and TURSO_AUTH_TOKEN)
 
-import threading
-_local_data = threading.local()
-
-def get_turso_client():
-    if not USING_TURSO:
+def _turso_val(typed_val):
+    """Turso HTTP API typed value -> Python value."""
+    if typed_val is None or typed_val.get('type') == 'null':
         return None
-    if not hasattr(_local_data, 'client') or _local_data.client is None:
-        import libsql_client
-        _local_data.client = libsql_client.create_client_sync(url=TURSO_DB_URL, auth_token=TURSO_AUTH_TOKEN)
-    return _local_data.client
+    t = typed_val.get('type')
+    v = typed_val.get('value')
+    if t == 'integer':
+        return int(v)
+    if t == 'float':
+        return float(v)
+    return v  # text, blob, etc.
+
+def _make_turso_arg(a):
+    if a is None:
+        return {'type': 'null'}
+    if isinstance(a, bool):
+        return {'type': 'integer', 'value': '1' if a else '0'}
+    if isinstance(a, int):
+        return {'type': 'integer', 'value': str(a)}
+    if isinstance(a, float):
+        return {'type': 'float', 'value': str(a)}
+    return {'type': 'text', 'value': str(a)}
+
+def turso_http(sql, args=None):
+    """Execute a single SQL via Turso HTTP API. Returns (columns, rows, last_insert_rowid)."""
+    import requests as _req
+    url = TURSO_DB_URL.rstrip('/') + '/v2/pipeline'
+    headers = {
+        'Authorization': 'Bearer ' + TURSO_AUTH_TOKEN,
+        'Content-Type': 'application/json',
+    }
+    typed_args = [_make_turso_arg(a) for a in (args or [])]
+    body = {
+        'requests': [
+            {'type': 'execute', 'stmt': {'sql': sql, 'args': typed_args}},
+            {'type': 'close'}
+        ]
+    }
+    resp = _req.post(url, json=body, headers=headers, timeout=10)
+    resp.raise_for_status()
+    data = resp.json()
+    result = data['results'][0]
+    if result.get('type') == 'error':
+        msg = result.get('error', {}).get('message', 'Turso HTTP error')
+        raise sqlite3.OperationalError(msg)
+    exec_result = result['response']['result']
+    columns = [c['name'] for c in exec_result['cols']]
+    rows = [[_turso_val(v) for v in row] for row in exec_result['rows']]
+    raw_lid = exec_result.get('last_insert_rowid')
+    last_insert_rowid = int(raw_lid) if raw_lid is not None else None
+    return columns, rows, last_insert_rowid
 
 class TursoRowFakeDict:
-    def __init__(self, libsql_row, columns):
-        self._row = libsql_row
+    def __init__(self, row_values, columns):
+        self._row = row_values  # plain Python list
         self._columns = columns
         
     def __getitem__(self, key):
@@ -58,44 +93,54 @@ class TursoRowFakeDict:
 
 class TursoCursor:
     def __init__(self):
-        self._result = None
+        self._columns = []
+        self._rows = []
         self.lastrowid = None
         
     def execute(self, sql, parameters=()):
         args = list(parameters) if parameters else []
         try:
-            client = get_turso_client()
-            self._result = client.execute(sql, args)
-            if hasattr(self._result, 'rows_affected') and self._result.rows_affected > 0:
-                self.lastrowid = self._result.last_insert_rowid
+            columns, rows, last_insert_rowid = turso_http(sql, args)
+            self._columns = columns
+            self._rows = rows
+            if last_insert_rowid is not None:
+                self.lastrowid = last_insert_rowid
+        except sqlite3.OperationalError:
+            raise
         except Exception as e:
             raise sqlite3.OperationalError(str(e))
         return self
         
     def executemany(self, sql, seq_of_parameters):
-        # Turso lacks a native executemany, so we use batch
-        from libsql_client import Statement
-        stmts = [Statement(sql, list(p)) for p in seq_of_parameters]
+        import requests as _req
+        url = TURSO_DB_URL.rstrip('/') + '/v2/pipeline'
+        headers = {
+            'Authorization': 'Bearer ' + TURSO_AUTH_TOKEN,
+            'Content-Type': 'application/json',
+        }
+        params_list = list(seq_of_parameters)
+        batch_size = 500
         try:
-            client = get_turso_client()
-            # Execute in batches if it's too large (Turso might have limits)
-            batch_size = 500
-            for i in range(0, len(stmts), batch_size):
-                chunk = stmts[i:i + batch_size]
-                client.batch(chunk)
+            for i in range(0, len(params_list), batch_size):
+                chunk = params_list[i:i + batch_size]
+                reqs = []
+                for p in chunk:
+                    typed_args = [_make_turso_arg(a) for a in (p or [])]
+                    reqs.append({'type': 'execute', 'stmt': {'sql': sql, 'args': typed_args}})
+                reqs.append({'type': 'close'})
+                resp = _req.post(url, json={'requests': reqs}, headers=headers, timeout=30)
+                resp.raise_for_status()
         except Exception as e:
             raise sqlite3.OperationalError(str(e))
         return self
         
     def fetchone(self):
-        if self._result and len(self._result.rows) > 0:
-            return TursoRowFakeDict(self._result.rows[0], self._result.columns)
+        if self._rows:
+            return TursoRowFakeDict(self._rows[0], self._columns)
         return None
         
     def fetchall(self):
-        if self._result and self._result.rows:
-            return [TursoRowFakeDict(r, self._result.columns) for r in self._result.rows]
-        return []
+        return [TursoRowFakeDict(r, self._columns) for r in self._rows]
         
     def close(self):
         pass
@@ -135,19 +180,18 @@ def get_db_connection():
 def init_db():
     if USING_TURSO:
         try:
-            client = get_turso_client()
-            # Hızlı kontrol: Eğer users tablosu ve tickets.owner_name kolonu varsa,
-            # veritabanı zaten kuruludur, 25 tane ayrı HTTP isteği atmaya gerek yok.
-            client.execute("SELECT id FROM users LIMIT 1", [])
-            client.execute("SELECT owner_name FROM tickets LIMIT 1", [])
-            # Refunds tablosunu da kontrol et - yoksa oluşturmaya izin ver
+            # Hizli kontrol: Eger users tablosu ve tickets.owner_name kolonu varsa,
+            # veritabani zaten kuruludur, 25 tane ayri HTTP istegi atmaya gerek yok.
+            turso_http("SELECT id FROM users LIMIT 1", [])
+            turso_http("SELECT owner_name FROM tickets LIMIT 1", [])
+            # Refunds tablosunu da kontrol et - yoksa olusturmaya izin ver
             try:
-                client.execute("SELECT id FROM refunds LIMIT 1", [])
-                return  # Veritabanı hazır, hızlıca çık
+                turso_http("SELECT id FROM refunds LIMIT 1", [])
+                return  # Veritabani hazir, hizlica cik
             except Exception:
-                pass  # refunds tablosu yok, aşağıdan oluştur
+                pass  # refunds tablosu yok, asagidan olustur
         except Exception:
-            pass # Eğer kurulu değilse, aşağıdan normal şekilde tabloları oluşturmaya devam et
+            pass  # Eger kurulu degilse, asagidan normal sekilde tablolari olusturmaya devam et
             
     conn = get_db_connection()
     c = conn.cursor()
