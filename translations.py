@@ -2,9 +2,9 @@ TRANSLATIONS = {
     'tr': {
         # ── General ───────────────────────────────────────
         'explore': 'Keşfet',
-        'concerts': 'Konserler',
+        'concerts': 'Konser',
         'theater': 'Tiyatro',
-        'workshops': 'Atölyeler',
+        'workshops': 'Atölye',
         'search_placeholder': 'Etkinlik, sanatçı veya mekan ara...',
         'filters': 'Filtreler',
         'find_tickets': 'Bilet Bul',

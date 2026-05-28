@@ -34,11 +34,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ── RENDER EVENTS ──────────────────────────────────────────
    function getCategoryName(cat) {
-     const val = { concert: window.I18N?.concerts || 'Concert', workshop: window.I18N?.workshops || 'Workshop', theater: window.I18N?.theater || 'Theater' }[cat] || cat;
      const lang = (document.cookie.match(new RegExp('(^| )lang=([^;]+)'))?.[2] || 'tr').toLowerCase();
      if (lang === 'tr') {
-       return val.replace(/i/g, 'İ').replace(/ı/g, 'I').toUpperCase();
+       const maps = { concert: "KONSER", theater: "TİYATRO", workshop: "ATÖLYE" };
+       return maps[cat] || cat.toUpperCase();
      }
+     const val = { concert: window.I18N?.concerts || 'Concert', workshop: window.I18N?.workshops || 'Workshop', theater: window.I18N?.theater || 'Theater' }[cat] || cat;
      return val.toUpperCase();
    }
    function getCategoryClass(cat) {

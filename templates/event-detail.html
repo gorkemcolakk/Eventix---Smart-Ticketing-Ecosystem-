@@ -283,12 +283,21 @@
         document.getElementById('d-img').alt = event.title;
 
         // Badge
-        const badgeMap = { concert: ["{{ t('concert_option') }}",'139,92,246'], theater: ["{{ t('theater_option') }}",'236,72,153'], workshop: ["{{ t('workshop_option') }}",'14,165,233'] };
-        const [bName, bColor] = badgeMap[event.category] || [event.category,'139,92,246'];
+        const badgeMap = { concert: ["KONSER",'139,92,246'], theater: ["TİYATRO",'236,72,153'], workshop: ["ATÖLYE",'14,165,233'] };
+        const lang = (document.cookie.match(new RegExp('(^| )lang=([^;]+)'))?.[2] || 'tr').toLowerCase();
+        const bMaps = {
+          tr: { concert: "KONSER", theater: "TİYATRO", workshop: "ATÖLYE" },
+          de: { concert: "KONZERT", theater: "THEATER", workshop: "SEMINAR" },
+          en: { concert: "CONCERT", theater: "THEATER", workshop: "WORKSHOP" }
+        };
+        const activeMap = bMaps[lang] || bMaps['tr'];
+        const bName = activeMap[event.category] || event.category.toUpperCase();
+        const bColor = (badgeMap[event.category] || [event.category,'139,92,246'])[1];
         const badge = document.getElementById('d-badge');
         badge.textContent = bName;
         badge.style.background = `rgba(${bColor},0.8)`;
         badge.style.borderColor = `rgb(${bColor})`;
+        badge.style.textTransform = 'none';
 
         // Title, date
         document.getElementById('d-title').textContent = event.title;
