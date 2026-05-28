@@ -34,11 +34,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ── RENDER EVENTS ──────────────────────────────────────────
    function getCategoryName(cat) {
-    return { concert: window.I18N?.concerts || 'Concert', workshop: window.I18N?.workshops || 'Workshop', theater: window.I18N?.theater || 'Theater' }[cat] || cat;
-  }
-  function getCategoryClass(cat) {
-    return { concert: 'category-concert', workshop: 'category-workshop', theater: 'category-theater' }[cat] || '';
-  }
+     const val = { concert: window.I18N?.concerts || 'Concert', workshop: window.I18N?.workshops || 'Workshop', theater: window.I18N?.theater || 'Theater' }[cat] || cat;
+     const lang = (document.cookie.match(new RegExp('(^| )lang=([^;]+)'))?.[2] || 'tr').toLowerCase();
+     if (lang === 'tr') {
+       return val.replace(/i/g, 'İ').replace(/ı/g, 'I').toUpperCase();
+     }
+     return val.toUpperCase();
+   }
+   function getCategoryClass(cat) {
+     return { concert: 'category-concert', workshop: 'category-workshop', theater: 'category-theater' }[cat] || '';
+   }
 
   function renderEvents(events) {
     if (!eventsGrid) return;
@@ -63,7 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       card.innerHTML = `
         <div class="event-img-wrapper">
-          <div class="event-category-badge ${getCategoryClass(event.category)}">${getCategoryName(event.category)}</div>
+          <div class="event-category-badge ${getCategoryClass(event.category)}" style="text-transform:none;">${getCategoryName(event.category)}</div>
           ${event.featured ? `<div class="featured-badge">⭐ ${window.I18N?.featured || 'Featured'}</div>` : ''}
           <img src="${event.image}" alt="${event.title}" class="event-img" loading="lazy">
           <button class="wish-btn ${isWished ? 'wished' : ''}" title="${isWished ? 'Remove from wishlist' : 'Add to wishlist'}"
