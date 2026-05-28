@@ -22,6 +22,9 @@ DB_PATH = os.path.join(_BASE_DIR, 'database.db')
 
 USING_TURSO = bool(TURSO_DB_URL and TURSO_AUTH_TOKEN)
 
+import requests
+_turso_session = requests.Session()
+
 def _turso_val(typed_val):
     """Turso HTTP API typed value -> Python value."""
     if typed_val is None or typed_val.get('type') == 'null':
@@ -47,7 +50,6 @@ def _make_turso_arg(a):
 
 def turso_http(sql, args=None):
     """Execute a single SQL via Turso HTTP API. Returns (columns, rows, last_insert_rowid)."""
-    import requests as _req
     url = TURSO_DB_URL.rstrip('/') + '/v2/pipeline'
     headers = {
         'Authorization': 'Bearer ' + TURSO_AUTH_TOKEN,
@@ -60,7 +62,7 @@ def turso_http(sql, args=None):
             {'type': 'close'}
         ]
     }
-    resp = _req.post(url, json=body, headers=headers, timeout=10)
+    resp = _turso_session.post(url, json=body, headers=headers, timeout=10)
     resp.raise_for_status()
     data = resp.json()
     result = data['results'][0]
@@ -112,7 +114,6 @@ class TursoCursor:
         return self
         
     def executemany(self, sql, seq_of_parameters):
-        import requests as _req
         url = TURSO_DB_URL.rstrip('/') + '/v2/pipeline'
         headers = {
             'Authorization': 'Bearer ' + TURSO_AUTH_TOKEN,
@@ -128,7 +129,7 @@ class TursoCursor:
                     typed_args = [_make_turso_arg(a) for a in (p or [])]
                     reqs.append({'type': 'execute', 'stmt': {'sql': sql, 'args': typed_args}})
                 reqs.append({'type': 'close'})
-                resp = _req.post(url, json={'requests': reqs}, headers=headers, timeout=30)
+                resp = _turso_session.post(url, json={'requests': reqs}, headers=headers, timeout=30)
                 resp.raise_for_status()
         except Exception as e:
             raise sqlite3.OperationalError(str(e))

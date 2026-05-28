@@ -578,9 +578,9 @@ TRANSLATIONS = {
     'en': {
         # ── General ───────────────────────────────────────
         'explore': 'Explore',
-        'concerts': 'Concerts',
+        'concerts': 'Concert',
         'theater': 'Theater',
-        'workshops': 'Workshops',
+        'workshops': 'Workshop',
         'search_placeholder': 'Search events, artists or venues...',
         'filters': 'Filters',
         'find_tickets': 'Find Tickets',
@@ -1154,9 +1154,9 @@ TRANSLATIONS = {
     'de': {
         # ── General ───────────────────────────────────────
         'explore': 'Entdecken',
-        'concerts': 'Konzerte',
+        'concerts': 'Konzert',
         'theater': 'Theater',
-        'workshops': 'Workshops',
+        'workshops': 'Seminar',
         'search_placeholder': 'Veranstaltungen, Künstler oder Orte suchen...',
         'filters': 'Filter',
         'find_tickets': 'Tickets finden',
