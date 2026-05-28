@@ -838,8 +838,8 @@
     // ── Init ──────────────────────────────────────────────────────────
     window.addEventListener('DOMContentLoaded', () => {
       const p = new URLSearchParams(window.location.search);
-      const t = p.get('tab') || 'pending';
-      showTab(t);
+      const initTab = p.get('tab') || 'pending';
+      showTab(initTab);
     });
   </script>
 
