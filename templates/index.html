@@ -43,6 +43,7 @@
   </style>
   <script>
     window.I18N = {
+      locale: "{{ 'tr-TR' if current_lang == 'tr' else ('de-DE' if current_lang == 'de' else 'en-US') }}",
       concerts: "{{ t('concerts') }}",
       workshops: "{{ t('workshops') }}",
       theater: "{{ t('theater') }}",

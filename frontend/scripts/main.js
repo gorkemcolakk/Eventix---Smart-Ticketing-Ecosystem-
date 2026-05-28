@@ -77,7 +77,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             ${(() => {
                 try {
                     const d = new Date(event.date);
-                    if (!isNaN(d)) return d.toLocaleDateString("en-US", {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
+                    const locale = window.I18N?.locale || 'en-US';
+                    if (!isNaN(d)) return d.toLocaleDateString(locale, {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
                 } catch(e) {}
                 return event.date;
             })()}
