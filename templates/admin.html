@@ -433,10 +433,10 @@
                 <td style="padding:10px 14px;color:var(--text-muted);">${u.id}</td>
                 <td style="padding:10px 14px;color:var(--text);font-weight:600;">${u.fullname}</td>
                 <td style="padding:14px 14px;color:var(--text-sub);">${u.email}</td>
-                <td style="padding:10px 14px;">
+                 <td style="padding:10px 14px;">
                   <span style="background:${roleColor(u.role)}18;color:${roleColor(u.role)};border:1px solid ${roleColor(u.role)}44;border-radius:100px;padding:2px 10px;font-size:0.72rem;font-weight:600;">${roleLabel(u.role)}</span>
                 </td>
-                <td style="padding:10px 14px;color:var(--text-muted);font-size:0.78rem;">${new Date(u.created_at).toLocaleDateString('en-US')}</td>
+                <td style="padding:10px 14px;color:var(--text-muted);font-size:0.78rem;">${new Date(u.created_at).toLocaleDateString('tr-TR')}</td>
               </tr>`).join('')}</tbody>
             </table>
           </div>`;
@@ -451,52 +451,187 @@
         const r = await fetch('/api/admin/all-events', { headers: authHeaders() });
         const events = await r.json();
         const sColor = s => ({ active:'#14b8a6', pending:'#f59e0b', cancelled:'#ef4444', rejected:'#6b7280' }[s] || '#6b7280');
+        const sBg   = s => ({ active:'rgba(20,184,166,0.12)', pending:'rgba(245,158,11,0.12)', cancelled:'rgba(239,68,68,0.12)', rejected:'rgba(107,114,128,0.12)' }[s] || 'rgba(107,114,128,0.12)');
+        const sDot  = s => ({ active:'●', pending:'◑', cancelled:'✕', rejected:'–' }[s] || '●');
         const sLabel = s => ({
-            active: "{{ t('status_active') }}",
-            pending: "{{ t('status_pending') }}",
+            active:    "{{ t('status_active') }}",
+            pending:   "{{ t('status_pending') }}",
             cancelled: "{{ t('status_cancelled') }}",
-            rejected: "{{ t('status_rejected') }}"
+            rejected:  "{{ t('status_rejected') }}"
         }[s] || s);
+        const catColor = c => ({ concert:'#f59e0b', theater:'#ef4444', workshop:'#14b8a6' }[c] || '#8b5cf6');
         const fDate = ds => {
           try {
             const d = new Date(ds);
             if(isNaN(d)) return ds;
-            return d.toLocaleDateString("en-US", {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
-          } catch { return ds; }
+            const dateStr = d.toLocaleDateString("tr-TR", {day:'numeric', month:'short', year:'numeric'});
+            const timeStr = d.toLocaleTimeString("tr-TR", {hour:'2-digit', minute:'2-digit'});
+            return { date: dateStr, time: timeStr };
+          } catch { return { date: ds, time: '' }; }
         };
 
-        el.innerHTML = `<p style="color:var(--text-muted);margin-bottom:14px;font-size:0.85rem;">${events.length} {{ t('all_events') }}</p>` +
-          events.map(e => `
-          <div class="glass-panel" style="margin-bottom:10px;padding:14px 18px;display:flex;gap:14px;align-items:center;">
-            <img src="${e.image}" style="width:60px;height:60px;border-radius:8px;object-fit:cover;flex-shrink:0;" onerror="this.src='https://images.unsplash.com/photo-1540039155733-5bb30b4a574b?w=200'">
-            <div style="flex:1;min-width:0;">
-              <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;flex-wrap:wrap;">
-                <span style="color:var(--text);font-weight:600;font-size:0.95rem;">${e.title} ${e.parent_event_id ? '<small style="font-weight:400;color:var(--text-muted);">(Session)</small>' : ''}</span>
-                <span style="background:${sColor(e.status)}18;color:${sColor(e.status)};border:1px solid ${sColor(e.status)}44;border-radius:100px;padding:1px 8px;font-size:0.75rem;font-weight:600;">${sLabel(e.status)}</span>
+        el.innerHTML = `
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="width:38px;height:38px;border-radius:10px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.25);display:flex;align-items:center;justify-content:center;font-size:1.1rem;">📋</div>
+              <div>
+                <div style="color:var(--text);font-weight:700;font-size:1.1rem;">{{ t('all_events') }}</div>
+                <div style="color:var(--text-muted);font-size:0.78rem;">${events.length} {{ t('all_events') }}</div>
               </div>
-              ${e.recurring_config ? `<div style="margin-bottom:6px;">${getRecurrenceBadge(e.recurring_config, e.session_count)}</div>` : ''}
-              <p style="color:var(--text-muted);font-size:0.78rem;margin:0;">📅 ${fDate(e.date)} | 📍 ${e.location} | 💰 ${e.price.toLocaleString('en-US')} ₺ | 🎟 ${e.sold_count}/${e.capacity}</p>
-              ${getSessionNotes(e.id, e.sessions, !!e.recurring_config)}
-            </div>
-            <div style="display:flex; gap:8px;">
-              ${(e.status === 'active' || e.status === 'pending') ? `
-                <button class="btn btn-primary btn-sm" onclick="toggleReasonBox('${e.id}', 'reject')">{{ t('request_edit') }}</button>
-                <button class="btn btn-danger btn-sm" onclick="toggleReasonBox('${e.id}', 'cancel')">{{ t('cancel_btn') }}</button>
-              ` : ''}
-              ${e.status === 'rejected' ? `<button class="btn btn-outline btn-sm" onclick="approveEvent('${e.id}', this)">{{ t('re_activate') }}</button>` : ''}
             </div>
           </div>
-          <div id="reason-box-${e.id}" style="display:none;margin-top:10px; padding:0 18px 14px;">
-            <div class="glass-panel" style="padding:15px; border-color:rgba(239,68,68,0.3);">
-                <label id="reason-label-${e.id}" class="form-label" style="margin-bottom:8px; display:block; color:var(--text); font-weight:600;">{{ t('reason_for_rejection') }}</label>
-                <textarea class="form-control" placeholder="{{ t('provide_note_organizer') }}" id="reason-input-${e.id}" style="margin-bottom:8px; min-height:60px;"></textarea>
-                <div style="display:flex; gap:10px;">
-                    <button class="btn btn-danger btn-sm" style="flex:1;justify-content:center;" id="reason-confirm-btn-${e.id}">{{ t('save') }}</button>
-                    <button class="btn btn-outline btn-sm" style="flex:1;justify-content:center;" onclick="toggleReasonBox('${e.id}')">{{ t('cancel_btn') }}</button>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+          ${events.map(e => {
+            const fd = fDate(e.date);
+            const pct = e.capacity > 0 ? Math.min(100, Math.round(e.sold_count / e.capacity * 100)) : 0;
+            const barColor = pct >= 90 ? '#ef4444' : pct >= 60 ? '#f59e0b' : '#14b8a6';
+            return `
+            <div style="
+              background:var(--bg-card);
+              border:1px solid var(--border);
+              border-radius:16px;
+              overflow:hidden;
+              transition:all 0.22s cubic-bezier(0.4,0,0.2,1);
+              position:relative;
+            "
+            onmouseenter="this.style.borderColor='rgba(245,158,11,0.4)';this.style.boxShadow='0 8px 32px rgba(0,0,0,0.3)';this.style.transform='translateY(-1px)'"
+            onmouseleave="this.style.borderColor='var(--border)';this.style.boxShadow='none';this.style.transform='translateY(0)'"
+            >
+              <div style="display:flex;gap:0;align-items:stretch;">
+
+                <!-- Thumbnail -->
+                <div style="position:relative;flex-shrink:0;width:110px;">
+                  <img src="${e.image}"
+                    style="width:110px;height:100%;min-height:90px;object-fit:cover;display:block;"
+                    onerror="this.src='https://images.unsplash.com/photo-1540039155733-5bb30b4a574b?w=200'">
+                  <div style="
+                    position:absolute;inset:0;
+                    background:linear-gradient(90deg,transparent 60%,var(--bg-card));
+                  "></div>
+                  ${e.category ? `<div style="
+                    position:absolute;top:8px;left:8px;
+                    background:${catColor(e.category)};
+                    color:#fff;font-size:0.6rem;font-weight:700;letter-spacing:0.6px;
+                    text-transform:uppercase;padding:2px 7px;border-radius:100px;
+                    border:1px solid rgba(255,255,255,0.2);
+                    backdrop-filter:blur(4px);
+                  ">${e.category}</div>` : ''}
                 </div>
+
+                <!-- Content -->
+                <div style="flex:1;min-width:0;padding:14px 16px;display:flex;flex-direction:column;gap:8px;">
+
+                  <!-- Title row -->
+                  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+                    <div style="flex:1;min-width:0;">
+                      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
+                        <span style="color:var(--text);font-weight:700;font-size:0.97rem;line-height:1.3;">
+                          ${e.title}${e.parent_event_id ? ' <span style="font-weight:400;color:var(--text-muted);font-size:0.8rem;">(Seans)</span>' : ''}
+                        </span>
+                        <span style="
+                          background:${sBg(e.status)};
+                          color:${sColor(e.status)};
+                          border:1px solid ${sColor(e.status)}44;
+                          border-radius:100px;padding:2px 10px;
+                          font-size:0.7rem;font-weight:700;
+                          display:inline-flex;align-items:center;gap:5px;
+                          flex-shrink:0;
+                        ">
+                          <span style="font-size:0.6rem;">${sDot(e.status)}</span>
+                          ${sLabel(e.status)}
+                        </span>
+                        ${e.recurring_config ? getRecurrenceBadge(e.recurring_config, e.session_count) : ''}
+                      </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div style="display:flex;gap:6px;flex-shrink:0;">
+                      ${(e.status === 'active' || e.status === 'pending') ? `
+                        <button class="btn btn-sm" onclick="toggleReasonBox('${e.id}', 'reject')"
+                          style="background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.3);color:#f59e0b;font-size:0.72rem;padding:5px 12px;"
+                          onmouseenter="this.style.background='rgba(245,158,11,0.2)'"
+                          onmouseleave="this.style.background='rgba(245,158,11,0.1)'"
+                        >
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                          {{ t('request_edit') }}
+                        </button>
+                        <button class="btn btn-sm" onclick="toggleReasonBox('${e.id}', 'cancel')"
+                          style="background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:#f87171;font-size:0.72rem;padding:5px 12px;"
+                          onmouseenter="this.style.background='rgba(239,68,68,0.2)'"
+                          onmouseleave="this.style.background='rgba(239,68,68,0.1)'"
+                        >
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                          {{ t('cancel_btn') }}
+                        </button>
+                      ` : ''}
+                      ${e.status === 'rejected' ? `
+                        <button class="btn btn-sm" onclick="approveEvent('${e.id}', this)"
+                          style="background:rgba(20,184,166,0.1);border-color:rgba(20,184,166,0.3);color:#14b8a6;font-size:0.72rem;padding:5px 12px;"
+                        >
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                          {{ t('re_activate') }}
+                        </button>
+                      ` : ''}
+                    </div>
+                  </div>
+
+                  <!-- Date + Location + Price row -->
+                  <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+
+                    <!-- Date/Time badge -->
+                    <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:4px 10px;">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                      <span style="color:#f59e0b;font-size:0.75rem;font-weight:700;">${fd.date}</span>
+                      ${fd.time ? `<span style="width:1px;height:12px;background:rgba(245,158,11,0.3);"></span><span style="color:rgba(245,158,11,0.75);font-size:0.7rem;font-weight:600;">${fd.time}</span>` : ''}
+                    </div>
+
+                    <!-- Location -->
+                    <div style="display:inline-flex;align-items:center;gap:5px;color:var(--text-muted);font-size:0.78rem;">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                      <span style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${e.location}</span>
+                    </div>
+
+                    <!-- Price -->
+                    <div style="display:inline-flex;align-items:center;gap:5px;">
+                      <span style="font-family:'Space Mono',monospace;font-size:0.85rem;font-weight:700;color:var(--text);">${e.price.toLocaleString('tr-TR')} <span style="color:var(--gold);">₺</span></span>
+                    </div>
+
+                  </div>
+
+                  <!-- Capacity bar -->
+                  ${e.capacity > 0 ? `
+                  <div style="display:flex;align-items:center;gap:10px;">
+                    <div style="flex:1;height:4px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;">
+                      <div style="height:100%;width:${pct}%;background:${barColor};border-radius:100px;transition:width 0.6s ease;"></div>
+                    </div>
+                    <span style="font-size:0.7rem;color:var(--text-muted);white-space:nowrap;font-weight:600;">
+                      <span style="color:${barColor};">${e.sold_count}</span>/${e.capacity}
+                      <span style="color:var(--text-muted);font-weight:400;"> · %${pct}</span>
+                    </span>
+                  </div>
+                  ` : ''}
+
+                  ${getSessionNotes(e.id, e.sessions, !!e.recurring_config)}
+                </div>
+              </div>
             </div>
-          </div>`).join('');
-      } catch(err) { el.innerHTML = '<p class="loading-text" style="color:#f87171;">{{ t('failed_to_load') }}</p>'; }
+
+            <!-- Reason box (outside card, below it) -->
+            <div id="reason-box-${e.id}" style="display:none;margin-top:-8px;margin-bottom:4px;padding:0 2px;">
+              <div class="glass-panel" style="padding:16px;border-color:rgba(239,68,68,0.3);border-radius:12px;">
+                <label id="reason-label-${e.id}" class="form-label" style="margin-bottom:8px;display:block;color:var(--text);font-weight:600;">{{ t('reason_for_rejection') }}</label>
+                <textarea class="form-control" placeholder="{{ t('provide_note_organizer') }}" id="reason-input-${e.id}" style="margin-bottom:10px;min-height:60px;"></textarea>
+                <div style="display:flex;gap:10px;">
+                  <button class="btn btn-danger btn-sm" style="flex:1;justify-content:center;" id="reason-confirm-btn-${e.id}">{{ t('save') }}</button>
+                  <button class="btn btn-outline btn-sm" style="flex:1;justify-content:center;" onclick="toggleReasonBox('${e.id}')">{{ t('cancel_btn') }}</button>
+                </div>
+              </div>
+            </div>
+          `;
+          }).join('')}
+          </div>
+        `;
+      } catch(err) { el.innerHTML = '<p class="loading-text" style="color:#f87171;">{{ t(\'failed_to_load\') }}</p>'; }
     }
 
     // ── REVENUE ───────────────────────────────────────────────
