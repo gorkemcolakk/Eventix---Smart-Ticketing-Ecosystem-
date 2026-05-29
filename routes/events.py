@@ -493,8 +493,8 @@ def cancel_event(event_id):
         conn.execute(f"UPDATE events SET status = 'cancelled', rejection_reason = ?, cancelled_by = ? WHERE id IN ({placeholders})", 
                      [reason, cancelled_by] + list(selected_ids))
     else:
-        conn.execute("UPDATE events SET status = 'cancelled', rejection_reason = ?, cancelled_by = ? WHERE id = ? OR parent_event_id = ?", 
-                     (reason, cancelled_by, event_id, event_id))
+        conn.execute("UPDATE events SET status = 'cancelled', rejection_reason = ?, cancelled_by = ? WHERE id = ?", 
+                     (reason, cancelled_by, event_id))
 
     # Organizatöre bildirim gönder (Eğer admin iptal ettiyse)
     if cancelled_by == 'admin' and event['organizer_id']:

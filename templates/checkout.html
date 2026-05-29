@@ -183,15 +183,16 @@
       display: flex;
       justify-content: space-between;
       margin-bottom: 12px;
-      color: var(--text-muted);
+      color: var(--text-sub);
+      font-weight: 600;
     }
     .summary-row.total {
       border-top: 1px solid rgba(255,255,255,0.1);
       padding-top: 16px;
       margin-bottom: 0;
-      color:var(--text);
-      font-weight: bold;
-      font-size: 1.2rem;
+      color: var(--text);
+      font-weight: 800;
+      font-size: 1.25rem;
     }
     .event-preview {
       display: flex;
@@ -716,20 +717,22 @@
             <div class="event-preview">
               <img id="evImgSimple" src="" alt="Event Image" style="width:80px;height:80px;border-radius:10px;object-fit:cover;">
               <div>
-                <h3 id="evTitleSimple" style="margin:0 0 6px;">Event Name</h3>
-                <p id="evDateSimple" style="color:var(--text-muted); font-size:0.875rem; margin:0 0 4px;"></p>
-                <p id="evLocSimple" style="color:var(--text-muted); font-size:0.875rem; margin:0;"></p>
+                <h3 id="evTitleSimple" style="margin:0 0 12px; font-size:1.2rem; font-weight:800; color:var(--text);">Event Name</h3>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <div><span style="color:var(--text-sub);font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;">{{ t('date_and_time') }}</span><br><strong id="evDateSimple" style="color:var(--text);font-size:0.95rem;font-weight:700;"></strong></div>
+                    <div><span style="color:var(--text-sub);font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;">{{ t('location') }}</span><br><strong id="evLocSimple" style="color:var(--text);font-size:0.95rem;font-weight:700;"></strong></div>
+                </div>
               </div>
             </div>
             <div class="summary-box">
-              <div class="summary-row"><span>{{ t('unit_price') }}</span><span id="evPriceSimple">0 ₺</span></div>
+              <div class="summary-row"><span>{{ t('unit_price') }}</span><span id="evPriceSimple" style="font-weight:700; color:var(--text);">0 ₺</span></div>
               <div class="summary-row" style="align-items:center; margin-top:12px;">
                 <span>{{ t('quantity') }}</span>
-                <input type="number" id="ticketQuantity" class="form-control" value="1" min="1" max="10" style="width:100px; text-align:center;">
+                <input type="number" id="ticketQuantity" class="form-control" value="1" min="1" max="10" style="width:100px; text-align:center; font-weight:700;">
               </div>
               <div class="summary-row total"><span>Subtotal</span><span id="evTotalSimple">0 ₺</span></div>
             </div>
-            <p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">{{ t('secure_payment') }}</p>
+            <p style="font-size:0.85rem; font-weight:600; color:var(--text-sub); text-align:center;">{{ t('secure_payment') }}</p>
             <div class="checkout-actions">
               <button class="btn btn-outline" onclick="history.back()">{{ t('go_back') }}</button>
               <button class="btn btn-primary" id="goStepAttendeeSimple">{{ t('continue_btn') }} &rarr;</button>
@@ -821,7 +824,7 @@
         <!-- STEP - ATTENDEES (Intermediate) -->
         <div class="checkout-panel" id="step-attendees">
           <h2 style="margin-bottom: 20px; font-size: 1.5rem;">{{ t('ticket_holders') }}</h2>
-          <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 20px;">
+          <p style="color:var(--text-sub); font-size:0.92rem; font-weight:600; margin-bottom: 20px;">
             {{ t('please_enter_full_name') }}
           </p>
           <div id="attendeesFormsContainer" style="display:flex; flex-direction:column; gap:20px; margin-bottom: 20px;">

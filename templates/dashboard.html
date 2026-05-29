@@ -39,17 +39,17 @@
     }
     .ticket-detail-label {
       display: block;
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--text-sub);
       text-transform: uppercase;
       letter-spacing: 0.05em;
       margin-bottom: 4px;
     }
     .ticket-detail-value {
       display: block;
-      font-size: 0.9rem;
-      font-weight: 600;
+      font-size: 0.95rem;
+      font-weight: 700;
       color: var(--text);
       line-height: 1.35;
     }
@@ -60,7 +60,7 @@
     }
     .ticket-detail-value--price {
       color: var(--gold);
-      font-weight: 700;
+      font-weight: 800;
     }
     @media (max-width: 640px) {
       .ticket-card { flex-direction: column !important; }
@@ -96,7 +96,7 @@
         </button>
         <button class="dash-nav-btn" onclick="showTab('profile',this)">👤 {{ t('my_profile') }}</button>
       </nav>
-      <button onclick="logout()" class="btn" style="width:100%;margin-top:auto;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:var(--coral);padding:10px;">🚪 {{ t('logout') }}</button>
+      <button onclick="logout()" class="btn" style="width:100%;margin-top:auto;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:var(--coral);padding:10px;font-weight:700;">🚪 {{ t('logout') }}</button>
     </aside>
 
     <div class="dash-content">
@@ -511,15 +511,39 @@
         badge.style.display = unread > 0 ? 'inline-flex' : 'none';
         badge.textContent = unread;
         if (!notifs.length) { el.innerHTML = `<p class="loading-text">{{ t('no_notifications') }}</p>`; return; }
-        el.innerHTML = notifs.map(n => `
-          <div class="glass-panel" style="padding:14px 18px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start;border-left:3px solid ${n.is_read ? 'transparent' : 'var(--gold)'};">
-            <span style="font-size:1.2rem;flex-shrink:0;">${n.is_read ? '🔔' : '🔔'}</span>
+        el.innerHTML = notifs.map(n => {
+          const langCode = "{{ current_lang }}" === 'tr' ? 'tr-TR' : ("{{ current_lang }}" === 'de' ? 'de-DE' : 'en-US');
+          let title = "{{ current_lang }}" === 'tr' ? 'Bildirim' : ("{{ current_lang }}" === 'de' ? 'Benachrichtigung' : 'Notification');
+          let text = n.message;
+          let icon = '🔔';
+          try {
+             if (n.message.startsWith('{')) {
+                const data = JSON.parse(n.message);
+                if (data.type === 'purchase_success') {
+                   icon = '🎟️';
+                   title = `{{ t('notif_ticket_purchased') }}`;
+                   const d = new Date(data.date).toLocaleString(langCode, {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
+                   text = `<strong style="color:var(--gold); font-size:1.15rem; font-weight:800;">${data.event}</strong> <span style="font-weight:600;">{{ t('notif_event_for') }}</span> <strong style="font-size:1.1rem; font-weight:800;">${data.qty}</strong> <span style="font-weight:600;">{{ t('notif_ticket_bought') }}.</span><br/>
+                           <div style="margin-top: 10px; padding: 10px 14px; background: rgba(0,0,0,0.4); border-radius: 8px; display: inline-block; border: 1px solid rgba(255,255,255,0.05);">
+                               <span style="font-size:0.95rem; font-weight:700; color:#f3f4f6; letter-spacing: 0.5px;">📍 ${data.location} <span style="margin:0 8px; color:var(--gold);">|</span> 📅 ${d}</span>
+                           </div>`;
+                }
+             }
+          } catch(e) {}
+          
+          const createdTime = new Date(n.created_at).toLocaleString(langCode, {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
+          
+          return `
+          <div class="glass-panel" style="padding:18px 24px; margin-bottom:14px; display:flex; gap:18px; align-items:flex-start; border-left:5px solid ${n.is_read ? 'transparent' : 'var(--gold)'}; background: ${n.is_read ? 'rgba(0,0,0,0.25)' : 'rgba(245, 158, 11, 0.08)'}; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+            <div style="font-size:1.8rem; flex-shrink:0; background:rgba(255,255,255,0.05); border-radius:14px; width:54px; height:54px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);">${icon}</div>
             <div style="flex:1;">
-              <p style="color:var(--text); opacity:${n.is_read ? '0.6' : '1'}; margin:0 0 4px; font-size:0.9rem;">${n.message}</p>
-              <p style="color:var(--text-muted);font-size:0.75rem;margin:0;">${new Date(n.created_at).toLocaleString('en-US')}</p>
+              <h4 style="margin:0 0 8px; font-size:1.2rem; font-weight:800; color:var(--text); letter-spacing: 0.3px;">${title}</h4>
+              <p style="color:var(--text); opacity:${n.is_read ? '0.85' : '1'}; margin:0 0 12px; font-size:1.05rem; font-weight:600; line-height:1.6;">${text}</p>
+              <p style="color:var(--text-sub); font-size:0.85rem; margin:0; font-weight:700; opacity: 0.8;">${createdTime}</p>
             </div>
-            ${!n.is_read ? `<button class="btn btn-outline" style="font-size:0.75rem;padding:4px 10px;flex-shrink:0;" onclick="readOne(${n.id},this)">{{ t('mark_read') }}</button>` : ''}
-          </div>`).join('');
+            ${!n.is_read ? `<button class="btn btn-outline" style="font-size:0.85rem; font-weight:700; padding:8px 16px; flex-shrink:0; border-color:var(--gold); color:var(--gold); border-radius: 8px;" onclick="readOne(${n.id},this)">{{ t('mark_read') }}</button>` : ''}
+          </div>`;
+        }).join('');
       } catch { el.innerHTML = `<p class="loading-text" style="color:#f87171;">{{ t('could_not_load_notifications') }}</p>`; }
     }
 

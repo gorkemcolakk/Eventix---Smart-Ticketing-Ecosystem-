@@ -19,18 +19,14 @@ def admin_list_users():
 def admin_all_events():
     conn = get_db_connection()
     events = conn.execute('''
-        SELECT e.*, 
-        (SELECT COUNT(*) FROM events WHERE parent_event_id = e.id) + 1 as s_count
-        FROM events e
-        WHERE e.parent_event_id IS NULL 
-        ORDER BY e.id
+        SELECT e.* FROM events e ORDER BY e.id
     ''').fetchall()
     conn.close()
     
     result = []
     for e in events:
         d = event_to_dict(e)
-        d['session_count'] = e['s_count']
+        d['session_count'] = 1
         
         # Fetch only ACTIVE session info
         conn_sessions = get_db_connection()
@@ -47,19 +43,10 @@ def admin_pending_events():
     conn = get_db_connection()
     # Ana etkinlik bekliyor olabilir VEYA içindeki seanslardan en az biri bekliyor olabilir
     events = conn.execute('''
-        SELECT e.*, u.fullname as organizer_name, u.email as organizer_email,
-        (SELECT COUNT(*) FROM events WHERE parent_event_id = e.id) + 1 as s_count
-        FROM events e
-        LEFT JOIN users u ON e.organizer_id = u.id
-        WHERE e.parent_event_id IS NULL 
-        AND (
-            e.status IN ('pending', 'rejected') 
-            OR EXISTS (
-                SELECT 1 FROM events s 
-                WHERE s.parent_event_id = e.id 
-                AND s.status IN ('pending', 'rejected')
-            )
-        )
+        SELECT e.*, u.fullname as organizer_name, u.email as organizer_email 
+        FROM events e 
+        LEFT JOIN users u ON e.organizer_id = u.id 
+        WHERE e.status IN ('pending', 'rejected') 
         ORDER BY e.id DESC
     ''').fetchall()
     conn.close()
@@ -69,7 +56,7 @@ def admin_pending_events():
         d = event_to_dict(e)
         d['organizer_name'] = e['organizer_name']
         d['organizer_email'] = e['organizer_email']
-        d['session_count'] = e['s_count']
+        d['session_count'] = 1
         
         # Sadece onay bekleyen veya reddedilmiş seansları getir
         conn_sessions = get_db_connection()
@@ -107,7 +94,7 @@ def approve_event(event_id):
     
     if not selected_ids:
         # Default behavior: approve as single or approve all sessions if parent
-        conn.execute("UPDATE events SET status = 'active' WHERE id = ? OR parent_event_id = ?", (event_id, event_id))
+        conn.execute("UPDATE events SET status = 'active' WHERE id = ?", (event_id,))
     else:
         # Granular approval: only approve the selected IDs
         # We use placeholders for the IN clause
@@ -141,7 +128,7 @@ def reject_event(event_id):
         conn.execute(f"UPDATE events SET status = 'rejected', rejection_reason = ? WHERE id IN ({placeholders})", params)
     else:
         # Fallback to whole series if nothing selected
-        conn.execute("UPDATE events SET status = 'rejected', rejection_reason = ? WHERE id = ? OR parent_event_id = ?", (reason, event_id, event_id))
+        conn.execute("UPDATE events SET status = 'rejected', rejection_reason = ? WHERE id = ?", (reason, event_id))
 
     if event['organizer_id']:
         create_notification(conn, event['organizer_id'], f"An edit has been requested for your session(s) in '{event['title']}'. Reason: {reason}")

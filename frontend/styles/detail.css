@@ -116,8 +116,9 @@
 }
 
 .detail-about p {
-  color: var(--text-muted);
+  color: var(--text-sub);
   font-size: 1.1rem;
+  font-weight: 500;
   line-height: 1.8;
   margin-bottom: 20px;
 }
@@ -176,8 +177,9 @@
 }
 
 .ticket-box-label {
-  color: var(--text-muted);
-  font-size: 0.9rem;
+  color: var(--text-sub);
+  font-size: 0.95rem;
+  font-weight: 600;
   margin-bottom: 24px;
   display: block;
 }
@@ -191,8 +193,9 @@
   align-items: center;
   gap: 10px;
   margin-bottom: 12px;
-  color: var(--text-main);
+  color: var(--text);
   font-size: 0.95rem;
+  font-weight: 600;
 }
 
 .feature-item svg {

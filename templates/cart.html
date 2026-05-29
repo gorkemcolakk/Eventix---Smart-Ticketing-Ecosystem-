@@ -3,67 +3,554 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your Cart | EVENTIX</title>
+  <title>{{ t('your_cart') }} | EVENTIX</title>
   <link rel="stylesheet" href="./styles/main.css">
   <link rel="stylesheet" href="./styles/components.css">
   <style>
-    .cart-page { padding: 100px 0 60px; min-height: calc(100vh - 80px); }
-    .cart-container { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: 1fr 320px; gap: 30px; }
-    @media (max-width: 768px) {
-      .cart-container { grid-template-columns: 1fr; }
-      .cart-page { padding: 80px 0 40px; }
+    /* ─── CART PAGE LAYOUT ───────────────────────────────── */
+    .cart-page {
+      padding: 96px 0 80px;
+      min-height: 100vh;
     }
-    @media (max-width: 480px) {
-      .cart-page { padding: 70px 0 30px; }
-      .cart-item { flex-wrap: wrap; gap: 12px; padding: 14px; }
-      .cart-item img { width: 70px; height: 70px; }
-      .cart-item-title { font-size: 1rem; }
-      .cart-summary { position: static !important; }
+
+    .cart-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 32px;
     }
+    .cart-breadcrumb a { color: var(--text-sub); transition: var(--transition); }
+    .cart-breadcrumb a:hover { color: var(--gold); }
+    .cart-breadcrumb svg { color: var(--text-muted); flex-shrink: 0; }
+
+    .cart-heading {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      margin-bottom: 36px;
+    }
+    .cart-heading h1 {
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .cart-count-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--gold);
+      color: var(--text-inv);
+      font-size: 0.78rem;
+      font-weight: 700;
+      min-width: 26px;
+      height: 26px;
+      padding: 0 8px;
+      border-radius: 100px;
+    }
+
+    /* ─── PROGRESS STEPS ─────────────────────────────────── */
+    .cart-steps {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 40px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px 24px;
+      overflow: hidden;
+    }
+    .cart-step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      position: relative;
+    }
+    .cart-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 2px;
+      background: var(--border);
+    }
+    .step-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.82rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      transition: var(--transition);
+    }
+    .step-active .step-num {
+      background: var(--gold);
+      color: var(--text-inv);
+      box-shadow: 0 0 16px var(--gold-glow);
+    }
+    .step-done .step-num {
+      background: rgba(20,184,166,0.15);
+      color: var(--teal);
+      border: 1.5px solid var(--teal);
+    }
+    .step-inactive .step-num {
+      background: var(--bg-card);
+      color: var(--text-muted);
+      border: 1.5px solid var(--border);
+    }
+    .step-label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .step-active .step-label { color: var(--text); }
+    .step-done .step-label { color: var(--teal); }
+    .step-inactive .step-label { color: var(--text-muted); }
+
+    @media (max-width: 600px) {
+      .cart-steps { display: none; }
+    }
+
+    /* ─── MAIN GRID ──────────────────────────────────────── */
+    .cart-grid {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 28px;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .cart-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ─── CART ITEM CARD ─────────────────────────────────── */
+    .cart-items-section {}
+    .cart-items-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 16px;
+      padding-left: 4px;
+    }
+
     .cart-item {
-      display: flex; gap: 20px; background: var(--bg-surface);
-      border: 1px solid var(--border-color); border-radius: 12px; padding: 20px;
-      margin-bottom: 20px; align-items: center; position: relative;
+      position: relative;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 16px;
+      transition: var(--transition);
     }
-    .cart-item img { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; flex-shrink: 0; }
-    .cart-item-details { flex: 1; min-width: 0; }
-    .cart-item-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; color: var(--text); word-break: break-word; }
-    .cart-item-meta { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px; }
-    .cart-qty-control { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
-    .cart-qty-btn { background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); color: var(--text); width: 30px; height: 30px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .cart-qty-btn:hover { background: var(--accent-purple); border-color: var(--accent-purple); }
-    .cart-remove { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #ef4444; cursor: pointer; padding: 5px; opacity: 0.7; transition: 0.2s; }
-    .cart-remove:hover { opacity: 1; transform: scale(1.1); }
-    .cart-summary { background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 25px; position: sticky; top: 100px; height: fit-content; }
-    .summary-row { display: flex; justify-content: space-between; margin-bottom: 15px; color: var(--text-muted); }
-    .summary-total { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; margin-top: 5px; font-weight: 700; font-size: 1.25rem; color: var(--text); }
+    .cart-item:hover {
+      border-color: rgba(245,158,11,0.2);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    }
+    .cart-item.deselected {
+      opacity: 0.5;
+    }
+
+    .cart-item-inner {
+      display: flex;
+      gap: 0;
+    }
+
+    /* Resim sol şerit */
+    .cart-item-img-wrap {
+      position: relative;
+      width: 140px;
+      flex-shrink: 0;
+    }
+    .cart-item-img-wrap img {
+      width: 100%;
+      height: 100%;
+      min-height: 140px;
+      object-fit: cover;
+      display: block;
+    }
+    .cart-item-img-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, transparent 60%, var(--bg-surface));
+      pointer-events: none;
+    }
+
+    /* Checkbox */
+    .cart-check-wrap {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      z-index: 2;
+    }
+    .cart-item-checkbox {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--gold);
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    /* İçerik alanı */
+    .cart-item-body {
+      flex: 1;
+      padding: 20px 20px 18px;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .cart-item-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .cart-item-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.3;
+      flex: 1;
+    }
+
+    .cart-remove-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      flex-shrink: 0;
+      margin-top: -2px;
+    }
+    .cart-remove-btn:hover {
+      color: var(--coral);
+      background: rgba(239,68,68,0.1);
+    }
+
+    /* Meta bilgileri (saat, yer vb.) */
+    .cart-item-meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 18px;
+    }
+    .meta-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      color: var(--text-sub);
+      font-weight: 500;
+    }
+    .meta-chip svg {
+      color: var(--gold);
+      flex-shrink: 0;
+    }
+
+    /* Katılımcı/koltuk listesi */
+    .attendee-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .attendee-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      font-weight: 500;
+    }
+    .attendee-seat {
+      background: rgba(245,158,11,0.12);
+      border: 1px solid rgba(245,158,11,0.25);
+      color: var(--gold);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 100px;
+      white-space: nowrap;
+    }
+    .attendee-name {
+      color: var(--text);
+      flex: 1;
+    }
+
+    /* Alt satır: adet + fiyat */
+    .cart-item-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: auto;
+    }
+    .qty-control {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .qty-btn {
+      background: none;
+      border: none;
+      color: var(--text-sub);
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 700;
+      transition: var(--transition);
+    }
+    .qty-btn:hover { background: var(--bg-hover); color: var(--gold); }
+    .qty-val {
+      padding: 0 14px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text);
+      min-width: 36px;
+      text-align: center;
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      line-height: 32px;
+    }
+    .qty-fixed {
+      padding: 0 14px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-sub);
+      line-height: 32px;
+    }
+    .cart-item-price {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.5px;
+    }
+    .cart-item-price.strikethrough {
+      text-decoration: line-through;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Rezervasyon timer */
     .reservation-timer {
       display: flex;
       align-items: center;
       gap: 8px;
-      background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(251,191,36,0.08));
-      border: 1px solid rgba(251,191,36,0.4);
-      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(251,191,36,0.04));
+      border: 1px solid rgba(251,191,36,0.3);
+      border-radius: var(--radius-sm);
       padding: 8px 14px;
-      margin-top: 10px;
-      animation: pulse-cart 2s ease-in-out infinite;
+      font-size: 0.8rem;
+      animation: pulse-border 2.5s ease-in-out infinite;
     }
     .reservation-timer.expired {
-      background: rgba(239,68,68,0.1);
-      border-color: rgba(239,68,68,0.5);
+      background: rgba(239,68,68,0.08);
+      border-color: rgba(239,68,68,0.4);
       animation: none;
     }
-    .reservation-timer .timer-count {
-      font-family: monospace;
-      font-size: 1rem;
-      font-weight: 800;
-      color: #f59e0b;
+    .timer-count {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--gold);
       letter-spacing: 1px;
     }
-    .reservation-timer.expired .timer-count { color: #ef4444; }
-    @keyframes pulse-cart {
-      0%,100% { border-color: rgba(251,191,36,0.4); }
-      50% { border-color: rgba(251,191,36,0.8); box-shadow: 0 0 8px rgba(251,191,36,0.2); }
+    .reservation-timer.expired .timer-count { color: var(--coral); }
+
+    @keyframes pulse-border {
+      0%, 100% { border-color: rgba(251,191,36,0.3); }
+      50% { border-color: rgba(251,191,36,0.65); box-shadow: 0 0 10px rgba(251,191,36,0.15); }
+    }
+
+    @media (max-width: 600px) {
+      .cart-item-img-wrap { width: 100px; }
+      .cart-item-img-wrap img { min-height: 120px; }
+      .cart-item-body { padding: 14px 14px 12px; }
+      .cart-item-title { font-size: 0.95rem; }
+    }
+
+    /* ─── ORDER SUMMARY ──────────────────────────────────── */
+    .cart-summary-panel {
+      position: sticky;
+      top: 88px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .summary-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .summary-header h2 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-sub);
+    }
+
+    .summary-body { padding: 20px 24px; }
+
+    .summary-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.875rem;
+    }
+    .summary-line:last-child { border-bottom: none; }
+    .summary-line-name {
+      color: var(--text-sub);
+      line-height: 1.4;
+      flex: 1;
+    }
+    .summary-line-name strong {
+      display: block;
+      color: var(--text);
+      font-weight: 600;
+    }
+    .summary-line-name small {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .summary-line-price {
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .summary-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 4px 0 16px;
+    }
+
+    .summary-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0 4px;
+    }
+    .summary-total-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .summary-total-price {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--gold);
+      letter-spacing: -1px;
+    }
+
+    .summary-footer { padding: 0 24px 24px; }
+
+    .checkout-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: var(--gold);
+      color: var(--text-inv);
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 15px 24px;
+      border-radius: var(--radius-md);
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      letter-spacing: -0.2px;
+    }
+    .checkout-btn:hover {
+      background: var(--gold-dim);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px var(--gold-glow);
+    }
+    .checkout-btn:active { transform: translateY(0); }
+
+    .trust-badges {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 18px;
+    }
+    .trust-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.77rem;
+      color: var(--text-muted);
+    }
+    .trust-badge svg { color: var(--teal); flex-shrink: 0; }
+
+    /* ─── EMPTY STATE ────────────────────────────────────── */
+    .empty-cart-state {
+      text-align: center;
+      padding: 80px 24px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      display: none;
+    }
+    .empty-cart-icon {
+      width: 80px;
+      height: 80px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 2rem;
+    }
+    .empty-cart-state h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .empty-cart-state p {
+      color: var(--text-sub);
+      margin-bottom: 28px;
+      font-size: 0.9rem;
     }
   </style>
 </head>
@@ -71,7 +558,7 @@
   <nav class="navbar scrolled">
     <div class="container nav-container">
       <a href="index.html" class="logo">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="url(#gd)" stroke-width="2"><defs><linearGradient id="gd" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#ec4899"/></linearGradient></defs><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="url(#gd)" stroke-width="2"><defs><linearGradient id="gd" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#ef4444"/></linearGradient></defs><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
         <span>EVENT<span class="logo-highlight">IX</span></span>
       </a>
       <ul class="nav-links">
@@ -84,37 +571,97 @@
   </nav>
 
   <main class="container cart-page">
-    <h1 style="margin-bottom: 30px; font-size: 2rem;">{{ t('your_cart') }}</h1>
-    
-    <div class="cart-container" id="cartContainer" style="display: none;">
-      <div class="cart-items" id="cartItemsList">
-        <!-- Rendered by JS -->
+
+    <!-- Breadcrumb -->
+    <nav class="cart-breadcrumb">
+      <a href="index.html">{{ t('explore') }}</a>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      <span>{{ t('your_cart') }}</span>
+    </nav>
+
+    <!-- Başlık -->
+    <div class="cart-heading">
+      <h1>{{ t('your_cart') }}</h1>
+      <span class="cart-count-badge" id="cartCountBadge">0</span>
+    </div>
+
+    <!-- Adım göstergesi -->
+    <div class="cart-steps">
+      <div class="cart-step step-active">
+        <div class="step-num">1</div>
+        <span class="step-label">{{ t('your_cart') }}</span>
       </div>
-      
-      <div class="cart-summary">
-        <h3 style="margin-bottom: 20px;">{{ t('order_summary') }}</h3>
-        <div id="summaryRows"></div>
-        <div class="summary-row summary-total">
-          <span>{{ t('total') }}</span>
-          <span id="cartTotal" style="color:var(--accent-teal);">0 ₺</span>
+      <div class="cart-step step-inactive">
+        <div class="step-num">2</div>
+        <span class="step-label">{{ t('checkout') }}</span>
+      </div>
+      <div class="cart-step step-inactive">
+        <div class="step-num">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
         </div>
-        <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 20px; padding: 14px;" onclick="proceedToCheckout()">
-          {{ t('checkout') }} &rarr;
-        </button>
+        <span class="step-label">{{ t('confirmation') }}</span>
       </div>
     </div>
 
-    <div id="emptyCart" style="text-align: center; padding: 60px 20px; background: var(--bg-surface); border-radius: 16px; display: none;">
-      <div style="font-size: 4rem; margin-bottom: 20px; filter: grayscale(1) opacity(0.5);">🛒</div>
-      <h2>{{ t('empty_cart') }}</h2>
-      <p style="color: var(--text-muted); margin-bottom: 30px;">{{ t('empty_cart_desc') }}</p>
-      <a href="index.html" class="btn btn-primary" style="display: inline-flex;">{{ t('explore') }}</a>
+    <!-- Ana grid -->
+    <div class="cart-grid" id="cartContainer" style="display:none;">
+      <!-- Sol: Ürün listesi -->
+      <div class="cart-items-section">
+        <p class="cart-items-label" id="cartItemsLabel"></p>
+        <div id="cartItemsList"></div>
+      </div>
+
+      <!-- Sağ: Sipariş özeti -->
+      <div class="cart-summary-panel">
+        <div class="summary-header">
+          <h2>{{ t('order_summary') }}</h2>
+        </div>
+        <div class="summary-body">
+          <div id="summaryRows"></div>
+          <div class="summary-divider"></div>
+          <div class="summary-total-row">
+            <span class="summary-total-label">{{ t('total') }}</span>
+            <span class="summary-total-price" id="cartTotal">0 ₺</span>
+          </div>
+        </div>
+        <div class="summary-footer">
+          <button class="checkout-btn" id="checkoutBtn" onclick="proceedToCheckout()">
+            <span>{{ t('checkout') }}</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </button>
+          <div class="trust-badges">
+            <div class="trust-badge">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              <span>{{ t('trust_badge_ssl') }}</span>
+            </div>
+            <div class="trust-badge">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              <span>{{ t('trust_badge_secure') }}</span>
+            </div>
+            <div class="trust-badge">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>{{ t('trust_badge_instant') }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <!-- Boş sepet -->
+    <div class="empty-cart-state" id="emptyCart">
+      <div class="empty-cart-icon">🎟️</div>
+      <h2>{{ t('empty_cart') }}</h2>
+      <p>{{ t('empty_cart_desc') }}</p>
+      <a href="index.html" class="btn btn-primary" style="display:inline-flex; gap:8px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        {{ t('explore') }}
+      </a>
+    </div>
+
   </main>
 
   <script src="./scripts/auth.js"></script>
   <script>
-    // Sepetteki rezervasyon sayaçları
     const cartTimerIntervals = [];
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -123,46 +670,40 @@
 
     function changeQty(index, delta) {
       const cart = window.getCart();
-      if(!cart[index]) return;
+      if (!cart[index]) return;
       if (cart[index].tickets_info && cart[index].tickets_info.length > 0) {
-        alert("This item has pre-assigned seats and names. If you wish to change the quantity, please remove the item and add it again.");
+        alert("Bu ürünün önceden atanmış koltukları ve isimleri var. Miktarı değiştirmek için lütfen ürünü kaldırıp tekrar ekleyin.");
         return;
       }
-      if(cart[index].has_seating && delta > 0) {
-        alert("For seated events, please edit items at checkout or add again from event page.");
+      if (cart[index].has_seating && delta > 0) {
+        alert("Koltuklu etkinlikler için lütfen etkinlik sayfasından tekrar ekleyin.");
         return;
       }
       cart[index].qty += delta;
-      if(cart[index].qty < 1) cart.splice(index, 1);
+      if (cart[index].qty < 1) cart.splice(index, 1);
       window.saveCart(cart);
     }
 
     async function removeItem(index) {
-      // Timer'ı temizle
       if (cartTimerIntervals[index]) {
         clearInterval(cartTimerIntervals[index]);
         delete cartTimerIntervals[index];
       }
       const cart = window.getCart();
       const item = cart[index];
-      
       if (item && item.has_seating && item.tickets_info) {
-          for (let t of item.tickets_info) {
-              if (t.seat_id) {
-                  try {
-                      await fetch('/api/tickets/unlock-seat', {
-                          method: 'POST',
-                          headers: {
-                              'Content-Type': 'application/json',
-                              'X-Session-ID': window.getOrCreateSessionId()
-                          },
-                          body: JSON.stringify({ seat_id: t.seat_id })
-                      });
-                  } catch (e) {}
-              }
+        for (let t of item.tickets_info) {
+          if (t.seat_id) {
+            try {
+              await fetch('/api/tickets/unlock-seat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Session-ID': window.getOrCreateSessionId() },
+                body: JSON.stringify({ seat_id: t.seat_id })
+              });
+            } catch (e) {}
           }
+        }
       }
-      
       cart.splice(index, 1);
       window.saveCart(cart);
     }
@@ -170,38 +711,33 @@
     function startCartItemTimer(idx, expiryMs) {
       if (!expiryMs) return;
       if (cartTimerIntervals[idx]) clearInterval(cartTimerIntervals[idx]);
-      
       function tick() {
         const timerEl = document.getElementById('cart-timer-' + idx);
         const timerBox = document.getElementById('cart-timer-box-' + idx);
         if (!timerEl || !timerBox) { clearInterval(cartTimerIntervals[idx]); return; }
-        
         const remaining = expiryMs - Date.now();
         if (remaining <= 0) {
           clearInterval(cartTimerIntervals[idx]);
           timerEl.textContent = '00:00';
           timerBox.classList.add('expired');
-          timerBox.querySelector('.timer-label').textContent = "{{ t('reservation_expired') }}!";
-          // Expired item'ı sepetten kaldır
+          const lbl = timerBox.querySelector('.timer-label');
+          if (lbl) lbl.textContent = "{{ t('reservation_expired') }}!";
           setTimeout(async () => {
             const cart = window.getCart();
             if (cart[idx] && cart[idx].reservationExpiry === expiryMs) {
               const item = cart[idx];
               if (item.has_seating && item.tickets_info) {
-                  for (let t of item.tickets_info) {
-                      if (t.seat_id) {
-                          try {
-                              await fetch('/api/tickets/unlock-seat', {
-                                  method: 'POST',
-                                  headers: {
-                                      'Content-Type': 'application/json',
-                                      'X-Session-ID': window.getOrCreateSessionId()
-                                  },
-                                  body: JSON.stringify({ seat_id: t.seat_id })
-                              });
-                          } catch (e) {}
-                      }
+                for (let t of item.tickets_info) {
+                  if (t.seat_id) {
+                    try {
+                      await fetch('/api/tickets/unlock-seat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-Session-ID': window.getOrCreateSessionId() },
+                        body: JSON.stringify({ seat_id: t.seat_id })
+                      });
+                    } catch (e) {}
                   }
+                }
               }
               cart.splice(idx, 1);
               window.saveCart(cart);
@@ -220,11 +756,15 @@
     }
 
     function renderCart() {
-      // Önceki timer'ları temizle
       cartTimerIntervals.forEach(id => clearInterval(id));
       cartTimerIntervals.length = 0;
 
       const cart = window.getCart();
+
+      // Rozet güncelle
+      const badge = document.getElementById('cartCountBadge');
+      if (badge) badge.textContent = cart.length;
+
       if (cart.length === 0) {
         document.getElementById('cartContainer').style.display = 'none';
         document.getElementById('emptyCart').style.display = 'block';
@@ -234,6 +774,12 @@
       document.getElementById('cartContainer').style.display = 'grid';
       document.getElementById('emptyCart').style.display = 'none';
 
+      const lbl = document.getElementById('cartItemsLabel');
+      if (lbl) {
+        const text = cart.length === 1 ? "{{ t('event_count_singular') }}" : "{{ t('event_count_plural') }}";
+        lbl.textContent = cart.length + ' ' + text.toUpperCase();
+      }
+
       const list = document.getElementById('cartItemsList');
       const sumRows = document.getElementById('summaryRows');
       list.innerHTML = '';
@@ -242,18 +788,49 @@
 
       cart.forEach((item, idx) => {
         const isSelected = item._selected !== false;
-        // Koltuklu etkinlikte totalPrice kullan, yoksa price * qty
         const itemTotal = item.totalPrice != null ? item.totalPrice : (item.price * item.qty);
-        if (isSelected) {
-            total += itemTotal;
+        if (isSelected) total += itemTotal;
+
+        // Tarih/saat formatla
+        let dateStr = '';
+        let timeStr = '';
+        let locationStr = '';
+        if (item.date) {
+          try {
+            const d = new Date(item.date);
+            dateStr = d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+            timeStr = d.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+          } catch(e) {
+            dateStr = item.date;
+          }
+        }
+        if (item.location) locationStr = item.location;
+
+        // Meta bilgi satırları
+        let metaHtml = '';
+        if (dateStr) {
+          metaHtml += `
+            <span class="meta-chip">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              ${dateStr}
+            </span>`;
+        }
+        if (timeStr) {
+          metaHtml += `
+            <span class="meta-chip">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              ${timeStr}
+            </span>`;
+        }
+        if (locationStr) {
+          metaHtml += `
+            <span class="meta-chip">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              ${locationStr}
+            </span>`;
         }
 
-        // Koltuk etiketlerini göster
-        const seatLabels = item.tickets_info && item.tickets_info.length > 0 && item.has_seating
-          ? item.tickets_info.map(t => t.seatLabel || '').filter(Boolean)
-          : [];
-
-        // Rezervasyon sayacı HTML'i
+        // Rezervasyon timer HTML
         let timerHtml = '';
         if (item.reservationExpiry && item.has_seating) {
           const timeLeft = item.reservationExpiry - Date.now();
@@ -262,65 +839,93 @@
             const s = Math.floor((timeLeft % 60000) / 1000);
             timerHtml = `
               <div id="cart-timer-box-${idx}" class="reservation-timer">
-                <span>⏳</span>
-                <span class="timer-label" style="font-size:0.8rem; color:rgba(251,191,36,0.9); font-weight:600;">{{ t('seats_reserved_for') }}</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <span class="timer-label" style="color:rgba(251,191,36,0.85); font-weight:600; font-size:0.78rem;">{{ t('seats_reserved_for') }}</span>
                 <span id="cart-timer-${idx}" class="timer-count">${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}</span>
               </div>`;
           } else {
-            timerHtml = `<div class="reservation-timer expired"><span>⚠️</span><span style="font-size:0.8rem; color:#ef4444;">{{ t('reservation_expired') }}</span></div>`;
+            timerHtml = `
+              <div class="reservation-timer expired">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <span class="timer-label" style="color:var(--coral); font-size:0.78rem; font-weight:600;">{{ t('reservation_expired') }}</span>
+              </div>`;
           }
         }
 
+        // Koltuklu: katılımcı listesi
+        let attendeesHtml = '';
+        if (item.tickets_info && item.tickets_info.length > 0 && item.has_seating) {
+          const rows = item.tickets_info.map(t => `
+            <li class="attendee-item">
+              <span class="attendee-seat">🪑 ${t.seatLabel || '?'}</span>
+              <span class="attendee-name">${t.name} ${t.surname}</span>
+            </li>`).join('');
+          attendeesHtml = `<ul class="attendee-list">${rows}</ul>`;
+        } else if (item.tickets_info && item.tickets_info.length > 0 && !item.has_seating) {
+          // Oturma düzeni yok: sadece isim listesi, koltuk gösterme
+          const rows = item.tickets_info.map(t => `
+            <li class="attendee-item">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-muted)"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              <span class="attendee-name">${t.name} ${t.surname}</span>
+            </li>`).join('');
+          attendeesHtml = `<ul class="attendee-list">${rows}</ul>`;
+        }
+
+        // Miktar kontrolü
+        let qtyHtml = '';
+        if (item.tickets_info && item.tickets_info.length > 0) {
+          qtyHtml = `<div class="qty-control"><span class="qty-fixed">{{ t('quantity') }}: ${item.qty}</span></div>`;
+        } else {
+          qtyHtml = `
+            <div class="qty-control">
+              <button class="qty-btn" onclick="changeQty(${idx}, -1)" title="Azalt">−</button>
+              <span class="qty-val">${item.qty}</span>
+              <button class="qty-btn" onclick="changeQty(${idx}, 1)" title="Artır">+</button>
+            </div>`;
+        }
+
         list.innerHTML += `
-          <div class="cart-item" style="${!isSelected ? 'opacity: 0.6; background: rgba(0,0,0,0.05);' : ''} padding-left: 50px;">
-            <input type="checkbox" class="cart-item-check" ${isSelected ? 'checked' : ''} onchange="toggleItemSelection(${idx})" style="position: absolute; left: 16px; top: 20px; width: 22px; height: 22px; cursor: pointer; accent-color: var(--accent-purple);">
-            <button class="cart-remove" onclick="removeItem(${idx})" title="Remove item">
-               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
-            <img src="${item.image}" alt="" style="${!isSelected ? 'filter: grayscale(0.8);' : ''}">
-            <div class="cart-item-details">
-              <div class="cart-item-title">${item.title}</div>
-              <div class="cart-item-meta">{{ t('price_col') }}: ${item.price.toLocaleString()} ₺</div>
-              ${item.has_seating ? '<div class="cart-item-meta" style="color:var(--accent-purple); font-weight:700; margin-bottom:10px;">🎟️ ' + "{{ t('seated_event') }}" + '</div>' : ''}
-              ${item.tickets_info && item.tickets_info.length > 0 ? 
-                `<ul style="list-style:none; padding:0; margin:10px 0; display:flex; flex-direction:column; gap:8px;">
-                  ${item.tickets_info.map(t => `
-                    <li style="font-weight:600; font-size:0.9rem; padding:10px 14px; background:var(--bg-surface); border:1px solid var(--border-color); border-left:4px solid var(--accent-purple); border-radius:8px; color:var(--text); display:flex; align-items:center; flex-wrap:wrap; gap:8px;">
-                      <span style="color:var(--accent-teal); white-space:nowrap;">🪑 {{ t('seat_label') }}: ${t.seatLabel || 'N/A'}</span> 
-                      <span style="opacity:0.3; margin:0 2px;">|</span> 
-                      <span style="white-space:nowrap;">👤 {{ t('attendee_name_label') }}: ${t.name} ${t.surname}</span>
-                    </li>
-                  `).join('')}
-                 </ul>
-                 <div class="cart-qty-control" style="margin-top:12px;">
-                   <span style="font-weight:600; background:var(--bg-surface); border:1px solid var(--border-color); padding:6px 14px; border-radius:6px; color:var(--text);">{{ t('quantity') }}: ${item.qty}</span>
-                 </div>` 
-                : 
-                `<div class="cart-qty-control">
-                  <button class="cart-qty-btn" onclick="changeQty(${idx}, -1)">–</button>
-                  <span style="width: 20px; text-align: center; color:var(--text); font-weight:600;">${item.qty}</span>
-                  <button class="cart-qty-btn" onclick="changeQty(${idx}, 1)">+</button>
-                </div>`
-              }
-              ${timerHtml}
+          <div class="cart-item ${!isSelected ? 'deselected' : ''}" id="cart-item-${idx}">
+            <div class="cart-check-wrap">
+              <input type="checkbox" class="cart-item-checkbox" ${isSelected ? 'checked' : ''} onchange="toggleItemSelection(${idx})" title="Seç/Kaldır">
             </div>
-            <div style="font-weight: 700; font-size: 1.1rem; ${!isSelected ? 'text-decoration: line-through; opacity: 0.6;' : ''}">${itemTotal.toLocaleString()} ₺</div>
-          </div>
-        `;
+            <div class="cart-item-inner">
+              <div class="cart-item-img-wrap">
+                <img src="${item.image || ''}" alt="${item.title}" style="${!isSelected ? 'filter:grayscale(0.7);' : ''}">
+                <div class="cart-item-img-overlay"></div>
+              </div>
+              <div class="cart-item-body">
+                <div class="cart-item-header">
+                  <div class="cart-item-title">${item.title}</div>
+                  <button class="cart-remove-btn" onclick="removeItem(${idx})" title="{{ t('remove') }}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </button>
+                </div>
+                ${metaHtml ? `<div class="cart-item-meta-row">${metaHtml}</div>` : ''}
+                ${attendeesHtml}
+                ${timerHtml}
+                <div class="cart-item-footer">
+                  ${qtyHtml}
+                  <div class="cart-item-price ${!isSelected ? 'strikethrough' : ''}">${itemTotal.toLocaleString('tr-TR')} ₺</div>
+                </div>
+              </div>
+            </div>
+          </div>`;
 
         if (isSelected) {
-            sumRows.innerHTML += `
-              <div class="summary-row">
-                <span>${item.qty}x ${item.title}</span>
-                <span>${itemTotal.toLocaleString()} ₺</span>
+          sumRows.innerHTML += `
+            <div class="summary-line">
+              <div class="summary-line-name">
+                <strong>${item.title}</strong>
+                <small>${item.qty} ${item.qty === 1 ? "{{ t('ticket_count_singular') }}" : "{{ t('ticket_count_plural') }}"}</small>
               </div>
-            `;
+              <span class="summary-line-price">${itemTotal.toLocaleString('tr-TR')} ₺</span>
+            </div>`;
         }
       });
 
-      document.getElementById('cartTotal').textContent = total.toLocaleString() + ' ₺';
+      document.getElementById('cartTotal').textContent = total.toLocaleString('tr-TR') + ' ₺';
 
-      // DOM render sonrası timer'ları başlat
       cart.forEach((item, idx) => {
         if (item.reservationExpiry && item.has_seating && (item.reservationExpiry - Date.now()) > 0) {
           startCartItemTimer(idx, item.reservationExpiry);
@@ -340,33 +945,30 @@
       const cart = window.getCart();
       const selectedIndices = [];
       cart.forEach((item, idx) => {
-         if (item._selected !== false) selectedIndices.push(idx);
+        if (item._selected !== false) selectedIndices.push(idx);
       });
-
       if (selectedIndices.length === 0) {
-         alert("{{ t('select_at_least_one') }}");
-         return;
+        alert("{{ t('select_at_least_one') }}");
+        return;
       }
-
-      // Süresi dolmuş koltuklu kalemleri kontrol et (sadece seçili olanlar)
-      const expiredItem = cart.find((item, idx) => selectedIndices.includes(idx) && item.has_seating && item.reservationExpiry && item.reservationExpiry < Date.now());
+      const expiredItem = cart.find((item, idx) =>
+        selectedIndices.includes(idx) && item.has_seating && item.reservationExpiry && item.reservationExpiry < Date.now()
+      );
       if (expiredItem) {
         alert(`"${expiredItem.title}" {{ t('reselect_seats') }}`);
         return;
       }
-      
       sessionStorage.setItem('checkout_indices', JSON.stringify(selectedIndices));
       window.location.href = 'cart-checkout.html';
     }
+
     window.renderCart = renderCart;
   </script>
   <script>
-      document.addEventListener("DOMContentLoaded", () => {
-          const langLabel = document.getElementById('currentLangLabel');
-          if(langLabel) {
-              langLabel.textContent = "{{ current_lang | upper }}";
-          }
-      });
+    document.addEventListener("DOMContentLoaded", () => {
+      const langLabel = document.getElementById('currentLangLabel');
+      if (langLabel) langLabel.textContent = "{{ current_lang | upper }}";
+    });
   </script>
 </body>
 </html>

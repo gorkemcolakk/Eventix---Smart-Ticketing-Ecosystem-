@@ -149,7 +149,7 @@ def guest_buy_ticket():
                   (guest_user_id, event_id, key, q_data, 1, t_p, t_name, t_surname, sid))
         ticket_db_id = c.lastrowid
         
-        gen_tix.append({'id': ticket_db_id, 'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'seat_id': sid})
+        gen_tix.append({'id': ticket_db_id, 'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'seat_id': sid, 'purchase_date': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')})
 
     conn.commit()
     conn.close()
@@ -289,6 +289,7 @@ def buy_ticket():
     else:
         total_price = event['price'] * quantity
 
+    orig_total_price = total_price
     # PROMO
     promo_record = None
     if promo_code:
@@ -347,11 +348,29 @@ def buy_ticket():
         elif promo_record.get('id', 0) != 0:
             c.execute('UPDATE promotions SET used_count = used_count + 1 WHERE id = ?', (promo_record['id'],))
 
-    gen_tix = []
+    ticket_base_prices = []
     for t_info in tickets_info:
+        bp = event['price'] if not event['has_seating'] else seats_dict[str(t_info.get('seat_id'))]['price']
+        ticket_base_prices.append(bp)
+        
+    discounted_ticket_prices = []
+    if promo_record and orig_total_price > 0:
+        remaining_total = total_price
+        for i, bp in enumerate(ticket_base_prices):
+            if i == len(ticket_base_prices) - 1:
+                discounted_ticket_prices.append(remaining_total)
+            else:
+                dp = int(bp * (total_price / orig_total_price))
+                discounted_ticket_prices.append(dp)
+                remaining_total -= dp
+    else:
+        discounted_ticket_prices = ticket_base_prices
+
+    gen_tix = []
+    for idx, t_info in enumerate(tickets_info):
         key = uuid.uuid4().hex.upper()[:12]
         q_data = sign_ticket_data(f"EVENTIX-{key}-{event_id}")
-        t_p = event['price'] if not event['has_seating'] else seats_dict[str(t_info['seat_id'])]['price']
+        t_p = discounted_ticket_prices[idx]
         sid = t_info.get('seat_id') if event['has_seating'] else None
         
         t_name = sanitize_html(t_info.get('name', ''))
@@ -360,9 +379,17 @@ def buy_ticket():
         c.execute("INSERT INTO tickets (user_id, event_id, ticket_key, qr_code, quantity, total_price, status, owner_name, owner_surname, seat_id) VALUES (?, ?, ?, ?, ?, ?, 'valid', ?, ?, ?)",
                   (g.user['id'], event_id, key, q_data, 1, t_p, t_name, t_surname, sid))
         ticket_db_id = c.lastrowid
-        gen_tix.append({'id': ticket_db_id, 'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'seat_id': sid})
+        gen_tix.append({'id': ticket_db_id, 'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'seat_id': sid, 'purchase_date': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')})
 
-    create_notification(conn, g.user['id'], f"Successfully purchased {quantity} tickets.")
+    import json
+    notif_data = {
+        "type": "purchase_success",
+        "qty": quantity,
+        "event": event['title'],
+        "date": str(event['date']),
+        "location": event['location']
+    }
+    create_notification(conn, g.user['id'], json.dumps(notif_data))
     conn.commit()
     conn.close()
     
@@ -397,6 +424,7 @@ def cart_buy():
     seat_updates = []
     event_updates = []
     inserts = []
+    promo_updates = []
     
     for item in cart_items:
         event_id = item.get('event_id')
@@ -435,6 +463,7 @@ def cart_buy():
             item_price = event['price'] * quantity
             event_updates.append(("UPDATE events SET sold_count = sold_count + ? WHERE id = ? AND capacity - sold_count >= ? AND status = 'active'", (quantity, event_id, quantity)))
             
+        orig_item_price = item_price
         promo_record = None
         if promo_code:
             promo_record = c.execute('SELECT * FROM promotions WHERE event_id = ? AND code = ?', (event_id, promo_code)).fetchone()
@@ -444,12 +473,32 @@ def cart_buy():
                 else:
                     item_price -= promo_record['discount_value']
                 item_price = max(0, item_price)
-        total_price += item_price
-        
+                promo_updates.append(("UPDATE promotions SET used_count = used_count + 1 WHERE id = ?", (promo_record['id'],)))
+
+        ticket_base_prices = []
         for t_info in tickets_info:
+            bp = event['price'] if not event['has_seating'] else seats_dict[str(t_info.get('seat_id'))]['price']
+            ticket_base_prices.append(bp)
+            
+        discounted_ticket_prices = []
+        if promo_record and orig_item_price > 0:
+            remaining_total = item_price
+            for i, bp in enumerate(ticket_base_prices):
+                if i == len(ticket_base_prices) - 1:
+                    discounted_ticket_prices.append(remaining_total)
+                else:
+                    dp = int(bp * (item_price / orig_item_price))
+                    discounted_ticket_prices.append(dp)
+                    remaining_total -= dp
+        else:
+            discounted_ticket_prices = ticket_base_prices
+
+        total_price += sum(discounted_ticket_prices)
+        
+        for idx, t_info in enumerate(tickets_info):
             key = uuid.uuid4().hex.upper()[:12]
             q_data = sign_ticket_data(f"EVENTIX-{key}-{event_id}")
-            t_p = event['price'] if not event['has_seating'] else seats_dict[str(t_info['seat_id'])]['price']
+            t_p = discounted_ticket_prices[idx]
             sid = t_info.get('seat_id') if event['has_seating'] else None
             
             t_name = sanitize_html(t_info.get('name', ''))
@@ -457,7 +506,7 @@ def cart_buy():
             
             inserts.append((g.user['id'], event_id, key, q_data, 1, t_p, t_name, t_surname, sid))
             s_label = f"{seats_dict[str(sid)]['zone']} - R{seats_dict[str(sid)]['row_label']} S{seats_dict[str(sid)]['col_label']}" if sid and event['has_seating'] else ""
-            all_gen_tix.append({'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'event_id': event_id, 'seat_id': sid, 'seat_label': s_label})
+            all_gen_tix.append({'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'event_id': event_id, 'seat_id': sid, 'seat_label': s_label, 'purchase_date': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')})
             
     # PAYMENT
     from payment import PaymentGateway
@@ -474,10 +523,26 @@ def cart_buy():
             c.execute(sql, params)
         for params in inserts:
             c.execute("INSERT INTO tickets (user_id, event_id, ticket_key, qr_code, quantity, total_price, status, owner_name, owner_surname, seat_id) VALUES (?, ?, ?, ?, ?, ?, 'valid', ?, ?, ?)", params)
+        for sql, params in promo_updates:
+            c.execute(sql, params)
     except Exception as e:
         pass
         
-    create_notification(conn, g.user['id'], f"Successfully purchased {len(all_gen_tix)} tickets.")
+    import json
+    event_ids_in_cart = set([t['event_id'] for t in all_gen_tix])
+    for eid in event_ids_in_cart:
+        ev = conn.execute('SELECT * FROM events WHERE id = ?', (eid,)).fetchone()
+        ev_tix_count = len([t for t in all_gen_tix if t['event_id'] == eid])
+        if ev:
+            notif_data = {
+                "type": "purchase_success",
+                "qty": ev_tix_count,
+                "event": ev['title'],
+                "date": str(ev['date']),
+                "location": ev['location']
+            }
+            create_notification(conn, g.user['id'], json.dumps(notif_data))
+            
     conn.commit()
     
     # E-POSTA GONDERIMI
@@ -487,7 +552,6 @@ def cart_buy():
             eid = params[-1] if 'WHERE id = ?' in sql and len(params)==2 else params[1] # A bit hacky, so let's just query events directly
         
         # Daha güvenli event bulma
-        event_ids_in_cart = set([t['event_id'] for t in all_gen_tix])
         for eid in event_ids_in_cart:
             ev = conn.execute('SELECT * FROM events WHERE id = ?', (eid,)).fetchone()
             ev_tix = [t for t in all_gen_tix if t['event_id'] == eid]
@@ -541,6 +605,7 @@ def guest_cart_buy():
     seat_updates = []
     event_updates = []
     inserts = []
+    promo_updates = []
     
     for item in cart_items:
         event_id = item.get('event_id')
@@ -578,18 +643,50 @@ def guest_cart_buy():
             item_price = event['price'] * quantity
             event_updates.append(("UPDATE events SET sold_count = sold_count + ? WHERE id = ? AND capacity - sold_count >= ? AND status = 'active'", (quantity, event_id, quantity)))
             
-        total_price += item_price # Simplified without promo code for guest for now to keep size small
+        orig_item_price = item_price
+        promo_record = None
+        promo_code = item.get('promo_code', '').strip().upper()
+        if promo_code:
+            promo_record = c.execute('SELECT * FROM promotions WHERE event_id = ? AND code = ?', (event_id, promo_code)).fetchone()
+            if promo_record:
+                if promo_record['discount_type'] == 'percentage':
+                    item_price -= (item_price * promo_record['discount_value']) // 100
+                else:
+                    item_price -= promo_record['discount_value']
+                item_price = max(0, item_price)
+                promo_updates.append(("UPDATE promotions SET used_count = used_count + 1 WHERE id = ?", (promo_record['id'],)))
+
+        ticket_base_prices = []
         for t_info in tickets_info:
+            bp = event['price'] if not event['has_seating'] else seats_dict[str(t_info.get('seat_id'))]['price']
+            ticket_base_prices.append(bp)
+            
+        discounted_ticket_prices = []
+        if promo_record and orig_item_price > 0:
+            remaining_total = item_price
+            for i, bp in enumerate(ticket_base_prices):
+                if i == len(ticket_base_prices) - 1:
+                    discounted_ticket_prices.append(remaining_total)
+                else:
+                    dp = int(bp * (item_price / orig_item_price))
+                    discounted_ticket_prices.append(dp)
+                    remaining_total -= dp
+        else:
+            discounted_ticket_prices = ticket_base_prices
+
+        total_price += sum(discounted_ticket_prices)
+        
+        for idx, t_info in enumerate(tickets_info):
             key = uuid.uuid4().hex.upper()[:12]
             q_data = sign_ticket_data(f"EVENTIX-{key}-{event_id}")
-            t_p = event['price'] if not event['has_seating'] else seats_dict[str(t_info['seat_id'])]['price']
+            t_p = discounted_ticket_prices[idx]
             t_name = sanitize_html(t_info.get('name', ''))
             t_surname = sanitize_html(t_info.get('surname', ''))
             sid = t_info.get('seat_id') if event['has_seating'] else None
             
             inserts.append((guest_user_id, event_id, key, q_data, 1, t_p, t_name, t_surname, sid))
             s_label = f"{seats_dict[str(sid)]['zone']} - R{seats_dict[str(sid)]['row_label']} S{seats_dict[str(sid)]['col_label']}" if sid and event['has_seating'] else ""
-            all_gen_tix.append({'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'event_id': event_id, 'seat_id': sid, 'seat_label': s_label})
+            all_gen_tix.append({'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'event_id': event_id, 'seat_id': sid, 'seat_label': s_label, 'purchase_date': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')})
             
     from payment import PaymentGateway
     pay_res = PaymentGateway.process_payment(total_price, card_name, card_number, card_exp, cvc)
@@ -603,6 +700,9 @@ def guest_cart_buy():
         c.execute(sql, params)
     for params in inserts:
         c.execute("INSERT INTO tickets (user_id, event_id, ticket_key, qr_code, quantity, total_price, status, owner_name, owner_surname, seat_id) VALUES (?, ?, ?, ?, ?, ?, 'valid', ?, ?, ?)", params)
+    for sql, params in promo_updates:
+        c.execute(sql, params)
+        
         
     conn.commit()
     

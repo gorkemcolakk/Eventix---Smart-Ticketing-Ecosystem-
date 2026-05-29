@@ -175,7 +175,7 @@
             let conf = typeof configJSON === 'string' ? JSON.parse(configJSON) : configJSON;
             let typeMap = { 'weekly': "{{ t('recurrence_weekly') }}", 'monthly': "{{ t('recurrence_monthly') }}", 'daily': "{{ t('recurrence_daily') }}" };
             let t = typeMap[conf.type] || conf.type;
-            return `<span style="background:rgba(20,184,166,.1);color:#14b8a6;border:1px solid rgba(20,184,166,.3);padding:2px 10px;border-radius:100px;font-size:0.75rem;font-weight:600;display:inline-flex;align-items:center;gap:6px;">
+            return `<span style="background:rgba(20,184,166,.1);color:#22c55e;border:1px solid rgba(20,184,166,.3);padding:2px 10px;border-radius:100px;font-size:0.75rem;font-weight:600;display:inline-flex;align-items:center;gap:6px;">
               🔄 ${t} {{ t('recurrence_repeat') }} (${count || 0} {{ t('recurrence_sessions') }})
             </span>`;
         } catch(err) { return ''; }
@@ -331,11 +331,8 @@
     }
 
     async function approveEvent(id, btn) {
-      const selectedIds = sessionSelectedData[id] || [];
-      if (selectedIds.length === 0) {
-          showToast('{{ t('select_sessions_to_process') }}', 'error');
-          return;
-      }
+      let selectedIds = sessionSelectedData[id] || [];
+      if (selectedIds.length === 0) selectedIds = [id];
 
       btn.textContent = '{{ t('processing') }}'; btn.disabled = true;
       try {
@@ -384,11 +381,8 @@
         return;
       }
 
-      const selectedIds = sessionSelectedData[id] || [];
-      if (selectedIds.length === 0) {
-        alert("{{ t('select_sessions_to_process') }}");
-        return;
-      }
+      let selectedIds = sessionSelectedData[id] || [];
+      if (selectedIds.length === 0) selectedIds = [id];
 
       const endpoint = action === 'cancel' ? `/api/events/${id}?permanent=false&reason=${encodeURIComponent(reason)}` : `/api/admin/events/${id}/reject`;
       const method = action === 'cancel' ? 'POST' : 'POST'; // We'll use POST for both to handle body smoothly
@@ -417,7 +411,7 @@
         const r = await fetch('/api/admin/users', { headers: authHeaders() });
         const users = await r.json();
         const roleLabel = r => ({ admin: '⚙ {{ t('admin_panel') }}', organizer: '🎪 Org.', customer: '🎟 Customer' }[r] || r);
-        const roleColor = r => ({ admin: '#ef4444', organizer: '#f59e0b', customer: '#14b8a6' }[r] || '#6b7280');
+        const roleColor = r => ({ admin: '#ef4444', organizer: '#f59e0b', customer: '#22c55e' }[r] || '#6b7280');
         el.innerHTML = `<p style="color:var(--text-muted);margin-bottom:14px;font-size:0.85rem;">${users.length} {{ t('users') }}</p>
           <div class="glass-panel" style="overflow:auto;">
             <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
@@ -433,10 +427,10 @@
                 <td style="padding:10px 14px;color:var(--text-muted);">${u.id}</td>
                 <td style="padding:10px 14px;color:var(--text);font-weight:600;">${u.fullname}</td>
                 <td style="padding:14px 14px;color:var(--text-sub);">${u.email}</td>
-                <td style="padding:10px 14px;">
+                 <td style="padding:10px 14px;">
                   <span style="background:${roleColor(u.role)}18;color:${roleColor(u.role)};border:1px solid ${roleColor(u.role)}44;border-radius:100px;padding:2px 10px;font-size:0.72rem;font-weight:600;">${roleLabel(u.role)}</span>
                 </td>
-                <td style="padding:10px 14px;color:var(--text-muted);font-size:0.78rem;">${new Date(u.created_at).toLocaleDateString('en-US')}</td>
+                <td style="padding:10px 14px;color:var(--text-muted);font-size:0.78rem;">${new Date(u.created_at).toLocaleDateString('tr-TR')}</td>
               </tr>`).join('')}</tbody>
             </table>
           </div>`;
@@ -450,89 +444,168 @@
       try {
         const r = await fetch('/api/admin/all-events', { headers: authHeaders() });
         const events = await r.json();
-        const sColor = s => ({ active:'#14b8a6', pending:'#f59e0b', cancelled:'#ef4444', rejected:'#6b7280' }[s] || '#6b7280');
+        const sColor = s => ({ active:'#22c55e', pending:'#f59e0b', cancelled:'#ef4444', rejected:'#6b7280' }[s] || '#6b7280');
+        const sBg   = s => ({ active:'rgba(20,184,166,0.12)', pending:'rgba(245,158,11,0.12)', cancelled:'rgba(239,68,68,0.12)', rejected:'rgba(107,114,128,0.12)' }[s] || 'rgba(107,114,128,0.12)');
+        const sDot  = s => ({ active:'●', pending:'◑', cancelled:'✕', rejected:'–' }[s] || '●');
         const sLabel = s => ({
-            active: "{{ t('status_active') }}",
-            pending: "{{ t('status_pending') }}",
+            active:    "{{ t('status_active') }}",
+            pending:   "{{ t('status_pending') }}",
             cancelled: "{{ t('status_cancelled') }}",
-            rejected: "{{ t('status_rejected') }}"
+            rejected:  "{{ t('status_rejected') }}"
         }[s] || s);
+        const catColor = c => ({ concert:'#f59e0b', theater:'#ef4444', workshop:'#22c55e' }[c] || '#8b5cf6');
         const fDate = ds => {
           try {
             const d = new Date(ds);
             if(isNaN(d)) return ds;
-            const lang = (document.cookie.match(new RegExp('(^| )lang=([^;]+)'))?.[2] || 'tr').toLowerCase();
-            return d.toLocaleDateString(lang === 'tr' ? 'tr-TR' : lang === 'de' ? 'de-DE' : 'en-US', {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
-          } catch { return ds; }
-        };
-        const getCatLabel = c => {
-          const lang = (document.cookie.match(new RegExp('(^| )lang=([^;]+)'))?.[2] || 'tr').toLowerCase();
-          const maps = {
-            tr: { concert: "KONSER", theater: "TİYATRO", workshop: "ATÖLYE" },
-            de: { concert: "KONZERT", theater: "THEATER", workshop: "SEMINAR" },
-            en: { concert: "CONCERT", theater: "THEATER", workshop: "WORKSHOP" }
-          };
-          return (maps[lang] || maps['tr'])[c] || c.toUpperCase();
+            const dateStr = d.toLocaleDateString("tr-TR", {day:'numeric', month:'short', year:'numeric'});
+            const timeStr = d.toLocaleTimeString("tr-TR", {hour:'2-digit', minute:'2-digit'});
+            return { date: dateStr, time: timeStr };
+          } catch { return { date: ds, time: '' }; }
         };
 
-        el.innerHTML = `<p style="color:var(--text-muted);margin-bottom:14px;font-size:0.85rem;">${events.length} {{ t('all_events') }}</p>` +
-          events.map(e => {
+        el.innerHTML = `
+          <div style="display:flex;flex-direction:column;gap:10px;">
+          ${events.map(e => {
+            const fd = fDate(e.date);
             const pct = e.capacity > 0 ? Math.min(100, Math.round(e.sold_count / e.capacity * 100)) : 0;
-            const barC = pct >= 90 ? '#ef4444' : pct >= 60 ? '#f59e0b' : '#14b8a6';
-            const catC = ({concert:'#f59e0b',theater:'#ef4444',workshop:'#14b8a6'}[e.category] || '#8b5cf6');
-            const sBg  = ({active:'rgba(20,184,166,0.1)',pending:'rgba(245,158,11,0.1)',cancelled:'rgba(239,68,68,0.1)',rejected:'rgba(107,114,128,0.1)'}[e.status] || 'rgba(107,114,128,0.1)');
+            const barColor = pct >= 70 ? '#ef4444' : pct >= 30 ? '#f59e0b' : '#22c55e';
+            const catLabel = (c) => {
+              const lang = document.cookie.match(/lang=([^;]+)/)?.[1] || 'tr';
+              const map = { concert: lang==='tr'?'KONSER':'CONCERT', theater: lang==='tr'?'TİYATRO':'THEATER', workshop: lang==='tr'?'ATÖLYE':'WORKSHOP' };
+              return map[c] || (c||'').toUpperCase();
+            };
             return `
-          <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:10px;transition:border-color .2s,box-shadow .2s,transform .2s;"
-            onmouseenter="this.style.borderColor='rgba(245,158,11,0.45)';this.style.boxShadow='0 6px 28px rgba(0,0,0,0.28)';this.style.transform='translateY(-1px)'"
-            onmouseleave="this.style.borderColor='var(--border)';this.style.boxShadow='none';this.style.transform='translateY(0)'">
-            <div style="display:flex;align-items:stretch;">
-              <div style="position:relative;flex-shrink:0;width:108px;">
-                <img src="${e.image}" style="width:108px;height:100%;min-height:88px;object-fit:cover;display:block;" onerror="this.src='https://images.unsplash.com/photo-1540039155733-5bb30b4a574b?w=200'">
-                <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent 55%,var(--bg-card));"></div>
-                ${e.category ? `<div style="position:absolute;top:7px;left:7px;background:${catC};color:#fff;font-size:0.58rem;font-weight:700;letter-spacing:.6px;padding:2px 7px;border-radius:100px;">${getCatLabel(e.category)}</div>` : ''}
-              </div>
-              <div style="flex:1;min-width:0;padding:13px 15px;display:flex;flex-direction:column;gap:7px;">
-                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;">
-                  <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;flex:1;min-width:0;">
-                    <span style="color:var(--text);font-weight:700;font-size:0.95rem;">${e.title}${e.parent_event_id ? ' <span style="font-weight:400;color:var(--text-muted);font-size:0.8rem;">(Seans)</span>' : ''}</span>
-                    <span style="background:${sBg};color:${sColor(e.status)};border:1px solid ${sColor(e.status)}44;border-radius:100px;padding:2px 9px;font-size:0.7rem;font-weight:700;flex-shrink:0;">${sLabel(e.status)}</span>
-                    ${e.recurring_config ? getRecurrenceBadge(e.recurring_config, e.session_count) : ''}
-                  </div>
-                  <div style="display:flex;gap:6px;flex-shrink:0;">
-                    ${(e.status === 'active' || e.status === 'pending') ? `
-                      <button class="btn btn-sm" onclick="toggleReasonBox('${e.id}', 'reject')" style="background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.3);color:#f59e0b;padding:5px 11px;font-size:0.72rem;">&#9998; {{ t('request_edit') }}</button>
-                      <button class="btn btn-sm" onclick="toggleReasonBox('${e.id}', 'cancel')" style="background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:#f87171;padding:5px 11px;font-size:0.72rem;">&#10005; {{ t('cancel_btn') }}</button>
-                    ` : ''}
-                    ${e.status === 'rejected' ? `<button class="btn btn-sm" onclick="approveEvent('${e.id}', this)" style="background:rgba(20,184,166,0.1);border-color:rgba(20,184,166,0.3);color:#14b8a6;padding:5px 11px;font-size:0.72rem;">&#10003; {{ t('re_activate') }}</button>` : ''}
-                  </div>
+            <div style="
+              background:var(--bg-card);
+              border:1px solid var(--border);
+              border-radius:14px;
+              overflow:hidden;
+              transition:border-color .2s, box-shadow .2s, transform .2s;
+            "
+            onmouseenter="this.style.borderColor='rgba(245,158,11,0.4)';this.style.boxShadow='0 6px 24px rgba(0,0,0,0.3)';this.style.transform='translateY(-1px)'"
+            onmouseleave="this.style.borderColor='var(--border)';this.style.boxShadow='none';this.style.transform='none'"
+            >
+              <div style="display:flex;align-items:stretch;">
+
+                <!-- Thumbnail -->
+                <div style="position:relative;flex-shrink:0;width:120px;">
+                  <img src="${e.image}"
+                    style="width:120px;height:100%;min-height:80px;object-fit:cover;display:block;"
+                    onerror="this.src='https://images.unsplash.com/photo-1540039155733-5bb30b4a574b?w=200'">
+                  <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent 50%,var(--bg-card));"></div>
                 </div>
-                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-                  <div style="display:inline-flex;align-items:center;gap:5px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:7px;padding:3px 9px;">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                    <span style="color:#f59e0b;font-size:0.73rem;font-weight:700;">${fDate(e.date)}</span>
+
+                <!-- Content -->
+                <div style="flex:1;min-width:0;padding:16px 20px;display:flex;flex-direction:column;gap:6px;">
+
+                  <!-- Row 1: Title + Status + Buttons -->
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex:1;min-width:0;">
+                      <span style="color:var(--text);font-weight:700;font-size:0.92rem;">${e.title}</span>
+                      <span style="
+                        background:${sBg(e.status)};color:${sColor(e.status)};
+                        border:1px solid ${sColor(e.status)}55;
+                        border-radius:100px;padding:1px 9px;
+                        font-size:0.7rem;font-weight:700;flex-shrink:0;
+                      ">${sLabel(e.status)}</span>
+                    </div>
+                    <div style="display:flex;gap:6px;flex-shrink:0;">
+                      ${(e.status === 'active' || e.status === 'pending') ? `
+                        <button onclick="toggleReasonBox('${e.id}', 'reject')"
+                          style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.35);color:#f59e0b;
+                                 border-radius:8px;padding:4px 12px;font-size:0.72rem;font-weight:600;cursor:pointer;
+                                 display:inline-flex;align-items:center;gap:5px;transition:background .15s;"
+                          onmouseenter="this.style.background='rgba(245,158,11,0.22)'"
+                          onmouseleave="this.style.background='rgba(245,158,11,0.12)'"
+                        >✎ {{ t('request_edit') }}</button>
+                        <button onclick="toggleReasonBox('${e.id}', 'cancel')"
+                          style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.35);color:#f87171;
+                                 border-radius:8px;padding:4px 12px;font-size:0.72rem;font-weight:600;cursor:pointer;
+                                 display:inline-flex;align-items:center;gap:5px;transition:background .15s;"
+                          onmouseenter="this.style.background='rgba(239,68,68,0.22)'"
+                          onmouseleave="this.style.background='rgba(239,68,68,0.12)'"
+                        >✕ {{ t('cancel_btn') }}</button>
+                      ` : ''}
+                      ${e.status === 'rejected' ? `
+                        <button onclick="approveEvent('${e.id}', this)"
+                          style="background:rgba(20,184,166,0.12);border:1px solid rgba(20,184,166,0.35);color:#22c55e;
+                                 border-radius:8px;padding:4px 12px;font-size:0.72rem;font-weight:600;cursor:pointer;"
+                        >✓ {{ t('re_activate') }}</button>
+                      ` : ''}
+                    </div>
                   </div>
-                  <div style="display:inline-flex;align-items:center;gap:4px;color:var(--text-muted);font-size:0.77rem;">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                    <span style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${e.location}</span>
+
+                  <!-- Row 2: Category badge -->
+                  ${e.category ? `
+                  <div>
+                    <span style="
+                      background:${catColor(e.category)}22;
+                      color:${catColor(e.category)};
+                      border:1px solid ${catColor(e.category)}44;
+                      border-radius:5px;padding:1px 8px;
+                      font-size:0.65rem;font-weight:700;letter-spacing:0.5px;
+                    ">${catLabel(e.category)}</span>
+                  </div>` : ''}
+
+                  <!-- Row 3: TARİH & SAAT | MEKAN | FİYAT -->
+                  <div style="display:flex;gap:24px;flex-wrap:wrap;">
+                    <div style="display:flex;flex-direction:column;gap:2px;">
+                      <span style="color:var(--text-muted);font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">{{ t('date_time_col') }}</span>
+                      <span style="color:var(--text);font-size:0.8rem;font-weight:600;display:flex;align-items:center;gap:5px;">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        ${fd.date}${fd.time ? ' ' + fd.time : ''}
+                      </span>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:2px;">
+                      <span style="color:var(--text-muted);font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">{{ t('venue_col') }}</span>
+                      <span style="color:var(--text);font-size:0.8rem;font-weight:600;display:flex;align-items:center;gap:5px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        ${e.location}
+                      </span>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:2px;">
+                      <span style="color:var(--text-muted);font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">{{ t('price_col') }}</span>
+                      <span style="color:var(--text);font-size:0.88rem;font-weight:700;font-family:'Space Mono',monospace;">
+                        ${e.price.toLocaleString('tr-TR')} <span style="color:var(--gold);">₺</span>
+                      </span>
+                    </div>
                   </div>
-                  <span style="font-family:'Space Mono',monospace;font-size:0.82rem;font-weight:700;color:var(--text);">${e.price.toLocaleString('tr-TR')} <span style="color:var(--gold);">&#8378;</span></span>
+
+                  <!-- Row 4: Capacity bar -->
+                  ${e.capacity > 0 ? `
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="
+                      min-width:32px;text-align:right;
+                      font-size:0.68rem;font-weight:700;color:${barColor};
+                    ">%${pct}</span>
+                    <div style="flex:1;height:3px;background:rgba(255,255,255,0.07);border-radius:100px;overflow:hidden;">
+                      <div style="height:100%;width:${pct}%;background:${barColor};border-radius:100px;transition:width 0.6s ease;"></div>
+                    </div>
+                    <span style="font-size:0.8rem;font-weight:700;color:var(--text-muted);white-space:nowrap;">
+                      ${e.sold_count} / ${e.capacity} {{ t('tickets_sold_short') }}
+                    </span>
+                  </div>
+                  ` : ''}
+
                 </div>
-                ${e.capacity > 0 ? `<div style="display:flex;align-items:center;gap:9px;"><div style="flex:1;height:3px;background:rgba(255,255,255,0.07);border-radius:100px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:${barC};border-radius:100px;"></div></div><span style="font-size:0.69rem;color:var(--text-muted);white-space:nowrap;"><span style="color:${barC};font-weight:600;">${e.sold_count}</span>/${e.capacity} &middot; %${pct}</span></div>` : ''}
-                ${getSessionNotes(e.id, e.sessions, !!e.recurring_config)}
               </div>
-            </div>
-          </div>
-          <div id="reason-box-${e.id}" style="display:none;margin-top:-6px;margin-bottom:10px;">
-            <div class="glass-panel" style="padding:15px; border-color:rgba(239,68,68,0.3);">
-                <label id="reason-label-${e.id}" class="form-label" style="margin-bottom:8px; display:block; color:var(--text); font-weight:600;">{{ t('reason_for_rejection') }}</label>
-                <textarea class="form-control" placeholder="{{ t('provide_note_organizer') }}" id="reason-input-${e.id}" style="margin-bottom:8px; min-height:60px;"></textarea>
-                <div style="display:flex; gap:10px;">
-                    <button class="btn btn-danger btn-sm" style="flex:1;justify-content:center;" id="reason-confirm-btn-${e.id}">{{ t('save') }}</button>
+
+              <!-- Reason box -->
+              <div id="reason-box-${e.id}" style="display:none;padding:0 12px 12px;">
+                <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.25);border-radius:10px;padding:14px;">
+                  <label id="reason-label-${e.id}" style="display:block;color:var(--text);font-weight:600;font-size:0.82rem;margin-bottom:8px;">{{ t('reason_for_rejection') }}</label>
+                  <textarea id="reason-input-${e.id}" class="form-control" placeholder="{{ t('provide_note_organizer') }}" style="min-height:55px;margin-bottom:8px;font-size:0.82rem;"></textarea>
+                  <div style="display:flex;gap:8px;">
+                    <button id="reason-confirm-btn-${e.id}" class="btn btn-danger btn-sm" style="flex:1;justify-content:center;">{{ t('save') }}</button>
                     <button class="btn btn-outline btn-sm" style="flex:1;justify-content:center;" onclick="toggleReasonBox('${e.id}')">{{ t('cancel_btn') }}</button>
+                  </div>
                 </div>
-            </div>
-          </div>`;
-          }).join('');
+              </div>
+            </div>`;
+          }).join('')}
+          </div>
+        `;
       } catch(err) { el.innerHTML = '<p class="loading-text" style="color:#f87171;">{{ t('failed_to_load') }}</p>'; }
     }
 
@@ -562,8 +635,8 @@
             <div style="font-size:1.6rem;font-weight:700;background:linear-gradient(135deg,#8b5cf6,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">${(d.total_admin_refund_fee || 0).toLocaleString('en-US')} ₺</div>
             <div style="color:var(--text-muted);font-size:0.8rem;margin-top:4px;white-space:nowrap;">{{ t('refund_revenue') }} (%5)</div>
           </div>
-          <div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid #14b8a6;">
-            <div style="font-size:1.6rem;font-weight:700;color:#14b8a6;">${(d.platform_net_income || 0).toLocaleString('en-US')} ₺</div>
+          <div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid #22c55e;">
+            <div style="font-size:1.6rem;font-weight:700;color:#22c55e;">${(d.platform_net_income || 0).toLocaleString('en-US')} ₺</div>
             <div style="color:var(--text-muted);font-size:0.8rem;margin-top:4px;">{{ t('net_platform_revenue') }}</div>
           </div>
         </div>
@@ -630,7 +703,7 @@
                         cancelled: "{{ t('status_cancelled') }}",
                         rejected: "{{ t('status_rejected') }}"
                     }[ev.status] || ev.status;
-                    const statusColor = { active:'#14b8a6', pending:'#f59e0b', cancelled:'#ef4444' }[ev.status] || '#6b7280';
+                    const statusColor = { active:'#22c55e', pending:'#f59e0b', cancelled:'#ef4444' }[ev.status] || '#6b7280';
                     return `
                     <tr style="border-bottom:1px solid var(--border);">
                       <td style="padding:14px 8px;color:var(--text);font-weight:600;">${ev.title}</td>

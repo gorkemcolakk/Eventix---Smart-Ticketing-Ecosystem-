@@ -268,19 +268,19 @@ function renderNav() {
 
             if (user.role === 'admin') {
               dropLinks = `
-                <a href="admin.html?tab=pending" class="dropdown-item">${t('pending_approval')}</a>
-                <a href="admin.html?tab=users" class="dropdown-item">${t('users')}</a>
-                <a href="admin.html?tab=allevents" class="dropdown-item">${t('all_events')}</a>
-                <a href="admin.html?tab=revenue" class="dropdown-item">${t('platform_revenue')}</a>
+                <a href="#" onclick="event.preventDefault(); typeof showTab==='function' ? showTab('pending') : window.location.href='admin.html?tab=pending'" class="dropdown-item">${t('pending_approval')}</a>
+                <a href="#" onclick="event.preventDefault(); typeof showTab==='function' ? showTab('users') : window.location.href='admin.html?tab=users'" class="dropdown-item">${t('users')}</a>
+                <a href="#" onclick="event.preventDefault(); typeof showTab==='function' ? showTab('allevents') : window.location.href='admin.html?tab=allevents'" class="dropdown-item">${t('all_events')}</a>
+                <a href="#" onclick="event.preventDefault(); typeof showTab==='function' ? showTab('revenue') : window.location.href='admin.html?tab=revenue'" class="dropdown-item">${t('platform_revenue')}</a>
                 ${commonLinks}
               `;
             } else if (user.role === 'organizer') {
               dropLinks = `
-                <a href="organizer.html?tab=myevents" class="dropdown-item">${t('my_events')}</a>
-                <a href="organizer.html?tab=create" class="dropdown-item">${t('create_event')}</a>
-                <a href="organizer.html?tab=revenue" class="dropdown-item">${t('revenue_report')}</a>
-                <a href="organizer.html?tab=promotions" class="dropdown-item">${t('promotions')}</a>
-                <a href="organizer.html?tab=validate" class="dropdown-item">${t('qr_validation')}</a>
+                <a href="#" onclick="event.preventDefault(); typeof showTab==='function' ? showTab('myevents') : window.location.href='organizer.html?tab=myevents'" class="dropdown-item">${t('my_events')}</a>
+                <a href="#" onclick="event.preventDefault(); typeof showTab==='function' ? showTab('create') : window.location.href='organizer.html?tab=create'" class="dropdown-item">${t('create_event')}</a>
+                <a href="#" onclick="event.preventDefault(); typeof showTab==='function' ? showTab('revenue') : window.location.href='organizer.html?tab=revenue'" class="dropdown-item">${t('revenue_report')}</a>
+                <a href="#" onclick="event.preventDefault(); typeof showTab==='function' ? showTab('promotions') : window.location.href='organizer.html?tab=promotions'" class="dropdown-item">${t('promotions')}</a>
+                <a href="#" onclick="event.preventDefault(); typeof showTab==='function' ? showTab('validate') : window.location.href='organizer.html?tab=validate'" class="dropdown-item">${t('qr_validation')}</a>
                 ${commonLinks}
               `;
             } else {
@@ -308,7 +308,7 @@ function renderNav() {
                 <div id="userDropdown" class="user-dropdown-menu">
                   ${dropLinks}
                   <hr style="border:0; border-top:1px solid var(--border); margin:4px 0;">
-                  <button onclick="logout()" class="dropdown-item" style="width:100%; border:0; background:none; cursor:pointer; color:var(--coral); text-align:left;">${t('logout')}</button>
+                  <button onclick="logout()" class="dropdown-item" style="width:100%; border:0; background:none; cursor:pointer; color:var(--coral); text-align:left; font-weight:700;">${t('logout')}</button>
                 </div>
               </div>`;
         } else {
