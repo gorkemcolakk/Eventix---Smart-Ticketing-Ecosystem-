@@ -19,7 +19,7 @@ def admin_list_users():
 def admin_all_events():
     conn = get_db_connection()
     events = conn.execute('''
-        SELECT e.* FROM events e ORDER BY e.id
+        SELECT e.* FROM events e ORDER BY e.date ASC
     ''').fetchall()
     conn.close()
     

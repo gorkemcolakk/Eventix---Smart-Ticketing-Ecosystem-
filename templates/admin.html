@@ -453,7 +453,7 @@
             cancelled: "{{ t('status_cancelled') }}",
             rejected:  "{{ t('status_rejected') }}"
         }[s] || s);
-        const catColor = c => ({ concert:'#f59e0b', theater:'#ef4444', workshop:'#22c55e' }[c] || '#8b5cf6');
+        const catColor = c => ({ concert:'#f59e0b', theater:'#ef4444', workshop:'#14b8a6' }[c] || '#8b5cf6');
         const fDate = ds => {
           try {
             const d = new Date(ds);
@@ -481,8 +481,10 @@
               border:1px solid var(--border);
               border-radius:14px;
               overflow:hidden;
+              cursor:pointer;
               transition:border-color .2s, box-shadow .2s, transform .2s;
             "
+            onclick="if(!event.target.closest('button') && !event.target.closest('textarea') && !event.target.closest('input')) window.location.assign('event-detail.html?id=${e.id}')"
             onmouseenter="this.style.borderColor='rgba(245,158,11,0.4)';this.style.boxShadow='0 6px 24px rgba(0,0,0,0.3)';this.style.transform='translateY(-1px)'"
             onmouseleave="this.style.borderColor='var(--border)';this.style.boxShadow='none';this.style.transform='none'"
             >
@@ -540,11 +542,12 @@
                   ${e.category ? `
                   <div>
                     <span style="
-                      background:${catColor(e.category)}22;
-                      color:${catColor(e.category)};
-                      border:1px solid ${catColor(e.category)}44;
-                      border-radius:5px;padding:1px 8px;
-                      font-size:0.65rem;font-weight:700;letter-spacing:0.5px;
+                      background:${catColor(e.category)};
+                      color:#ffffff;
+                      border:1px solid ${catColor(e.category)};
+                      border-radius:100px;padding:3px 10px;
+                      font-size:0.7rem;font-weight:700;letter-spacing:0.8px;
+                      text-shadow:0 1px 2px rgba(0,0,0,0.4);
                     ">${catLabel(e.category)}</span>
                   </div>` : ''}
 
