@@ -188,9 +188,10 @@ def init_db():
             # Refunds tablosunu da kontrol et - yoksa olusturmaya izin ver
             try:
                 turso_http("SELECT id FROM refunds LIMIT 1", [])
+                turso_http("SELECT promo_code FROM tickets LIMIT 1", [])
                 return  # Veritabani hazir, hizlica cik
             except Exception:
-                pass  # refunds tablosu yok, asagidan olustur
+                pass  # yeni kolonlar veya refunds tablosu eksik, asagidan olustur
         except Exception:
             pass  # Eger kurulu degilse, asagidan normal sekilde tablolari olusturmaya devam et
             
@@ -354,6 +355,16 @@ def init_db():
     except sqlite3.OperationalError:
         pass
 
+    try:
+        c.execute("ALTER TABLE tickets ADD COLUMN original_price INTEGER")
+    except sqlite3.OperationalError:
+        pass
+
+    try:
+        c.execute("ALTER TABLE tickets ADD COLUMN promo_code TEXT")
+    except sqlite3.OperationalError:
+        pass
+
     # Refunds table — tracks all refund transactions
     c.execute('''
         CREATE TABLE IF NOT EXISTS refunds (
@@ -425,6 +436,23 @@ def init_db():
     
     conn.commit()
     conn.close()
+
+
+def run_schema_migrations():
+    """Incremental schema updates — safe on every app start (SQLite + Turso)."""
+    conn = get_db_connection()
+    try:
+        for sql in (
+            "ALTER TABLE tickets ADD COLUMN original_price INTEGER",
+            "ALTER TABLE tickets ADD COLUMN promo_code TEXT",
+        ):
+            try:
+                conn.execute(sql)
+            except sqlite3.OperationalError:
+                pass
+        conn.commit()
+    finally:
+        conn.close()
 
 if __name__ == '__main__':
     init_db()

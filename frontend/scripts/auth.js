@@ -109,6 +109,7 @@ const authI18n = {
         my_events: '🎪 Etkinliklerim',
         create_event: '➕ Etkinlik Oluştur',
         revenue_report: '💰 Gelir Raporu',
+        sales_history: '📜 Satış Geçmişi',
         promotions: '🎫 Promosyonlar',
         qr_validation: '🔍 QR Doğrulama',
         logout: '🚪 Çıkış Yap',
@@ -147,6 +148,7 @@ const authI18n = {
         my_events: '🎪 My Events',
         create_event: '➕ Create Event',
         revenue_report: '💰 Revenue Report',
+        sales_history: '📜 Sales History',
         promotions: '🎫 Promotions',
         qr_validation: '🔍 QR Validation',
         logout: '🚪 Logout',
@@ -185,6 +187,7 @@ const authI18n = {
         my_events: '🎪 Meine Events',
         create_event: '➕ Event Erstellen',
         revenue_report: '💰 Einnahmenbericht',
+        sales_history: '📜 Verkaufshistorie',
         promotions: '🎫 Werbeaktionen',
         qr_validation: '🔍 QR-Validierung',
         logout: '🚪 Abmelden',
@@ -272,6 +275,7 @@ function renderNav() {
                 <a href="#" onclick="event.preventDefault(); typeof showTab==='function' ? showTab('users') : window.location.href='admin.html?tab=users'" class="dropdown-item">${t('users')}</a>
                 <a href="#" onclick="event.preventDefault(); typeof showTab==='function' ? showTab('allevents') : window.location.href='admin.html?tab=allevents'" class="dropdown-item">${t('all_events')}</a>
                 <a href="#" onclick="event.preventDefault(); typeof showTab==='function' ? showTab('revenue') : window.location.href='admin.html?tab=revenue'" class="dropdown-item">${t('platform_revenue')}</a>
+                <a href="#" onclick="event.preventDefault(); typeof showTab==='function' ? showTab('sales') : window.location.href='admin.html?tab=sales'" class="dropdown-item">${t('sales_history')}</a>
                 ${commonLinks}
               `;
             } else if (user.role === 'organizer') {
@@ -279,6 +283,7 @@ function renderNav() {
                 <a href="#" onclick="event.preventDefault(); typeof showTab==='function' ? showTab('myevents') : window.location.href='organizer.html?tab=myevents'" class="dropdown-item">${t('my_events')}</a>
                 <a href="#" onclick="event.preventDefault(); typeof showTab==='function' ? showTab('create') : window.location.href='organizer.html?tab=create'" class="dropdown-item">${t('create_event')}</a>
                 <a href="#" onclick="event.preventDefault(); typeof showTab==='function' ? showTab('revenue') : window.location.href='organizer.html?tab=revenue'" class="dropdown-item">${t('revenue_report')}</a>
+                <a href="#" onclick="event.preventDefault(); typeof showTab==='function' ? showTab('sales') : window.location.href='organizer.html?tab=sales'" class="dropdown-item">${t('sales_history')}</a>
                 <a href="#" onclick="event.preventDefault(); typeof showTab==='function' ? showTab('promotions') : window.location.href='organizer.html?tab=promotions'" class="dropdown-item">${t('promotions')}</a>
                 <a href="#" onclick="event.preventDefault(); typeof showTab==='function' ? showTab('validate') : window.location.href='organizer.html?tab=validate'" class="dropdown-item">${t('qr_validation')}</a>
                 ${commonLinks}

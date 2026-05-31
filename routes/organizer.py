@@ -373,3 +373,222 @@ def export_attendees(event_id):
             'Content-Type': 'text/csv; charset=utf-8',
         }
     )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SALES HISTORY
+# ─────────────────────────────────────────────────────────────────────────────
+_SALES_SELECT = '''
+    SELECT
+        t.ticket_key, t.owner_name, t.owner_surname, t.status, t.total_price,
+        t.quantity, t.purchase_date, t.promo_code, t.original_price,
+        u.email, u.fullname,
+        e.id AS event_id, e.title AS event_title, e.date AS event_date, e.location AS event_location,
+        s.zone, s.row_label, s.col_label, s.price AS seat_price, e.price AS event_price,
+        org.fullname AS organizer_name
+    FROM tickets t
+    JOIN events e ON t.event_id = e.id
+    JOIN users u ON t.user_id = u.id
+    LEFT JOIN users org ON e.organizer_id = org.id
+    LEFT JOIN seats s ON t.seat_id = s.id
+'''
+
+
+def _sales_filters():
+    where = ['1=1']
+    params = []
+
+    if g.user['role'] != 'admin':
+        where.append('e.organizer_id = ?')
+        params.append(g.user['id'])
+    else:
+        org_id = request.args.get('organizer_id', '').strip()
+        if org_id.isdigit():
+            where.append('e.organizer_id = ?')
+            params.append(int(org_id))
+
+    event_id = request.args.get('event_id', '').strip()
+    if event_id:
+        where.append('t.event_id = ?')
+        params.append(event_id)
+
+    status = request.args.get('status', '').strip()
+    if status and status != 'all':
+        where.append('t.status = ?')
+        params.append(status)
+
+    search = request.args.get('search', '').strip().lower()
+    if search:
+        where.append('''(
+            LOWER(t.ticket_key) LIKE ? OR LOWER(u.email) LIKE ?
+            OR LOWER(COALESCE(t.owner_name, '')) LIKE ? OR LOWER(COALESCE(t.owner_surname, '')) LIKE ?
+            OR LOWER(u.fullname) LIKE ?
+        )''')
+        q = f'%{search}%'
+        params.extend([q, q, q, q, q])
+
+    date_from = request.args.get('date_from', '').strip()
+    date_to = request.args.get('date_to', '').strip()
+    if date_from:
+        where.append('DATE(t.purchase_date) >= DATE(?)')
+        params.append(date_from)
+    if date_to:
+        where.append('DATE(t.purchase_date) <= DATE(?)')
+        params.append(date_to)
+
+    sort_by = request.args.get('sort_by', 'purchase_date')
+    sort_order = request.args.get('sort_order', 'desc')
+    sort_map = {
+        'purchase_date': 't.purchase_date',
+        'price': 't.total_price',
+        'event_date': 'e.date',
+        'event_title': 'e.title',
+    }
+    order_col = sort_map.get(sort_by, 't.purchase_date')
+    order_dir = 'ASC' if sort_order == 'asc' else 'DESC'
+    order_sql = f'{order_col} {order_dir}, t.id DESC'
+
+    return ' AND '.join(where), params, order_sql
+
+
+def _format_sales_row(r):
+    seat = f"{r['zone']} {r['row_label']}-{r['col_label']}" if r['zone'] else 'General Admission'
+    name = r['owner_name'] or (r['fullname'] or '').split()[0] or '-'
+    surna = r['owner_surname'] or ' '.join((r['fullname'] or '').split()[1:]) or ''
+    list_price = r['original_price'] or r['seat_price'] or r['event_price'] or r['total_price']
+    list_price = int(list_price) if list_price else int(r['total_price'] or 0)
+    paid = int(r['total_price'] or 0)
+    return {
+        'ticket_key': r['ticket_key'],
+        'full_name': f"{name} {surna}".strip(),
+        'email': r['email'],
+        'event_id': r['event_id'],
+        'event_title': r['event_title'],
+        'event_date': (r['event_date'] or '')[:16],
+        'event_location': r['event_location'],
+        'seat': seat,
+        'status': r['status'],
+        'price': paid,
+        'original_price': list_price,
+        'has_discount': list_price > paid,
+        'promo_code': r['promo_code'] or None,
+        'quantity': r['quantity'],
+        'purchased_at': (r['purchase_date'] or '')[:16],
+        'organizer_name': r['organizer_name'],
+    }
+
+
+@organizer_bp.route('/sales-history', methods=['GET'])
+@role_required('organizer', 'admin')
+def sales_history():
+    try:
+        where_sql, params, order_sql = _sales_filters()
+        page = max(1, int(request.args.get('page', 1) or 1))
+        limit = min(200, max(1, int(request.args.get('limit', 50) or 50)))
+        offset = (page - 1) * limit
+
+        conn = get_db_connection()
+        base = f'{_SALES_SELECT} WHERE {where_sql}'
+
+        total = conn.execute(f'SELECT COUNT(*) AS c FROM ({base})', params).fetchone()['c']
+
+        stats = conn.execute(f'''
+            SELECT
+                COUNT(*) AS total_count,
+                COALESCE(SUM(t.total_price), 0) AS total_amount,
+                SUM(CASE WHEN t.status = 'valid' THEN 1 ELSE 0 END) AS valid_count,
+                SUM(CASE WHEN t.status = 'used' THEN 1 ELSE 0 END) AS used_count,
+                SUM(CASE WHEN t.status IN ('refunded', 'refund_pending') THEN 1 ELSE 0 END) AS refunded_count,
+                SUM(CASE WHEN t.status = 'cancelled' THEN 1 ELSE 0 END) AS cancelled_count
+            FROM tickets t
+            JOIN events e ON t.event_id = e.id
+            JOIN users u ON t.user_id = u.id
+            WHERE {where_sql}
+        ''', params).fetchone()
+
+        rows = conn.execute(f'{base} ORDER BY {order_sql} LIMIT ? OFFSET ?', params + [limit, offset]).fetchall()
+        conn.close()
+
+        return jsonify({
+            'items': [_format_sales_row(r) for r in rows],
+            'pagination': {
+                'page': page,
+                'limit': limit,
+                'total': total,
+                'pages': max(1, (total + limit - 1) // limit),
+            },
+            'summary': {
+                'total_count': stats['total_count'] or 0,
+                'total_amount': stats['total_amount'] or 0,
+                'valid_count': stats['valid_count'] or 0,
+                'used_count': stats['used_count'] or 0,
+                'refunded_count': stats['refunded_count'] or 0,
+                'cancelled_count': stats['cancelled_count'] or 0,
+            },
+        }), 200
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
+
+
+@organizer_bp.route('/sales-history/export', methods=['GET'])
+@role_required('organizer', 'admin')
+def export_sales_history():
+    import io, csv
+    from translations import TRANSLATIONS
+    from flask import session
+
+    where_sql, params, order_sql = _sales_filters()
+    conn = get_db_connection()
+    rows = conn.execute(
+        f'{_SALES_SELECT} WHERE {where_sql} ORDER BY {order_sql}',
+        params
+    ).fetchall()
+    conn.close()
+
+    lang = session.get('lang', 'tr')
+    tr = TRANSLATIONS.get(lang, TRANSLATIONS['tr'])
+    status_map = {
+        'valid': tr.get('valid_status', 'Valid'),
+        'used': tr.get('used_status', 'Used'),
+        'refund_pending': tr.get('refund_pending_status', 'Refund Pending'),
+        'refunded': tr.get('refunded_status', 'Refunded'),
+        'cancelled': tr.get('cancelled_status', 'Cancelled'),
+    }
+    buf = io.StringIO()
+    w = csv.writer(buf, delimiter=';')
+    w.writerow([
+        tr.get('ticket_key_col', 'Ticket'),
+        tr.get('buyer_col', 'Buyer'),
+        tr.get('email_col', 'Email'),
+        tr.get('event_col', 'Event'),
+        tr.get('event_date_col', 'Event Date'),
+        tr.get('location_col', 'Location'),
+        tr.get('seat_col', 'Seat'),
+        tr.get('status', 'Status'),
+        tr.get('original_price', 'Original'),
+        tr.get('paid_price', 'Paid'),
+        tr.get('promo_code', 'Promo'),
+        tr.get('purchase_date_col', 'Purchase'),
+        tr.get('organizer', 'Organizer'),
+    ])
+    ga = tr.get('general_admission', 'General Admission')
+    for r in rows:
+        item = _format_sales_row(r)
+        seat = item['seat'] if item['seat'] != 'General Admission' else ga
+        w.writerow([
+            item['ticket_key'], item['full_name'], item['email'], item['event_title'],
+            item['event_date'], item['event_location'], seat,
+            status_map.get(item['status'], item['status']),
+            item['original_price'], item['price'], item['promo_code'] or '',
+            item['purchased_at'], item['organizer_name'] or '',
+        ])
+
+    csv_bytes = b'\xef\xbb\xbf' + buf.getvalue().encode('utf-8')
+    return Response(
+        csv_bytes,
+        mimetype='text/csv',
+        headers={
+            'Content-Disposition': 'attachment; filename="Sales_History.csv"',
+            'Content-Type': 'text/csv; charset=utf-8',
+        }
+    )

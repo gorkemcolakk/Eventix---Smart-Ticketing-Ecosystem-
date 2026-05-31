@@ -7,6 +7,18 @@ from datetime import datetime, timedelta
 
 tickets_bp = Blueprint('tickets', __name__, url_prefix='/api/tickets')
 
+_TICKET_INSERT_SQL = (
+    "INSERT INTO tickets (user_id, event_id, ticket_key, qr_code, quantity, total_price, "
+    "status, owner_name, owner_surname, seat_id, original_price, promo_code) "
+    "VALUES (?, ?, ?, ?, ?, ?, 'valid', ?, ?, ?, ?, ?)"
+)
+
+def _insert_ticket(c, user_id, event_id, key, q_data, price, name, surname, seat_id,
+                   original_price=None, promo_code=None):
+    orig = original_price if original_price is not None else price
+    promo = (promo_code or '').strip().upper() or None
+    c.execute(_TICKET_INSERT_SQL, (user_id, event_id, key, q_data, 1, price, name, surname, seat_id, orig, promo))
+
 # ─────────────────────────────────────────────────────────────────────────────
 # GUEST TICKET PURCHASE
 # ─────────────────────────────────────────────────────────────────────────────
@@ -86,6 +98,8 @@ def guest_buy_ticket():
     else:
         total_price = event['price'] * quantity
 
+    orig_total_price = total_price
+
     # Promo Code
     promo_record = None
     if promo_code:
@@ -133,20 +147,37 @@ def guest_buy_ticket():
     if promo_record:
         c.execute('UPDATE promotions SET used_count = used_count + 1 WHERE id = ?', (promo_record['id'],))
 
+    ticket_base_prices = []
+    for t_info in tickets_info:
+        bp = event['price'] if not event['has_seating'] else seats_dict[str(t_info['seat_id'])]['price']
+        ticket_base_prices.append(bp)
+    discounted_ticket_prices = []
+    if promo_record and orig_total_price > 0:
+        remaining_total = total_price
+        for i, bp in enumerate(ticket_base_prices):
+            if i == len(ticket_base_prices) - 1:
+                discounted_ticket_prices.append(remaining_total)
+            else:
+                dp = int(bp * (total_price / orig_total_price))
+                discounted_ticket_prices.append(dp)
+                remaining_total -= dp
+    else:
+        discounted_ticket_prices = ticket_base_prices
+
     # GENERATE TICKETS
     gen_tix = []
-    for t_info in tickets_info:
+    stored_promo = promo_code if promo_record else None
+    for idx, t_info in enumerate(tickets_info):
         key = uuid.uuid4().hex.upper()[:12]
-        # Statik QR yerine Dinamik QR altyapısı için temel seed
         q_data = sign_ticket_data(f"EVENTIX-{key}-{event_id}")
-        t_p = event['price'] if not event['has_seating'] else seats_dict[str(t_info['seat_id'])]['price']
+        t_p = discounted_ticket_prices[idx]
         sid = t_info.get('seat_id') if event['has_seating'] else None
         
         t_name = sanitize_html(t_info.get('name', ''))
         t_surname = sanitize_html(t_info.get('surname', ''))
         
-        c.execute("INSERT INTO tickets (user_id, event_id, ticket_key, qr_code, quantity, total_price, status, owner_name, owner_surname, seat_id) VALUES (?, ?, ?, ?, ?, ?, 'valid', ?, ?, ?)",
-                  (guest_user_id, event_id, key, q_data, 1, t_p, t_name, t_surname, sid))
+        _insert_ticket(c, guest_user_id, event_id, key, q_data, t_p, t_name, t_surname, sid,
+                       ticket_base_prices[idx], stored_promo)
         ticket_db_id = c.lastrowid
         
         gen_tix.append({'id': ticket_db_id, 'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'seat_id': sid, 'purchase_date': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')})
@@ -376,8 +407,11 @@ def buy_ticket():
         t_name = sanitize_html(t_info.get('name', ''))
         t_surname = sanitize_html(t_info.get('surname', ''))
         
-        c.execute("INSERT INTO tickets (user_id, event_id, ticket_key, qr_code, quantity, total_price, status, owner_name, owner_surname, seat_id) VALUES (?, ?, ?, ?, ?, ?, 'valid', ?, ?, ?)",
-                  (g.user['id'], event_id, key, q_data, 1, t_p, t_name, t_surname, sid))
+        stored_promo = promo_code if promo_record else None
+        if promo_record and promo_record.get('is_bday'):
+            stored_promo = 'BDAY26'
+        _insert_ticket(c, g.user['id'], event_id, key, q_data, t_p, t_name, t_surname, sid,
+                       ticket_base_prices[idx], stored_promo)
         ticket_db_id = c.lastrowid
         gen_tix.append({'id': ticket_db_id, 'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'seat_id': sid, 'purchase_date': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')})
 
@@ -504,7 +538,9 @@ def cart_buy():
             t_name = sanitize_html(t_info.get('name', ''))
             t_surname = sanitize_html(t_info.get('surname', ''))
             
-            inserts.append((g.user['id'], event_id, key, q_data, 1, t_p, t_name, t_surname, sid))
+            stored_promo = promo_code if promo_record else None
+            inserts.append((g.user['id'], event_id, key, q_data, 1, t_p, t_name, t_surname, sid,
+                            ticket_base_prices[idx], stored_promo))
             s_label = f"{seats_dict[str(sid)]['zone']} - R{seats_dict[str(sid)]['row_label']} S{seats_dict[str(sid)]['col_label']}" if sid and event['has_seating'] else ""
             all_gen_tix.append({'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'event_id': event_id, 'seat_id': sid, 'seat_label': s_label, 'purchase_date': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')})
             
@@ -522,7 +558,7 @@ def cart_buy():
         for sql, params in event_updates:
             c.execute(sql, params)
         for params in inserts:
-            c.execute("INSERT INTO tickets (user_id, event_id, ticket_key, qr_code, quantity, total_price, status, owner_name, owner_surname, seat_id) VALUES (?, ?, ?, ?, ?, ?, 'valid', ?, ?, ?)", params)
+            _insert_ticket(c, params[0], params[1], params[2], params[3], params[5], params[6], params[7], params[8], params[9], params[10])
         for sql, params in promo_updates:
             c.execute(sql, params)
     except Exception as e:
@@ -684,7 +720,9 @@ def guest_cart_buy():
             t_surname = sanitize_html(t_info.get('surname', ''))
             sid = t_info.get('seat_id') if event['has_seating'] else None
             
-            inserts.append((guest_user_id, event_id, key, q_data, 1, t_p, t_name, t_surname, sid))
+            stored_promo = promo_code if promo_record else None
+            inserts.append((guest_user_id, event_id, key, q_data, 1, t_p, t_name, t_surname, sid,
+                            ticket_base_prices[idx], stored_promo))
             s_label = f"{seats_dict[str(sid)]['zone']} - R{seats_dict[str(sid)]['row_label']} S{seats_dict[str(sid)]['col_label']}" if sid and event['has_seating'] else ""
             all_gen_tix.append({'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'event_id': event_id, 'seat_id': sid, 'seat_label': s_label, 'purchase_date': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')})
             
@@ -699,7 +737,7 @@ def guest_cart_buy():
     for sql, params in event_updates:
         c.execute(sql, params)
     for params in inserts:
-        c.execute("INSERT INTO tickets (user_id, event_id, ticket_key, qr_code, quantity, total_price, status, owner_name, owner_surname, seat_id) VALUES (?, ?, ?, ?, ?, ?, 'valid', ?, ?, ?)", params)
+        _insert_ticket(c, params[0], params[1], params[2], params[3], params[5], params[6], params[7], params[8], params[9], params[10])
     for sql, params in promo_updates:
         c.execute(sql, params)
         

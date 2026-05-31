@@ -82,6 +82,158 @@
     .att-status.refund  { background:rgba(245,158,11,.15);  color:#fcd34d; }
     .att-status.cancel  { background:rgba(239,68,68,.15);   color:#fca5a5; }
     .att-empty { text-align:center; padding:40px; color:var(--text-muted); font-size:.9rem; }
+
+    /* ── Sales History ──────────────────────────────────────────── */
+    .sales-hero {
+      position:relative; overflow:hidden; border-radius:18px; padding:28px 32px; margin-bottom:24px;
+      background:linear-gradient(135deg, rgba(139,92,246,0.18) 0%, rgba(45,212,191,0.12) 50%, rgba(236,72,153,0.1) 100%);
+      border:1px solid rgba(139,92,246,0.25);
+      box-shadow:0 8px 32px rgba(139,92,246,0.08);
+    }
+    .sales-hero::before {
+      content:''; position:absolute; top:-40%; right:-10%; width:280px; height:280px;
+      background:radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 70%);
+      pointer-events:none;
+    }
+    .sales-hero-title { font-size:1.65rem; font-weight:800; margin:0 0 6px; background:linear-gradient(90deg,#c4b5fd,#2dd4bf); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .sales-hero-desc { color:var(--text-muted); font-size:0.9rem; margin:0; max-width:520px; line-height:1.5; }
+    .sales-stats { display:grid; grid-template-columns:repeat(6,1fr); gap:10px; margin-bottom:22px; }
+    .sales-stat-card {
+      position:relative; padding:16px 12px; border-radius:14px; overflow:hidden;
+      background:rgba(255,255,255,0.03); border:1px solid var(--border);
+      transition:transform .2s, box-shadow .2s;
+    }
+    .sales-stat-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.15); }
+    .sales-stat-card::after { content:''; position:absolute; top:0; left:0; right:0; height:3px; border-radius:14px 14px 0 0; }
+    .sales-stat-card.total::after { background:linear-gradient(90deg,#8b5cf6,#a78bfa); }
+    .sales-stat-card.amount::after { background:linear-gradient(90deg,#f59e0b,#fde68a); }
+    .sales-stat-card.valid::after { background:linear-gradient(90deg,#10b981,#6ee7b7); }
+    .sales-stat-card.used::after { background:linear-gradient(90deg,#3b82f6,#93c5fd); }
+    .sales-stat-card.refund::after { background:linear-gradient(90deg,#f59e0b,#fcd34d); }
+    .sales-stat-card.cancel::after { background:linear-gradient(90deg,#ef4444,#fca5a5); }
+    .sales-stat-val { font-size:clamp(1rem, 1.5vw, 1.45rem); font-weight:800; color:var(--text); letter-spacing:-0.02em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .sales-stat-lbl { font-size:0.72rem; color:var(--text-muted); margin-top:4px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600; }
+    .sales-filter-panel {
+      background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:16px;
+      padding:22px; margin-bottom:20px; backdrop-filter:blur(8px);
+    }
+    .sales-filter-grid { display:grid; grid-template-columns:repeat(8, minmax(0, 1fr)); gap:10px 12px; margin-bottom:16px; }
+    .sales-filter-grid label { display:block; font-size:0.72rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px; }
+    .sales-filter-grid select, .sales-filter-grid input[type="date"] {
+      width:100%; background:rgba(255,255,255,0.06); border:1px solid var(--border); border-radius:10px;
+      padding:10px 12px; color:var(--text); font-size:0.85rem; transition:border-color .2s;
+    }
+    .sales-filter-grid select:focus, .sales-filter-grid input:focus { outline:none; border-color:var(--accent-purple); }
+    .sales-search-row { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+    .sales-search-input {
+      flex:1; min-width:220px; background:rgba(255,255,255,0.06); border:1px solid var(--border);
+      border-radius:12px; padding:12px 16px 12px 42px; color:var(--text); font-size:0.88rem;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Ccircle cx='8' cy='8' r='6'/%3E%3Cpath d='M16 16l-4-4'/%3E%3C/svg%3E");
+      background-repeat:no-repeat; background-position:14px center;
+    }
+    .sales-chips { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+    .sales-chip {
+      padding:7px 16px; border-radius:999px; font-size:0.78rem; font-weight:600; cursor:pointer;
+      border:1px solid var(--border); background:rgba(255,255,255,0.04); color:var(--text-muted);
+      transition:all .2s;
+    }
+    .sales-chip:hover, .sales-chip.active { border-color:var(--accent-purple); background:rgba(139,92,246,0.15); color:#c4b5fd; }
+    .sales-table-wrap {
+      border-radius:16px; border:1px solid var(--border); overflow:hidden;
+      background:rgba(255,255,255,0.02); box-shadow:0 4px 24px rgba(0,0,0,0.08);
+    }
+    .sales-table { width:100%; border-collapse:collapse; font-size:0.82rem; }
+    .sales-table thead { background:linear-gradient(180deg, rgba(139,92,246,0.12) 0%, rgba(139,92,246,0.04) 100%); }
+    .sales-table th {
+      padding:14px 16px; text-align:left; font-weight:700; font-size:0.72rem;
+      text-transform:uppercase; letter-spacing:0.06em; color:var(--accent-purple,#a78bfa);
+      white-space:nowrap; border-bottom:1px solid var(--border);
+    }
+    .sales-table td { padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.04); color:var(--text); vertical-align:middle; }
+    .sales-table tbody tr { transition:background .15s; }
+    .sales-table tbody tr:hover { background:rgba(139,92,246,0.06); }
+    .sales-table tbody tr:last-child td { border-bottom:none; }
+    .sales-ticket-code {
+      font-family:'Space Mono',ui-monospace,monospace; font-size:0.78rem; font-weight:700;
+      color:var(--accent-teal,#2dd4bf); background:rgba(45,212,191,0.1); padding:4px 10px; border-radius:6px;
+    }
+    .sales-price-wrap { display:flex; flex-direction:column; gap:2px; align-items:flex-end; }
+    .sales-price-orig { text-decoration:line-through; color:var(--text-muted); font-size:0.75rem; }
+    .sales-price-paid { font-weight:800; font-size:0.95rem; color:#fde68a; }
+    .sales-promo-badge {
+      display:inline-block; font-size:0.68rem; font-weight:700; padding:2px 8px; border-radius:999px;
+      background:rgba(245,158,11,0.15); color:#fcd34d; border:1px solid rgba(245,158,11,0.3); margin-top:2px;
+    }
+    .sales-event-cell { max-width:180px; }
+    .sales-event-title { font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .sales-event-meta { font-size:0.72rem; color:var(--text-muted); margin-top:2px; }
+    .sales-pagination {
+      display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px;
+      padding:16px 20px; border-top:1px solid var(--border); background:rgba(0,0,0,0.15);
+    }
+    .sales-page-info { font-size:0.82rem; color:var(--text-muted); }
+    .sales-page-btns { display:flex; gap:8px; align-items:center; }
+    .sales-page-btn {
+      padding:8px 16px; border-radius:10px; border:1px solid var(--border);
+      background:rgba(255,255,255,0.05); color:var(--text); font-size:0.82rem; font-weight:600;
+      cursor:pointer; transition:all .2s;
+    }
+    .sales-page-btn:hover:not(:disabled) { border-color:var(--accent-purple); background:rgba(139,92,246,0.12); }
+    .sales-page-btn:disabled { opacity:0.4; cursor:not-allowed; }
+    .sales-export-btn {
+      display:inline-flex; align-items:center; gap:8px; padding:10px 20px; border-radius:12px;
+      background:linear-gradient(135deg,#8b5cf6,#6366f1); border:none; color:#fff;
+      font-weight:700; font-size:0.85rem; cursor:pointer; transition:transform .2s, box-shadow .2s;
+      box-shadow:0 4px 16px rgba(139,92,246,0.35);
+    }
+    .sales-export-btn:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(139,92,246,0.45); }
+    .sales-empty { text-align:center; padding:60px 24px; color:var(--text-muted); }
+    .sales-empty-icon { font-size:3rem; margin-bottom:12px; opacity:0.5; }
+    .sales-org-col { display:none; }
+    .sales-panel.is-admin .sales-org-col { display:table-cell; }
+    .sales-panel.is-admin .sales-filter-org { display:block; }
+    .sales-filter-org { display:none; }
+
+    /* Dark/light: dropdown & date inputs readable */
+    .sales-filter-panel select,
+    .sales-filter-panel input[type="date"] { color-scheme: dark; }
+    .sales-filter-panel select option { background: #1e1e2e; color: #f1f5f9; }
+    [data-theme="light"] .sales-filter-panel select,
+    [data-theme="light"] .sales-filter-panel input[type="date"] { color-scheme: light; }
+    [data-theme="light"] .sales-filter-panel select option { background: #fff; color: #111; }
+
+    /* Wider layout + compact table */
+    main.container.dashboard-page { max-width:  min(1680px, 98vw); }
+    #tab-sales .sales-table { table-layout: fixed; width: 100%; font-size: 0.8rem; }
+    #tab-sales .sales-table th,
+    #tab-sales .sales-table td { padding: 10px 8px; vertical-align: middle; overflow: hidden; }
+    #tab-sales .sales-table thead th { color: #a78bfa !important; font-weight: 700; }
+    #tab-sales .sales-table .col-ticket { width: 7%; }
+    #tab-sales .sales-table .col-buyer { width: 7%; }
+    #tab-sales .sales-table .col-email { width: 12%; }
+    #tab-sales .sales-table .col-event { width: 10%; }
+    #tab-sales .sales-table .col-loc { width: 15%; }
+    #tab-sales .sales-table .col-seat { width: 6%; }
+    #tab-sales .sales-table .col-status { width: 6%; }
+    #tab-sales .sales-table .col-price { width: 8%; }
+    #tab-sales .sales-table .col-purchase { width: 10%; }
+    #tab-sales .sales-table .col-org { width: 7%; }
+    #tab-sales .sales-table td.col-email,
+    #tab-sales .sales-table td.col-purchase {
+      font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    #tab-sales .sales-table td.col-email { color: var(--text); }
+    #tab-sales .sales-table td.col-loc {
+      font-weight: 600; color: var(--text-muted); white-space: normal; line-height: 1.35; word-break: break-word;
+    }
+    #tab-sales .sales-table td.col-purchase { color: var(--text); }
+    #tab-sales .sales-event-meta { font-weight: 600; font-size: 0.72rem; color: var(--text-muted); }
+    [data-theme="light"] #tab-sales .att-status.valid { background: rgba(5,150,105,.18); color: #047857; border: 1px solid rgba(5,150,105,.45); }
+    [data-theme="light"] #tab-sales .att-status.used { background: rgba(37,99,235,.14); color: #1d4ed8; border: 1px solid rgba(37,99,235,.4); }
+    [data-theme="light"] #tab-sales .att-status.refund { background: rgba(217,119,6,.18); color: #b45309; border: 1px solid rgba(217,119,6,.45); }
+    [data-theme="light"] #tab-sales .att-status.cancel { background: rgba(220,38,38,.14); color: #b91c1c; border: 1px solid rgba(220,38,38,.4); }
+    [data-theme="light"] #tab-sales .sales-price-paid { color: #b45309 !important; font-weight: 800; }
+    #tab-sales .sales-table-wrap { overflow-x: auto; }
   </style>
 </head>
 <body>
@@ -106,6 +258,7 @@
         <button class="dash-nav-btn active" onclick="showTab('myevents',this)"><span>🎪</span> {{ t('my_events') }}</button>
         <button class="dash-nav-btn" onclick="showTab('create',this)"><span>➕</span> {{ t('create_event') }}</button>
         <button class="dash-nav-btn" onclick="showTab('revenue',this)"><span>💰</span> {{ t('revenue_report') }}</button>
+        <button class="dash-nav-btn" onclick="showTab('sales',this)"><span>📜</span> {{ t('sales_history') }}</button>
         <button class="dash-nav-btn" onclick="showTab('promotions',this)"><span>🎫</span> {{ t('promotions') }}</button>
         <button class="dash-nav-btn" onclick="showTab('validate',this)"><span>🔍</span> {{ t('qr_validation') }}</button>
       </nav>
@@ -266,6 +419,105 @@
 
         <h3 style="color:var(--text);margin:28px 0 16px;">{{ t('event_breakdown') }}</h3>
         <div id="revenueBreakdown"></div>
+      </section>
+
+      <!-- SALES HISTORY -->
+      <section id="tab-sales" class="dash-tab sales-panel" style="display:none;">
+        <div class="sales-hero">
+          <h2 class="sales-hero-title">📜 {{ t('sales_history_title') }}</h2>
+          <p class="sales-hero-desc">{{ t('sales_history_desc') }}</p>
+        </div>
+
+        <div class="sales-stats" id="salesStatsRow">
+          <div class="sales-stat-card total"><div class="sales-stat-val" id="salesStatTotal">—</div><div class="sales-stat-lbl">{{ t('total_tickets') }}</div></div>
+          <div class="sales-stat-card amount"><div class="sales-stat-val" id="salesStatAmount">—</div><div class="sales-stat-lbl">{{ t('total_amount_label') }}</div></div>
+          <div class="sales-stat-card valid"><div class="sales-stat-val" id="salesStatValid">—</div><div class="sales-stat-lbl">{{ t('valid_label') }}</div></div>
+          <div class="sales-stat-card used"><div class="sales-stat-val" id="salesStatUsed">—</div><div class="sales-stat-lbl">{{ t('used_label') }}</div></div>
+          <div class="sales-stat-card refund"><div class="sales-stat-val" id="salesStatRefund">—</div><div class="sales-stat-lbl">{{ t('refunded_label') }}</div></div>
+          <div class="sales-stat-card cancel"><div class="sales-stat-val" id="salesStatCancel">—</div><div class="sales-stat-lbl">{{ t('cancelled_label') }}</div></div>
+        </div>
+
+        <div class="sales-filter-panel">
+          <div class="sales-chips" id="salesDateChips">
+            <button type="button" class="sales-chip active" data-range="all">{{ t('all_time') }}</button>
+            <button type="button" class="sales-chip" data-range="7d">{{ t('last_7_days') }}</button>
+            <button type="button" class="sales-chip" data-range="month">{{ t('this_month') }}</button>
+          </div>
+          <div class="sales-filter-grid">
+            <div><label>{{ t('filter_event_label') }}</label><select id="salesEventFilter"><option value="">{{ t('filter_all_events') }}</option></select></div>
+            <div class="sales-filter-org"><label>{{ t('filter_organizer_label') }}</label><select id="salesOrgFilter"><option value="">{{ t('filter_all_organizers') }}</option></select></div>
+            <div><label>{{ t('filter_status_label') }}</label>
+              <select id="salesStatusFilter">
+                <option value="all">{{ t('filter_all_statuses') }}</option>
+                <option value="valid">{{ t('valid_status') }}</option>
+                <option value="used">{{ t('used_status') }}</option>
+                <option value="refunded">{{ t('refunded_status') }}</option>
+                <option value="refund_pending">{{ t('refund_pending_status') }}</option>
+                <option value="cancelled">{{ t('cancelled_status') }}</option>
+              </select>
+            </div>
+            <div><label>{{ t('sort_by_label') }}</label>
+              <select id="salesSortBy">
+                <option value="purchase_date">{{ t('sort_purchase_date') }}</option>
+                <option value="event_date">{{ t('sort_event_date') }}</option>
+                <option value="price">{{ t('sort_price') }}</option>
+                <option value="event_title">{{ t('sort_event_title') }}</option>
+              </select>
+            </div>
+            <div><label>{{ t('sort_order_label') }}</label>
+              <select id="salesSortOrder">
+                <option value="desc">{{ t('sort_desc') }}</option>
+                <option value="asc">{{ t('sort_asc') }}</option>
+              </select>
+            </div>
+            <div><label>{{ t('date_from_label') }}</label><input type="date" id="salesDateFrom"></div>
+            <div><label>{{ t('date_to_label') }}</label><input type="date" id="salesDateTo"></div>
+            <div><label>{{ t('rows_per_page') }}</label>
+              <select id="salesLimit">
+                <option value="25">25</option>
+                <option value="50" selected>50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+          </div>
+          <div class="sales-search-row">
+            <input type="text" class="sales-search-input" id="salesSearch" placeholder="{{ t('search_sales_placeholder') }}">
+            <button type="button" class="btn btn-outline" style="padding:10px 18px;border-radius:12px;" onclick="resetSalesFilters()">{{ t('clear_filters') }}</button>
+            <button type="button" class="sales-export-btn" onclick="exportSalesCSV()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              {{ t('export_sales_csv') }}
+            </button>
+          </div>
+        </div>
+
+        <div class="sales-table-wrap">
+          <div style="overflow-x:auto;">
+            <table class="sales-table">
+              <thead>
+                <tr>
+                  <th class="col-ticket">{{ t('ticket_key_col') }}</th>
+                  <th class="col-buyer">{{ t('buyer_col') }}</th>
+                  <th class="col-email">{{ t('email_col') }}</th>
+                  <th class="col-event">{{ t('event_col') }}</th>
+                  <th class="col-loc">{{ t('location_col') }}</th>
+                  <th class="col-seat">{{ t('seat_col') }}</th>
+                  <th class="col-status">{{ t('status') }}</th>
+                  <th class="col-price" style="text-align:right;">{{ t('price_col') }}</th>
+                  <th class="col-purchase">{{ t('purchase_date_col') }}</th>
+                  <th class="col-org sales-org-col">{{ t('organizer') }}</th>
+                </tr>
+              </thead>
+              <tbody id="salesTbody"><tr><td colspan="10" class="sales-empty"><div class="sales-empty-icon">📋</div>{{ t('loading') }}</td></tr></tbody>
+            </table>
+          </div>
+          <div class="sales-pagination" id="salesPagination" style="display:none;">
+            <div class="sales-page-info" id="salesPageInfo"></div>
+            <div class="sales-page-btns">
+              <button type="button" class="sales-page-btn" id="salesPrevBtn" onclick="salesChangePage(-1)">{{ t('page_prev') }}</button>
+              <button type="button" class="sales-page-btn" id="salesNextBtn" onclick="salesChangePage(1)">{{ t('page_next') }}</button>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- PROMOTIONS -->
@@ -446,8 +698,8 @@
       alert('This page is exclusive to organizers.');
       window.location.href = 'index.html';
     }
-    document.getElementById('orgName').textContent = currentUser.fullname;
-    var initials = currentUser.fullname.split(' ').map(function(w){ return w[0]; }).join('').toUpperCase().slice(0,2);
+    document.getElementById('orgName').textContent = currentUser.fullname || '{{ t("organizer") }}';
+    var initials = (currentUser.fullname || 'O').split(' ').map(function(w){ return w[0]; }).join('').toUpperCase().slice(0,2);
     document.getElementById('orgAvatar').textContent = initials;
 
     // ── Tab Switch ─────────────────────────────────────────────
@@ -470,6 +722,7 @@
 
       if (name === 'myevents') loadMyEvents();
       if (name === 'revenue') loadRevenue();
+      if (name === 'sales') initSalesHistory();
       if (name === 'promotions') loadPromotions();
       if (name === 'validate') initValidateTab();
       if (name === 'profile') loadProfile();
@@ -584,10 +837,31 @@
           html += '<div style="flex:1;">';
           html += '<div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:4px;flex-wrap:wrap;">';
           html += '<strong style="color:var(--text);">' + e.title + '</strong>';
-          
-          var recBadge = \'\';);
-             }
-          } catch(e) {}
+
+          var recBadge = '';
+          if (e.recurring_config) {
+            try {
+              var rc = JSON.parse(e.recurring_config);
+              var recLabels = {daily: '{{ t("recurrence_daily") }}', weekly: '{{ t("recurrence_weekly") }}', monthly: '{{ t("recurrence_monthly") }}'};
+              recBadge = '<span class="recurring-badge parent">🔁 ' + (recLabels[rc.type] || rc.type) + ' {{ t("recurrence_repeat") }}</span>';
+            } catch(ex) {}
+          } else if (e.parent_event_id) {
+            recBadge = '<span class="recurring-badge child">🔗 {{ t("recurrence_sessions") }}</span>';
+          }
+
+          html += '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">';
+          if (recBadge) html += recBadge;
+          html += '<span style="background:' + statusColor + '22;color:' + statusColor + ';border:1px solid ' + statusColor + '44;border-radius:20px;padding:2px 10px;font-size:0.75rem;">' + statusTxt + '</span>';
+          html += '</div>';
+          html += '</div>';
+
+          var formattedDate = e.date;
+          try {
+            var dObj = new Date(e.date);
+            if (!isNaN(dObj)) {
+              formattedDate = dObj.toLocaleDateString('tr-TR', {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
+            }
+          } catch(ex) {}
 
           html += '<p style="color:var(--text-muted);font-size:0.82rem;margin:2px 0;">' + formattedDate + ' | ' + e.location + '</p>';
           html += '<p style="color:var(--text-muted);font-size:0.82rem;margin:2px 0;">' + e.price.toLocaleString('en-US') + ' TL | Capacity: ' + e.sold_count + '/' + e.capacity + '</p>';
@@ -1432,6 +1706,249 @@
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(link.href);
+    }
+
+    // ── Sales History ─────────────────────────────────────────────
+    var _salesPage = 1;
+    var _salesInited = false;
+    var SALES_I18N = {
+      noSales: '{{ t("no_sales_found") }}',
+      loadError: '{{ t("sales_load_error") }}',
+      pageOf: '{{ t("page_of") }}',
+      showing: '{{ t("showing_records") }}',
+      generalAdmission: '{{ t("general_admission") }}',
+      discountApplied: '{{ t("discount_applied") }}',
+      status: {
+        valid: '{{ t("valid_status") }}',
+        used: '{{ t("used_status") }}',
+        refunded: '{{ t("refunded_status") }}',
+        refund_pending: '{{ t("refund_pending_status") }}',
+        cancelled: '{{ t("cancelled_status") }}'
+      }
+    };
+
+    function initSalesHistory() {
+      if (!_salesInited) {
+        _salesInited = true;
+        ['salesEventFilter','salesStatusFilter','salesSortBy','salesSortOrder','salesLimit','salesDateFrom','salesDateTo'].forEach(function(id){
+          var el = document.getElementById(id);
+          if (el) el.addEventListener('change', function(){ _salesPage = 1; loadSalesHistory(); });
+        });
+        var orgEl = document.getElementById('salesOrgFilter');
+        if (orgEl) orgEl.addEventListener('change', function(){ _salesPage = 1; loadSalesHistory(); });
+        var searchEl = document.getElementById('salesSearch');
+        if (searchEl) {
+          var timer;
+          searchEl.addEventListener('input', function(){
+            clearTimeout(timer);
+            timer = setTimeout(function(){ _salesPage = 1; loadSalesHistory(); }, 350);
+          });
+        }
+        document.querySelectorAll('#salesDateChips .sales-chip').forEach(function(chip){
+          chip.addEventListener('click', function(){
+            document.querySelectorAll('#salesDateChips .sales-chip').forEach(function(c){ c.classList.remove('active'); });
+            chip.classList.add('active');
+            applySalesDatePreset(chip.getAttribute('data-range'));
+            _salesPage = 1;
+            loadSalesHistory();
+          });
+        });
+        loadSalesEventOptions();
+      }
+      loadSalesHistory();
+    }
+
+    function applySalesDatePreset(range) {
+      var from = document.getElementById('salesDateFrom');
+      var to = document.getElementById('salesDateTo');
+      var today = new Date();
+      var pad = function(n){ return String(n).padStart(2,'0'); };
+      var fmt = function(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); };
+      if (range === 'all') {
+        from.value = ''; to.value = '';
+      } else if (range === '7d') {
+        var d7 = new Date(today); d7.setDate(d7.getDate() - 7);
+        from.value = fmt(d7); to.value = fmt(today);
+      } else if (range === 'month') {
+        from.value = today.getFullYear()+'-'+pad(today.getMonth()+1)+'-01';
+        to.value = fmt(today);
+      }
+    }
+
+    function resetSalesFilters() {
+      document.getElementById('salesEventFilter').value = '';
+      document.getElementById('salesStatusFilter').value = 'all';
+      document.getElementById('salesSortBy').value = 'purchase_date';
+      document.getElementById('salesSortOrder').value = 'desc';
+      document.getElementById('salesLimit').value = '50';
+      document.getElementById('salesSearch').value = '';
+      document.getElementById('salesDateFrom').value = '';
+      document.getElementById('salesDateTo').value = '';
+      var orgEl = document.getElementById('salesOrgFilter');
+      if (orgEl) orgEl.value = '';
+      document.querySelectorAll('#salesDateChips .sales-chip').forEach(function(c,i){ c.classList.toggle('active', i===0); });
+      _salesPage = 1;
+      loadSalesHistory();
+    }
+
+    function loadSalesEventOptions() {
+      fetch('/api/organizer/events', { headers: { 'Authorization': 'Bearer ' + getToken() } })
+      .then(function(r){ return r.json(); })
+      .then(function(events){
+        var sel = document.getElementById('salesEventFilter');
+        var cur = sel.value;
+        sel.innerHTML = '<option value="">{{ t("filter_all_events") }}</option>';
+        (events||[]).forEach(function(e){
+          var opt = document.createElement('option');
+          opt.value = e.id;
+          opt.textContent = e.title + (e.date ? ' · ' + e.date.slice(0,10) : '');
+          sel.appendChild(opt);
+        });
+        if (cur) sel.value = cur;
+      }).catch(function(){});
+    }
+
+    function salesQueryParams(forExport) {
+      var p = new URLSearchParams();
+      var ev = document.getElementById('salesEventFilter').value;
+      var st = document.getElementById('salesStatusFilter').value;
+      var sb = document.getElementById('salesSortBy').value;
+      var so = document.getElementById('salesSortOrder').value;
+      var lim = document.getElementById('salesLimit').value;
+      var q = document.getElementById('salesSearch').value.trim();
+      var df = document.getElementById('salesDateFrom').value;
+      var dt = document.getElementById('salesDateTo').value;
+      var orgEl = document.getElementById('salesOrgFilter');
+      if (ev) p.set('event_id', ev);
+      if (st && st !== 'all') p.set('status', st);
+      p.set('sort_by', sb);
+      p.set('sort_order', so);
+      if (q) p.set('search', q);
+      if (df) p.set('date_from', df);
+      if (dt) p.set('date_to', dt);
+      if (orgEl && orgEl.value) p.set('organizer_id', orgEl.value);
+      if (!forExport) { p.set('page', _salesPage); p.set('limit', lim); }
+      return p.toString();
+    }
+
+    function formatEventDate(s) {
+      if (!s) return '—';
+      var raw = String(s).trim().slice(0, 16).replace(' ', 'T');
+      var m = raw.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+      if (m) {
+        var d = new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]);
+        var pad = function(n){ return String(n).padStart(2,'0'); };
+        return pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear()+' '+pad(d.getHours())+':'+pad(d.getMinutes());
+      }
+      return formatPurchaseDate(s);
+    }
+
+    function formatPurchaseDate(s) {
+      if (!s) return '—';
+      var raw = String(s).trim();
+      var iso = raw.includes('T') ? raw : raw.replace(' ', 'T');
+      if (!/Z|[+-]\d{2}/.test(iso)) iso += 'Z';
+      var d = new Date(iso);
+      if (isNaN(d)) return raw.slice(0, 16);
+      return d.toLocaleString('tr-TR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', hour12: false }).replace(',', '');
+    }
+
+    function renderSalesPrice(item) {
+      if (item.has_discount) {
+        var promo = item.promo_code
+          ? '<span class="sales-promo-badge">🏷 '+item.promo_code+'</span>'
+          : '<span class="sales-promo-badge">'+SALES_I18N.discountApplied+'</span>';
+        return '<div class="sales-price-wrap"><span class="sales-price-orig">'+item.original_price.toLocaleString('en-US')+' ₺</span><span class="sales-price-paid">'+item.price.toLocaleString('en-US')+' ₺</span>'+promo+'</div>';
+      }
+      return '<div class="sales-price-wrap"><span class="sales-price-paid">'+item.price.toLocaleString('en-US')+' ₺</span></div>';
+    }
+
+    function renderSalesStatus(st) {
+      var cls = { valid:'valid', used:'used', refund_pending:'refund', refunded:'refund', cancelled:'cancel' };
+      return '<span class="att-status '+(cls[st]||'')+'">'+(SALES_I18N.status[st]||st)+'</span>';
+    }
+
+    function loadSalesHistory() {
+      var tbody = document.getElementById('salesTbody');
+      tbody.innerHTML = '<tr><td colspan="10" class="sales-empty"><div class="sales-empty-icon">⏳</div>{{ t("loading") }}</td></tr>';
+      fetch('/api/organizer/sales-history?' + salesQueryParams(false), {
+        headers: { 'Authorization': 'Bearer ' + getToken() }
+      })
+      .then(function(r){
+        if (!r.ok) {
+          return r.json().catch(function(){ return {}; }).then(function(e){
+            throw new Error((e && e.message) || ('HTTP ' + r.status));
+          });
+        }
+        return r.json();
+      })
+      .then(function(data){
+        var s = data.summary || {};
+        document.getElementById('salesStatTotal').textContent = (s.total_count||0).toLocaleString('en-US');
+        document.getElementById('salesStatAmount').innerHTML = (s.total_amount||0).toLocaleString('en-US') + '<span style="font-size:0.75em;margin-left:3px;opacity:0.85;">₺</span>';
+        document.getElementById('salesStatValid').textContent = (s.valid_count||0).toLocaleString('en-US');
+        document.getElementById('salesStatUsed').textContent = (s.used_count||0).toLocaleString('en-US');
+        document.getElementById('salesStatRefund').textContent = (s.refunded_count||0).toLocaleString('en-US');
+        document.getElementById('salesStatCancel').textContent = (s.cancelled_count||0).toLocaleString('en-US');
+
+        var items = data.items || [];
+        var pag = data.pagination || {};
+        if (!items.length) {
+          tbody.innerHTML = '<tr><td colspan="10" class="sales-empty"><div class="sales-empty-icon">📭</div>'+SALES_I18N.noSales+'</td></tr>';
+        } else {
+          tbody.innerHTML = items.map(function(a){
+            var seat = a.seat === 'General Admission' ? SALES_I18N.generalAdmission : (a.seat||'—');
+            return '<tr>' +
+              '<td class="col-ticket"><span class="sales-ticket-code">' + (a.ticket_key||'—') + '</span></td>' +
+              '<td class="col-buyer" style="font-weight:600;">' + (a.full_name||'—') + '</td>' +
+              '<td class="col-email">' + (a.email||'—') + '</td>' +
+              '<td class="col-event sales-event-cell"><div class="sales-event-title">' + (a.event_title||'—') + '</div><div class="sales-event-meta">' + formatEventDate(a.event_date) + '</div></td>' +
+              '<td class="col-loc">' + (a.event_location||'—') + '</td>' +
+              '<td class="col-seat">' + seat + '</td>' +
+              '<td class="col-status">' + renderSalesStatus(a.status) + '</td>' +
+              '<td class="col-price" style="text-align:right;">' + renderSalesPrice(a) + '</td>' +
+              '<td class="col-purchase">' + formatPurchaseDate(a.purchased_at) + '</td>' +
+              '<td class="col-org sales-org-col">' + (a.organizer_name||'—') + '</td>' +
+            '</tr>';
+          }).join('');
+        }
+
+        var pagEl = document.getElementById('salesPagination');
+        if (pag.total > 0) {
+          pagEl.style.display = 'flex';
+          var shown = items.length;
+          document.getElementById('salesPageInfo').textContent =
+            SALES_I18N.showing.replace('{shown}', shown).replace('{total}', pag.total) + ' · ' +
+            SALES_I18N.pageOf.replace('{page}', pag.page).replace('{pages}', pag.pages);
+          document.getElementById('salesPrevBtn').disabled = pag.page <= 1;
+          document.getElementById('salesNextBtn').disabled = pag.page >= pag.pages;
+        } else {
+          pagEl.style.display = 'none';
+        }
+      })
+      .catch(function(){
+        tbody.innerHTML = '<tr><td colspan="10" class="sales-empty" style="color:#fca5a5;">⚠ '+SALES_I18N.loadError+'</td></tr>';
+      });
+    }
+
+    function salesChangePage(delta) {
+      _salesPage = Math.max(1, _salesPage + delta);
+      loadSalesHistory();
+    }
+
+    function exportSalesCSV() {
+      var url = '/api/organizer/sales-history/export?' + salesQueryParams(true);
+      fetch(url, { headers: { 'Authorization': 'Bearer ' + getToken() } })
+      .then(function(r){ return r.blob(); })
+      .then(function(blob){
+        var link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'Sales_History.csv';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+      });
     }
 
     // ── Init ──────────────────────────────────────────────────────────

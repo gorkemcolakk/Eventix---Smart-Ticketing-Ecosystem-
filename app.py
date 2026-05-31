@@ -33,12 +33,15 @@ from routes.organizer import organizer_bp
 from routes.admin import admin_bp
 from routes.upload import upload_bp
 from routes.contact import contact_bp
+from database import run_schema_migrations
 
 app = Flask(__name__, static_folder=None, template_folder=os.path.join(BASE_DIR, 'templates'))
 CORS(app)
 app.config['SECRET_KEY'] = SECRET_KEY
 limiter.init_app(app)
 cache.init_app(app)
+
+run_schema_migrations()
 
 # Register blueprints
 app.register_blueprint(auth_bp)
