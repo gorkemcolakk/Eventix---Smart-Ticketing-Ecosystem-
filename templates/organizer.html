@@ -977,9 +977,7 @@
             </div>`;
           }).join('')}
         </div>`;
-      } catch(err) {
-        el.innerHTML = '<p class="loading-text" style="color:#f87171;">{{ t("failed_to_load") }}</p>';
-      }
+      } catch(err) { el.innerHTML = '<p class="loading-text" style="color:#f87171;">{{ t(\\'failed_to_load\\') }}</p>'; }
     }
 
 
@@ -2035,8 +2033,8 @@
     // ── Init ──────────────────────────────────────────────────────────
     window.addEventListener('DOMContentLoaded', () => {
       const p = new URLSearchParams(window.location.search);
-      const t = p.get('tab') || 'myevents';
-      showTab(t);
+      const initTab = p.get('tab') || 'myevents';
+      showTab(initTab);
     });
   </script>
   <script>
