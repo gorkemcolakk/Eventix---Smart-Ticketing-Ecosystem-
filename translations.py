@@ -297,7 +297,7 @@ TRANSLATIONS = {
         'price_col': 'Fiyat',
         'date_col': 'Tarih',
         'capacity': 'Kapasite',
-        'tickets_sold': 'Satılan Biletler',
+        'tickets_sold': 'Satılan Bilet Adedi',
         'scan_image_file': 'Görüntü Dosyası Tara',
         'request_camera': 'Kamera İzni İste',
         'csv_ticket_key': 'Bilet Anahtarı',

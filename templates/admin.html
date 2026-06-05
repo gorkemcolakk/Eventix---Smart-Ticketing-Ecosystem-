@@ -658,36 +658,108 @@
     // ── USERS ─────────────────────────────────────────────────
     async function loadUsers() {
       const el = document.getElementById('usersList');
-      el.innerHTML = '<p class="loading-text">{{ t('loading') }}</p>';
+      el.innerHTML = '<p class="loading-text">{{ t("loading") }}</p>';
       try {
         const r = await fetch('/api/admin/users', { headers: authHeaders() });
         const users = await r.json();
-        const roleLabel = r => ({ admin: '⚙ {{ t('admin_panel') }}', organizer: '🎪 Org.', customer: '🎟 Customer' }[r] || r);
-        const roleColor = r => ({ admin: '#ef4444', organizer: '#f59e0b', customer: '#22c55e' }[r] || '#6b7280');
-        el.innerHTML = `<p style="color:var(--text-muted);margin-bottom:14px;font-size:0.85rem;">${users.length} {{ t('users') }}</p>
-          <div class="glass-panel" style="overflow:auto;">
-            <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
-              <thead><tr style="border-bottom:1px solid var(--border);">
-                <th style="text-align:left;padding:10px 14px;color:var(--text-muted);font-weight:500;">#</th>
-                <th style="text-align:left;padding:10px 14px;color:var(--text-muted);font-weight:500;">{{ t('full_name_col') }}</th>
-                <th style="text-align:left;padding:10px 14px;color:var(--text-muted);font-weight:500;">{{ t('email_col') }}</th>
-                <th style="text-align:left;padding:10px 14px;color:var(--text-muted);font-weight:500;">{{ t('role_col') }}</th>
-                <th style="text-align:left;padding:10px 14px;color:var(--text-muted);font-weight:500;">{{ t('registered_col') }}</th>
-              </tr></thead>
-              <tbody>${users.map(u => `
-              <tr style="border-bottom:1px solid var(--border);">
-                <td style="padding:10px 14px;color:var(--text-muted);">${u.id}</td>
-                <td style="padding:10px 14px;color:var(--text);font-weight:600;">${u.fullname}</td>
-                <td style="padding:14px 14px;color:var(--text-sub);">${u.email}</td>
-                 <td style="padding:10px 14px;">
-                  <span style="background:${roleColor(u.role)}18;color:${roleColor(u.role)};border:1px solid ${roleColor(u.role)}44;border-radius:100px;padding:2px 10px;font-size:0.72rem;font-weight:600;">${roleLabel(u.role)}</span>
-                </td>
-                <td style="padding:10px 14px;color:var(--text-muted);font-size:0.78rem;">${new Date(u.created_at).toLocaleDateString('tr-TR')}</td>
-              </tr>`).join('')}</tbody>
-            </table>
+
+        const roleMeta = {
+          admin:     { label: '{{ t("admin_panel") }}', color: '#ef4444', bg: 'rgba(239,68,68,0.12)', border: 'rgba(239,68,68,0.3)', icon: '⚙️' },
+          organizer: { label: '{{ t("organizer") }}',   color: '#f59e0b', bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.3)', icon: '🎪' },
+          customer:  { label: '{{ t("customer") }}',    color: '#22c55e', bg: 'rgba(34,197,94,0.12)',  border: 'rgba(34,197,94,0.3)',  icon: '🎟️' },
+          guest:     { label: '{{ t("guest") }}',       color: '#6b7280', bg: 'rgba(107,114,128,0.1)', border: 'rgba(107,114,128,0.25)', icon: '👤' },
+        };
+        const getMeta = role => roleMeta[role] || roleMeta.guest;
+        const getInitials = name => (name || '?').split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+        const avatarColors = ['#8b5cf6','#3b82f6','#ec4899','#f59e0b','#14b8a6','#ef4444','#22c55e','#6366f1'];
+        const getAvatarColor = (name) => avatarColors[(name||'').charCodeAt(0) % avatarColors.length];
+
+        const admins    = users.filter(u => u.role === 'admin').length;
+        const orgs      = users.filter(u => u.role === 'organizer').length;
+        const customers = users.filter(u => u.role === 'customer').length;
+        const guests    = users.filter(u => u.role === 'guest').length;
+
+        el.innerHTML = `
+          <!-- Stats Bar -->
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;">
+            ${[
+              { label:'{{ t("users") }}',     val: users.length, color:'#8b5cf6', icon:'👥' },
+              { label:'{{ t("organizer") }}s', val: orgs,         color:'#f59e0b', icon:'🎪' },
+              { label:'{{ t("customer") }}s',  val: customers,     color:'#22c55e', icon:'🎟️' },
+              { label:'{{ t("guest") }}s',     val: guests,        color:'#6b7280', icon:'👤' },
+            ].map(s => `
+              <div class="glass-panel" style="padding:16px 18px;display:flex;align-items:center;gap:14px;border-top:2px solid ${s.color};">
+                <div style="font-size:1.5rem;">${s.icon}</div>
+                <div>
+                  <div style="font-size:1.5rem;font-weight:800;color:${s.color};line-height:1;">${s.val}</div>
+                  <div style="font-size:0.7rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-top:3px;">${s.label}</div>
+                </div>
+              </div>`).join('')}
+          </div>
+
+          <!-- Search & Filter -->
+          <div style="display:flex;gap:10px;margin-bottom:18px;align-items:center;">
+            <input id="userSearch" type="text" placeholder="🔍 {{ t('search') }}..." oninput="filterUsers()"
+              style="flex:1;background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:9px 14px;color:var(--text);font-size:0.85rem;outline:none;transition:border-color .2s;"
+              onfocus="this.style.borderColor='#8b5cf6'" onblur="this.style.borderColor='var(--border)'">
+            <select id="userRoleFilter" onchange="filterUsers()"
+              style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:9px 14px;color:var(--text);font-size:0.85rem;outline:none;">
+              <option value="">{{ t('role_col') }}: {{ t('all_events') }}</option>
+              <option value="admin">Admin</option>
+              <option value="organizer">{{ t('organizer') }}</option>
+              <option value="customer">{{ t('customer') }}</option>
+              <option value="guest">{{ t('guest') }}</option>
+            </select>
+          </div>
+
+          <!-- User Cards Grid -->
+          <div id="usersGrid" style="display:flex;flex-direction:column;gap:8px;">
+            ${users.map((u, i) => {
+              const m = getMeta(u.role);
+              const initials = getInitials(u.fullname);
+              const avatarBg = getAvatarColor(u.fullname);
+              const dateStr = u.created_at ? new Date(u.created_at).toLocaleDateString('tr-TR', {day:'numeric',month:'short',year:'numeric'}) : '-';
+              return `
+              <div class="user-card" data-name="${(u.fullname||'').toLowerCase()}" data-email="${(u.email||'').toLowerCase()}" data-role="${u.role}"
+                style="display:flex;align-items:center;gap:16px;padding:14px 18px;background:var(--bg-surface);border:1px solid var(--border);border-radius:14px;transition:all 0.2s;cursor:default;"
+                onmouseenter="this.style.borderColor='${m.color}55';this.style.background='var(--bg-surface-hover,var(--bg-surface))';this.style.transform='translateX(3px)'"
+                onmouseleave="this.style.borderColor='var(--border)';this.style.transform='none'">
+                <!-- Avatar -->
+                <div style="width:42px;height:42px;border-radius:50%;background:${avatarBg};display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;color:#fff;flex-shrink:0;letter-spacing:0.5px;">
+                  ${initials}
+                </div>
+                <!-- Name + Email -->
+                <div style="flex:1;min-width:0;">
+                  <div style="font-weight:700;color:var(--text);font-size:0.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${u.fullname || '-'}</div>
+                  <div style="font-size:0.78rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${u.email}</div>
+                </div>
+                <!-- Role Badge -->
+                <div style="flex-shrink:0;">
+                  <span style="background:${m.bg};color:${m.color};border:1px solid ${m.border};border-radius:100px;padding:4px 12px;font-size:0.72rem;font-weight:700;white-space:nowrap;">
+                    ${m.icon} ${m.label}
+                  </span>
+                </div>
+                <!-- Date -->
+                <div style="flex-shrink:0;text-align:right;min-width:80px;">
+                  <div style="font-size:0.75rem;color:var(--text-muted);">${dateStr}</div>
+                  <div style="font-size:0.68rem;color:var(--text-muted);opacity:0.6;">#${i+1}</div>
+                </div>
+              </div>`;
+            }).join('')}
           </div>`;
-      } catch { el.innerHTML = '<p class="loading-text" style="color:#f87171;">{{ t('failed_to_load') }}</p>'; }
+      } catch { el.innerHTML = '<p class="loading-text" style="color:#f87171;">{{ t("failed_to_load") }}</p>'; }
     }
+
+    function filterUsers() {
+      const q = (document.getElementById('userSearch')?.value || '').toLowerCase();
+      const role = document.getElementById('userRoleFilter')?.value || '';
+      document.querySelectorAll('.user-card').forEach(card => {
+        const nameMatch = card.dataset.name.includes(q) || card.dataset.email.includes(q);
+        const roleMatch = !role || card.dataset.role === role;
+        card.style.display = (nameMatch && roleMatch) ? '' : 'none';
+      });
+    }
+
 
     // ── ALL EVENTS ────────────────────────────────────────────
     async function loadAllEvents() {
@@ -883,23 +955,23 @@
         <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:30px;">
           <div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid #3b82f6;">
             <div style="font-size:1.6rem;font-weight:700;color:#3b82f6;">${d.total_tickets || 0}</div>
-            <div style="color:#93c5fd;font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;">{{ t('sold_ticket_count') }}</div>
+            <div style="color:var(--text-muted);font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;">{{ t('sold_ticket_count') }}</div>
           </div>
           <div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid var(--gold);">
             <div style="font-size:1.6rem;font-weight:700;color:var(--gold);">${(d.total_revenue || 0).toLocaleString('en-US')} ₺</div>
-            <div style="color:#fcd34d;font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;">{{ t('tickets_sold_revenue') }}</div>
+            <div style="color:var(--text-muted);font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;">{{ t('tickets_sold_revenue') }}</div>
           </div>
           <div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid #ef4444;">
             <div style="font-size:1.6rem;font-weight:700;color:#ef4444;">${(d.commission || 0).toLocaleString('en-US')} ₺</div>
-            <div style="color:#fca5a5;font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;white-space:nowrap;">{{ t('platform_commission') }} (%${((d.commission_rate || 0.1)*100).toFixed(0)})</div>
+            <div style="color:var(--text-muted);font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;white-space:nowrap;">{{ t('platform_commission') }} (%${((d.commission_rate || 0.1)*100).toFixed(0)})</div>
           </div>
           <div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid #8b5cf6;box-shadow:0 4px 20px rgba(139,92,246,0.15);">
             <div style="font-size:1.6rem;font-weight:700;background:linear-gradient(135deg,#8b5cf6,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">${(d.total_admin_refund_fee || 0).toLocaleString('en-US')} ₺</div>
-            <div style="color:#c4b5fd;font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;white-space:nowrap;">{{ t('refund_revenue') }} (%5)</div>
+            <div style="color:var(--text-muted);font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;white-space:nowrap;">{{ t('refund_revenue') }} (%5)</div>
           </div>
           <div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid #22c55e;">
             <div style="font-size:1.6rem;font-weight:700;color:#22c55e;">${(d.platform_net_income || 0).toLocaleString('en-US')} ₺</div>
-            <div style="color:#86efac;font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;">{{ t('net_platform_revenue') }}</div>
+            <div style="color:var(--text-muted);font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;">{{ t('net_platform_revenue') }}</div>
           </div>
         </div>
 
@@ -913,12 +985,12 @@
             <div style="overflow-x:auto;">
               <table style="width:100%;border-collapse:collapse;font-size:0.88rem;">
                 <thead><tr style="border-bottom:1px solid var(--border);text-align:left;">
-                  <th style="padding:12px 8px;color:var(--text-muted);font-weight:500;">{{ t('organizer') }}</th>
-                  <th title="{{ t('th_tickets_sold_tip') }}" style="padding:12px 8px;color:var(--text-muted);font-weight:500;white-space:nowrap;">{{ t('th_tickets_sold') }}</th>
-                  <th title="{{ t('th_sales_amount_tip') }}" style="padding:12px 8px;color:var(--text-muted);font-weight:500;text-align:right;white-space:nowrap;">{{ t('th_sales_amount') }}</th>
-                  <th title="{{ t('th_commission_tip') }}" style="padding:12px 8px;color:var(--text-muted);font-weight:500;text-align:right;white-space:nowrap;">{{ t('th_commission_short') }} %${((d.commission_rate || 0.1)*100).toFixed(0)}</th>
-                  <th title="{{ t('th_refund_fee_tip') }}" style="padding:12px 8px;color:var(--text-muted);font-weight:500;text-align:right;white-space:nowrap;">{{ t('th_refund_fee_short') }} %5</th>
-                  <th title="{{ t('th_net_payout_tip') }}" style="padding:12px 8px;color:var(--text-muted);font-weight:500;text-align:right;white-space:nowrap;">{{ t('th_net_payout') }}</th>
+                  <th style="padding:12px 8px;color:var(--text);font-weight:700;">{{ t('organizer') }}</th>
+                  <th title="{{ t('th_tickets_sold_tip') }}" style="padding:12px 8px;color:var(--text);font-weight:700;white-space:nowrap;">{{ t('th_tickets_sold') }}</th>
+                  <th title="{{ t('th_sales_amount_tip') }}" style="padding:12px 8px;color:var(--text);font-weight:700;text-align:right;white-space:nowrap;">{{ t('th_sales_amount') }}</th>
+                  <th title="{{ t('th_commission_tip') }}" style="padding:12px 8px;color:var(--text);font-weight:700;text-align:right;white-space:nowrap;">{{ t('th_commission_short') }} %${((d.commission_rate || 0.1)*100).toFixed(0)}</th>
+                  <th title="{{ t('th_refund_fee_tip') }}" style="padding:12px 8px;color:var(--text);font-weight:700;text-align:right;white-space:nowrap;">{{ t('th_refund_fee_short') }} %5</th>
+                  <th title="{{ t('th_net_payout_tip') }}" style="padding:12px 8px;color:var(--text);font-weight:700;text-align:right;white-space:nowrap;">{{ t('th_net_payout') }}</th>
                 </tr></thead>
                 <tbody>
                   ${d.organizer_breakdown.map(o => `
@@ -928,10 +1000,10 @@
                         <div style="font-size:0.75rem;color:var(--text-muted);">${o.email}</div>
                       </td>
                       <td style="padding:14px 8px;color:var(--text-sub);white-space:nowrap;">${o.total_tickets}</td>
-                      <td style="padding:14px 8px;color:var(--text);font-weight:600;text-align:right;white-space:nowrap;">${o.gross_revenue.toLocaleString('en-US')} ₺</td>
+                      <td style="padding:14px 8px;color:#f59e0b;font-weight:700;text-align:right;white-space:nowrap;">${o.gross_revenue.toLocaleString('en-US')} ₺</td>
                       <td style="padding:14px 8px;color:var(--coral);text-align:right;font-weight:500;white-space:nowrap;">-${o.commission.toLocaleString('en-US')} ₺</td>
                       <td style="padding:14px 8px;text-align:right;font-weight:600;color:#a78bfa;white-space:nowrap;">${(o.admin_refund_fee||0) > 0 ? '+' + (o.admin_refund_fee||0).toLocaleString('en-US') + ' ₺' : '0 ₺'}</td>
-                      <td style="padding:14px 8px;color:var(--teal);text-align:right;font-weight:700;font-family:'Space Mono';white-space:nowrap;">${o.net_revenue.toLocaleString('en-US')} ₺</td>
+                      <td style="padding:14px 8px;color:#22c55e;text-align:right;font-weight:700;white-space:nowrap;">${o.net_revenue.toLocaleString('en-US')} ₺</td>
                     </tr>
                   `).join('')}
                 </tbody>
@@ -948,14 +1020,14 @@
             <div style="overflow-x:auto;">
               <table style="width:100%;border-collapse:collapse;font-size:0.88rem;">
                 <thead><tr style="border-bottom:1px solid var(--border);text-align:left;">
-                  <th style="padding:12px 8px;color:var(--text-muted);font-weight:500;">{{ t('event_col') }}</th>
-                  <th style="padding:12px 8px;color:var(--text-muted);font-weight:500;">{{ t('organizer') }}</th>
-                  <th style="padding:12px 8px;color:var(--text-muted);font-weight:500;">{{ t('status') }}</th>
-                  <th style="padding:12px 8px;color:var(--text-muted);font-weight:500;white-space:nowrap;">{{ t('capacity') }}</th>
-                  <th title="{{ t('th_sales_amount_tip') }}" style="padding:12px 8px;color:var(--text-muted);font-weight:500;text-align:right;white-space:nowrap;">{{ t('th_sales_amount') }}</th>
-                  <th title="{{ t('th_commission_tip') }}" style="padding:12px 8px;color:var(--text-muted);font-weight:500;text-align:right;white-space:nowrap;">{{ t('th_commission_short') }} %${((d.commission_rate || 0.1)*100).toFixed(0)}</th>
-                  <th title="{{ t('th_refund_fee_tip') }}" style="padding:12px 8px;color:var(--text-muted);font-weight:500;text-align:right;white-space:nowrap;">{{ t('th_refund_fee_short') }} %5</th>
-                  <th title="{{ t('th_net_payout_tip') }}" style="padding:12px 8px;color:var(--text-muted);font-weight:500;text-align:right;white-space:nowrap;">{{ t('th_net_payout') }}</th>
+                  <th style="padding:12px 8px;color:var(--text);font-weight:700;">{{ t('event_col') }}</th>
+                  <th style="padding:12px 8px;color:var(--text);font-weight:700;">{{ t('organizer') }}</th>
+                  <th style="padding:12px 8px;color:var(--text);font-weight:700;">{{ t('status') }}</th>
+                  <th style="padding:12px 8px;color:var(--text);font-weight:700;white-space:nowrap;">{{ t('capacity') }}</th>
+                  <th title="{{ t('th_sales_amount_tip') }}" style="padding:12px 8px;color:var(--text);font-weight:700;text-align:right;white-space:nowrap;">{{ t('th_sales_amount') }}</th>
+                  <th title="{{ t('th_commission_tip') }}" style="padding:12px 8px;color:var(--text);font-weight:700;text-align:right;white-space:nowrap;">{{ t('th_commission_short') }} %${((d.commission_rate || 0.1)*100).toFixed(0)}</th>
+                  <th title="{{ t('th_refund_fee_tip') }}" style="padding:12px 8px;color:var(--text);font-weight:700;text-align:right;white-space:nowrap;">{{ t('th_refund_fee_short') }} %5</th>
+                  <th title="{{ t('th_net_payout_tip') }}" style="padding:12px 8px;color:var(--text);font-weight:700;text-align:right;white-space:nowrap;">{{ t('th_net_payout') }}</th>
                 </tr></thead>
                 <tbody>
                   ${d.breakdown.map(ev => {
@@ -973,11 +1045,11 @@
                       <td style="padding:14px 8px;">
                         <span style="color:${statusColor};font-size:0.75rem;font-weight:600;">● ${statusLabel}</span>
                       </td>
-                      <td style="padding:14px 8px;color:var(--text-sub);white-space:nowrap;">${ev.sold_count} / ${ev.capacity}</td>
-                      <td style="padding:14px 8px;color:var(--text);font-weight:600;text-align:right;white-space:nowrap;">${ev.gross_revenue.toLocaleString('en-US')} ₺</td>
+                      <td style="padding:14px 8px;color:#3b82f6;font-weight:700;white-space:nowrap;">${ev.sold_count} / ${ev.capacity}</td>
+                      <td style="padding:14px 8px;color:#f59e0b;font-weight:700;text-align:right;white-space:nowrap;">${ev.gross_revenue.toLocaleString('en-US')} ₺</td>
                       <td style="padding:14px 8px;color:var(--coral);text-align:right;font-weight:500;white-space:nowrap;">-${ev.commission.toLocaleString('en-US')} ₺</td>
                       <td style="padding:14px 8px;text-align:right;font-weight:600;color:#a78bfa;white-space:nowrap;">${(ev.admin_fee||0) > 0 ? '+' + (ev.admin_fee||0).toLocaleString('en-US') + ' ₺' : '0 ₺'}</td>
-                      <td style="padding:14px 8px;color:var(--teal);text-align:right;font-weight:700;font-family:'Space Mono';white-space:nowrap;">${ev.net_revenue.toLocaleString('en-US')} ₺</td>
+                      <td style="padding:14px 8px;color:#22c55e;text-align:right;font-weight:700;white-space:nowrap;">${ev.net_revenue.toLocaleString('en-US')} ₺</td>
                     </tr>`;
                   }).join('')}
                 </tbody>

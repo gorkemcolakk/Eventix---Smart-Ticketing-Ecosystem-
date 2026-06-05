@@ -129,11 +129,10 @@ def organizer_revenue():
                 COALESCE(SUM(t.quantity), 0) as total_tickets,
                 COALESCE(SUM(t.total_price), 0) as total_gross
             FROM users u
-            JOIN events e ON u.id = e.organizer_id
+            LEFT JOIN events e ON u.id = e.organizer_id
             LEFT JOIN tickets t ON e.id = t.event_id AND t.status IN ('valid', 'used')
             WHERE u.role = 'organizer'
             GROUP BY u.id
-            HAVING total_tickets > 0
             ORDER BY total_gross DESC
         ''').fetchall()
 

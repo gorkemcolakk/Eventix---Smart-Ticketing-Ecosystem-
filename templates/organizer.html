@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ current_lang }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -234,6 +234,10 @@
     [data-theme="light"] #tab-sales .att-status.cancel { background: rgba(220,38,38,.14); color: #b91c1c; border: 1px solid rgba(220,38,38,.4); }
     [data-theme="light"] #tab-sales .sales-price-paid { color: #b45309 !important; font-weight: 800; }
     #tab-sales .sales-table-wrap { overflow-x: auto; }
+  
+    /* Light mode revenue card fixes */
+    [data-theme="light"] .glass-panel { background: rgba(255,255,255,0.85) !important; }
+    [data-theme="light"] #tab-revenue .glass-panel { background: rgba(255,255,255,0.9) !important; border: 1px solid rgba(0,0,0,0.1) !important; }
   </style>
 </head>
 <body>
@@ -977,7 +981,7 @@
             </div>`;
           }).join('')}
         </div>`;
-      } catch(err) { el.innerHTML = '<p class="loading-text" style="color:#f87171;">{{ t(\\'failed_to_load\\') }}</p>'; }
+      } catch(err) { el.innerHTML = '<p class="loading-text" style="color:#f87171;">{{ t("failed_to_load") }}</p>'; }
     }
 
 
@@ -1267,11 +1271,11 @@
         var refundComp = d.total_refund_comp || 0;
         el.innerHTML =
           '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;">' +
-          '<div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid #3b82f6;"><div style="font-size:1.6rem;font-weight:700;color:#3b82f6;">' + (d.total_tickets || 0) + '</div><div style="color:#93c5fd;font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;">{{ t(\'sold_ticket_count\') }}</div></div>' +
-          '<div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid var(--gold);"><div style="font-size:1.6rem;font-weight:700;color:var(--gold);">' + (d.total_revenue || 0).toLocaleString('en-US') + ' ₺</div><div style="color:#fcd34d;font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;">{{ t(\'tickets_sold_revenue\') }}</div></div>' +
-          '<div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid #ef4444;"><div style="font-size:1.6rem;font-weight:700;color:#ef4444;">' + (d.commission || 0).toLocaleString('en-US') + ' ₺</div><div style="color:#fca5a5;font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;white-space:nowrap;">{{ t(\'platform_commission\') }} (%10)</div></div>' +
-          '<div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid #8b5cf6;box-shadow:0 4px 20px rgba(139,92,246,0.15);"><div style="font-size:1.6rem;font-weight:700;background:linear-gradient(135deg,#8b5cf6,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">' + refundComp.toLocaleString('en-US') + ' ₺</div><div style="color:#c4b5fd;font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;white-space:nowrap;">{{ t(\'refund_revenue\') }} (%15)</div></div>' +
-          '<div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid #22c55e;"><div style="font-size:1.6rem;font-weight:700;color:#22c55e;">' + (d.net_revenue || 0).toLocaleString('en-US') + ' ₺</div><div style="color:#86efac;font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;">{{ t(\'net_revenue\') }}</div></div>' +
+          '<div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid #3b82f6;"><div style="font-size:1.6rem;font-weight:700;color:#3b82f6;">' + (d.total_tickets || 0) + '</div><div style="color:var(--text-muted);font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;">{{ t("sold_ticket_count") }}</div></div>' +
+          '<div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid var(--gold);"><div style="font-size:1.6rem;font-weight:700;color:var(--gold);">' + (d.total_revenue || 0).toLocaleString('en-US') + ' ₺</div><div style="color:var(--text-muted);font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;">{{ t("tickets_sold_revenue") }}</div></div>' +
+          '<div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid #ef4444;"><div style="font-size:1.6rem;font-weight:700;color:#ef4444;">' + (d.commission || 0).toLocaleString('en-US') + ' ₺</div><div style="color:var(--text-muted);font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;white-space:nowrap;">{{ t("platform_commission") }} (%10)</div></div>' +
+          '<div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid #8b5cf6;box-shadow:0 4px 20px rgba(139,92,246,0.15);"><div style="font-size:1.6rem;font-weight:700;background:linear-gradient(135deg,#8b5cf6,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">' + refundComp.toLocaleString('en-US') + ' ₺</div><div style="color:var(--text-muted);font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;white-space:nowrap;">{{ t("refund_revenue") }} (%15)</div></div>' +
+          '<div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid #22c55e;"><div style="font-size:1.6rem;font-weight:700;color:#22c55e;">' + (d.net_revenue || 0).toLocaleString('en-US') + ' ₺</div><div style="color:var(--text-muted);font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;">{{ t("net_revenue") }}</div></div>' +
           '</div>';
         var rows = '';
         var chartLabels = [];
@@ -1282,15 +1286,15 @@
           chartNetData.push(b.net_revenue);
           var rc = b.refund_comp || 0;
           rows += '<tr style="border-bottom:1px solid var(--border);">' +
-            '<td style="padding:9px 12px;color:var(--text);">' + b.title + '</td>' +
-            '<td style="padding:9px 12px;text-align:right;color:var(--text-muted);">' + b.sold_count + '/' + b.capacity + '</td>' +
-            '<td style="padding:9px 12px;text-align:right;color:var(--text);">' + b.gross_revenue.toLocaleString('en-US') + ' TL</td>' +
-            '<td style="padding:9px 12px;text-align:right;color:#ef4444;">-' + b.commission.toLocaleString('en-US') + ' TL</td>' +
-            '<td style="padding:9px 12px;text-align:right;color:#14b8a6;">' + b.net_revenue.toLocaleString('en-US') + ' TL</td>' +
-            '<td style="padding:9px 12px;text-align:right;color:#a78bfa;font-weight:600;">' + (rc > 0 ? '+' + rc.toLocaleString('en-US') + ' TL' : '0 TL') + '</td>' +
+            '<td style="padding:14px 12px;color:var(--text);font-weight:600;">' + b.title + '</td>' +
+            '<td style="padding:14px 12px;text-align:right;color:#3b82f6;font-weight:700;white-space:nowrap;">' + b.sold_count + '/' + b.capacity + '</td>' +
+            '<td style="padding:14px 12px;text-align:right;color:#f59e0b;font-weight:700;">' + b.gross_revenue.toLocaleString('en-US') + ' ₺</td>' +
+            '<td style="padding:14px 12px;text-align:right;color:#ef4444;font-weight:600;">-' + b.commission.toLocaleString('en-US') + ' ₺</td>' +
+            '<td style="padding:14px 12px;text-align:right;color:#a78bfa;font-weight:600;">' + (rc > 0 ? '+' + rc.toLocaleString('en-US') + ' ₺' : '0 ₺') + '</td>' +
+            '<td style="padding:14px 12px;text-align:right;color:#22c55e;font-weight:600;">' + b.net_revenue.toLocaleString('en-US') + ' ₺</td>' +
             '</tr>';
         }
-        el2.innerHTML = '<div class="glass-panel" style="overflow:auto;margin-top:16px;"><table style="width:100%;border-collapse:collapse;font-size:0.85rem;"><thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left;padding:9px 12px;color:var(--text-muted);">{{ t("event_col") }}</th><th style="text-align:right;padding:9px 12px;color:var(--text-muted);">{{ t("sold_capacity") }}</th><th style="text-align:right;padding:9px 12px;color:var(--text-muted);">{{ t("gross_revenue") }}</th><th style="text-align:right;padding:9px 12px;color:var(--text-muted);">{{ t("commission") }}</th><th style="text-align:right;padding:9px 12px;color:var(--text-muted);">{{ t("org_net") }}</th><th style="text-align:right;padding:9px 12px;color:var(--text-muted);">{{ t("refund_fees") }}</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
+        el2.innerHTML = '<div class="glass-panel" style="overflow:auto;margin-top:16px;"><table style="width:100%;border-collapse:collapse;font-size:0.85rem;"><thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left;padding:9px 12px;color:var(--text);font-weight:700;">{{ t("event_col") }}</th><th style="text-align:right;padding:9px 12px;color:var(--text);font-weight:700;">{{ t("capacity") }}</th><th style="text-align:right;padding:9px 12px;color:var(--text);font-weight:700;">{{ t("gross_revenue") }}</th><th style="text-align:right;padding:9px 12px;color:var(--text);font-weight:700;">{{ t("platform_commission") }}</th><th style="text-align:right;padding:9px 12px;color:var(--text);font-weight:700;">{{ t("refund_revenue") }}</th><th style="text-align:right;padding:9px 12px;color:var(--text);font-weight:700;">{{ t("net_revenue") }}</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
         
         renderChart(chartLabels, chartNetData);
       })
@@ -1308,27 +1312,56 @@
       var ctx = ctxPanel.getContext('2d');
       
       const isLight = document.documentElement.getAttribute('data-theme') === 'light' || document.body.classList.contains('light-mode');
-      const textColor = isLight ? '#4b5563' : 'rgba(255,255,255,0.7)';
-      const gridColor = isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)';
+      const textColor = isLight ? '#4b5563' : 'rgba(255,255,255,0.8)';
+      const gridColor = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)';
+
+      const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+      gradient.addColorStop(0, 'rgba(139, 92, 246, 0.6)');   // Purple top
+      gradient.addColorStop(1, 'rgba(139, 92, 246, 0.05)');  // Transparent bottom
 
       revChartInstance = new Chart(ctx, {
-        type: 'bar',
+        type: 'line',
         data: {
           labels: labels,
           datasets: [{
-            label: 'Net Revenue (TL)',
+            label: `{{ t('net_revenue') }} (₺)`,
             data: data,
-            backgroundColor: 'rgba(139, 92, 246, 0.6)',
-            borderColor: 'rgba(139, 92, 246, 1)',
-            borderWidth: 1,
-            borderRadius: 4
+            fill: true,
+            backgroundColor: gradient,
+            borderColor: '#8b5cf6',
+            borderWidth: 3,
+            pointBackgroundColor: isLight ? '#fff' : '#1e1b4b',
+            pointBorderColor: '#8b5cf6',
+            pointBorderWidth: 2,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            tension: 0.4
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false,
+          },
           plugins: {
-            legend: { labels: { color: textColor } }
+            legend: { 
+              labels: { 
+                color: textColor,
+                font: { family: "'Inter', sans-serif", weight: '600' }
+              } 
+            },
+            tooltip: {
+              backgroundColor: isLight ? 'rgba(255,255,255,0.9)' : 'rgba(15,10,30,0.9)',
+              titleColor: isLight ? '#1f2937' : '#fff',
+              bodyColor: isLight ? '#4b5563' : '#cbd5e1',
+              borderColor: 'rgba(139, 92, 246, 0.3)',
+              borderWidth: 1,
+              padding: 12,
+              boxPadding: 6,
+              usePointStyle: true
+            }
           },
           scales: {
             y: { 
