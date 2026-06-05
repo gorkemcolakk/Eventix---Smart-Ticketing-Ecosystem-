@@ -802,106 +802,176 @@
         const d = await res.json();
         if (res.ok) {
           fb.innerHTML = '<p style="color:#6ee7b7;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);padding:10px 14px;border-radius:8px;margin-bottom:12px;">✓ Password updated successfully!</p>';
-          document.getElementById('currentPassword').value = '';
-          document.getElementById('newPassword').value = '';
-          document.getElementById('confirmPassword').value = '';
-        } else {
-          fb.innerHTML = `<p style="color:#fca5a5;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);padding:10px 14px;border-radius:8px;margin-bottom:12px;">⚠ ${d.message || 'Error occurred'}</p>`;
-        }
-      } catch {
-        fb.innerHTML = '<p style="color:#fca5a5;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);padding:10px 14px;border-radius:8px;margin-bottom:12px;">⚠ Server error.</p>';
-      }
-    }
-
-    // ── My Events ─────────────────────────────────────────────
-    function loadMyEvents() {
-      var el = document.getElementById('myEventsList');
-      el.innerHTML = '<p class="loading-text">Loading...</p>';
-      var token = getToken();
-      fetch('/api/organizer/events', {
-        headers: { 'Authorization': 'Bearer ' + token }
-      })
-      .then(function(r){ return r.json(); })
-      .then(function(events) {
+           // ── My Events ─────────────────────────────────────────────
+    async function loadMyEvents() {
+      const el = document.getElementById('myEventsList');
+      el.innerHTML = '<p class="loading-text">{{ t("loading") }}</p>';
+      try {
+        const r = await fetch('/api/organizer/events', { headers: { 'Authorization': 'Bearer ' + getToken() } });
+        const events = await r.json();
         if (!events.length) {
           el.innerHTML = '<p class="loading-text">{{ t("no_events_created") }}</p>';
           return;
         }
-        var html = '';
-        for (var i = 0; i < events.length; i++) {
-          var e = events[i];
-          var statusTxt = e.status === 'active' ? '{{ t("status_active") }}' : e.status === 'pending' ? '{{ t("status_pending") }}' : e.status === 'cancelled' ? '{{ t("status_cancelled") }}' : e.status;
-          var statusColor = e.status === 'active' ? '#10b981' : e.status === 'pending' ? '#f59e0b' : '#ef4444';
-          html += '<div class="glass-panel" style="margin-bottom:14px;padding:18px;display:flex;gap:14px;align-items:flex-start;">';
-          html += '<img src="' + e.image + '" style="width:70px;height:70px;object-fit:cover;border-radius:8px;flex-shrink:0;" onerror="this.src=\'https://images.unsplash.com/photo-1540039155733-5bb30b4a574b?w=200\'">';
-          html += '<div style="flex:1;">';
-          html += '<div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:4px;flex-wrap:wrap;">';
-          html += '<strong style="color:var(--text);">' + e.title + '</strong>';
 
-          var recBadge = '';
-          if (e.recurring_config) {
-            try {
-              var rc = JSON.parse(e.recurring_config);
-              var recLabels = {daily: '{{ t("recurrence_daily") }}', weekly: '{{ t("recurrence_weekly") }}', monthly: '{{ t("recurrence_monthly") }}'};
-              recBadge = '<span class="recurring-badge parent">🔁 ' + (recLabels[rc.type] || rc.type) + ' {{ t("recurrence_repeat") }}</span>';
-            } catch(ex) {}
-          } else if (e.parent_event_id) {
-            recBadge = '<span class="recurring-badge child">🔗 {{ t("recurrence_sessions") }}</span>';
-          }
-
-          html += '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">';
-          if (recBadge) html += recBadge;
-          html += '<span style="background:' + statusColor + '22;color:' + statusColor + ';border:1px solid ' + statusColor + '44;border-radius:20px;padding:2px 10px;font-size:0.75rem;">' + statusTxt + '</span>';
-          html += '</div>';
-          html += '</div>';
-
-          var formattedDate = e.date;
+        const sColor = s => ({ active:'#22c55e', pending:'#f59e0b', cancelled:'#ef4444', rejected:'#6b7280' }[s] || '#6b7280');
+        const sBg   = s => ({ active:'rgba(20,184,166,0.12)', pending:'rgba(245,158,11,0.12)', cancelled:'rgba(239,68,68,0.12)', rejected:'rgba(107,114,128,0.12)' }[s] || 'rgba(107,114,128,0.12)');
+        const sLabel = s => ({
+          active:    "{{ t('status_active') }}",
+          pending:   "{{ t('status_pending') }}",
+          cancelled: "{{ t('status_cancelled') }}",
+          rejected:  "{{ t('status_rejected') }}"
+        }[s] || s);
+        const catColor = c => ({ concert:'#f59e0b', theater:'#ef4444', workshop:'#14b8a6' }[c] || '#8b5cf6');
+        const fDate = ds => {
           try {
-            var dObj = new Date(e.date);
-            if (!isNaN(dObj)) {
-              formattedDate = dObj.toLocaleDateString('tr-TR', {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
+            const d = new Date(ds);
+            if (isNaN(d)) return { date: ds, time: '' };
+            return {
+              date: d.toLocaleDateString('tr-TR', {day:'numeric', month:'short', year:'numeric'}),
+              time: d.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})
+            };
+          } catch { return { date: ds, time: '' }; }
+        };
+        const catLabel = c => {
+          const lang = document.cookie.match(/lang=([^;]+)/)?.[1] || 'tr';
+          const map = { concert: lang==='tr'?'KONSER':'CONCERT', theater: lang==='tr'?'TİYATRO':'THEATER', workshop: lang==='tr'?'ATÖLYE':'WORKSHOP' };
+          return map[c] || (c||'').toUpperCase();
+        };
+
+        el.innerHTML = `<div style="display:flex;flex-direction:column;gap:10px;">
+          ${events.map(e => {
+            const fd = fDate(e.date);
+            const pct = e.capacity > 0 ? Math.min(100, Math.round(e.sold_count / e.capacity * 100)) : 0;
+            const barColor = pct >= 70 ? '#ef4444' : pct >= 30 ? '#f59e0b' : '#22c55e';
+
+            let recBadge = '';
+            if (e.recurring_config) {
+              try {
+                const rc = typeof e.recurring_config === 'string' ? JSON.parse(e.recurring_config) : e.recurring_config;
+                const recLabels = {daily:"{{ t('recurrence_daily') }}", weekly:"{{ t('recurrence_weekly') }}", monthly:"{{ t('recurrence_monthly') }}"};
+                recBadge = `<span style="background:rgba(45,212,191,0.12);color:#2dd4bf;border:1px solid rgba(45,212,191,0.3);border-radius:100px;padding:1px 9px;font-size:0.7rem;font-weight:700;">🔁 ${recLabels[rc.type]||rc.type} {{ t('recurrence_repeat') }}</span>`;
+              } catch(ex) {}
+            } else if (e.parent_event_id) {
+              recBadge = `<span style="background:rgba(139,92,246,0.1);color:#a78bfa;border:1px solid rgba(139,92,246,0.3);border-radius:100px;padding:1px 9px;font-size:0.7rem;font-weight:700;">🔗 {{ t('recurring_session') }}</span>`;
             }
-          } catch(ex) {}
 
-          html += '<p style="color:var(--text-muted);font-size:0.82rem;margin:2px 0;">' + formattedDate + ' | ' + e.location + '</p>';
-          html += '<p style="color:var(--text-muted);font-size:0.82rem;margin:2px 0;">' + e.price.toLocaleString('en-US') + ' TL | Capacity: ' + e.sold_count + '/' + e.capacity + '</p>';
+            // Butonlar — organizatöre özgü
+            let btns = '';
+            if (e.status !== 'cancelled' && e.status !== 'rejected') {
+              btns = `
+                <button onclick="editEvent('${e.id}')"
+                  style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.35);color:#f59e0b;border-radius:8px;padding:4px 12px;font-size:0.72rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:background .15s;"
+                  onmouseenter="this.style.background='rgba(245,158,11,0.22)'" onmouseleave="this.style.background='rgba(245,158,11,0.12)'"
+                >✎ {{ t('edit') }}</button>
+                <button onclick="cancelEvent('${e.id}')"
+                  style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.35);color:#f87171;border-radius:8px;padding:4px 12px;font-size:0.72rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:background .15s;"
+                  onmouseenter="this.style.background='rgba(239,68,68,0.22)'" onmouseleave="this.style.background='rgba(239,68,68,0.12)'"
+                >✕ {{ t('cancel_btn') }}</button>`;
+            } else if (e.status === 'cancelled') {
+              btns = `
+                <button onclick="editEvent('${e.id}')"
+                  style="background:rgba(45,212,191,0.12);border:1px solid rgba(45,212,191,0.35);color:#2dd4bf;border-radius:8px;padding:4px 12px;font-size:0.72rem;font-weight:600;cursor:pointer;"
+                >✎ {{ t('edit') }} & {{ t('re_activate') }}</button>
+                <button onclick="cancelEvent('${e.id}', true)"
+                  style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.35);color:#f87171;border-radius:8px;padding:4px 12px;font-size:0.72rem;font-weight:600;cursor:pointer;"
+                >🗑 {{ t('delete_permanently') }}</button>`;
+            }
+            btns += `<button onclick="openAttendees('${e.id}')"
+              style="background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.35);color:#a78bfa;border-radius:8px;padding:4px 12px;font-size:0.72rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:background .15s;"
+              onmouseenter="this.style.background='rgba(139,92,246,0.22)'" onmouseleave="this.style.background='rgba(139,92,246,0.1)'"
+            >📋 {{ t('attendees') }}</button>`;
 
-          if (e.status === 'rejected') {
-            html += '<div style="margin-top:10px; padding:10px; background:rgba(239,68,68,0.1); border:1px dashed rgba(239,68,68,0.3); border-radius:8px;">';
-            html += '<p style="color:#ef4444; font-size:0.75rem; margin:0; font-weight:bold;">🚨 Admin Note:</p>';
-            html += '<p style="color:var(--text); font-size:0.8rem; margin:3px 0 0;">' + (e.rejection_reason || 'Editing required.') + '</p>';
-            html += '</div>';
-          }
+            // Reddedilme/iptal notu
+            let note = '';
+            if (e.status === 'rejected' && e.rejection_reason) {
+              note = `<div style="margin-top:8px;padding:10px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.25);border-radius:8px;">
+                <p style="color:#ef4444;font-size:0.72rem;font-weight:700;margin:0;">🚨 Admin Notu:</p>
+                <p style="color:var(--text);font-size:0.8rem;margin:3px 0 0;">${e.rejection_reason}</p>
+              </div>`;
+            } else if (e.status === 'cancelled' && e.cancelled_by === 'admin') {
+              note = `<div style="margin-top:8px;padding:10px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.25);border-radius:8px;">
+                <p style="color:#ef4444;font-size:0.72rem;font-weight:700;margin:0;">🚨 {{ t('cancelled_by_admin') }}:</p>
+                <p style="color:var(--text);font-size:0.8rem;margin:3px 0 0;">${e.rejection_reason || ''}</p>
+              </div>`;
+            }
 
-          if (e.status === 'cancelled' && e.cancelled_by) {
-            const byAdmin = e.cancelled_by === 'admin';
-             html += '<div style="margin-top:10px; padding:10px; background:rgba(239,68,68,0.1); border:1px dashed rgba(239,68,68,0.3); border-radius:8px;">';
-             html += '<p style="color:#ef4444; font-size:0.75rem; margin:0; font-weight:bold;">🚨 ' + (byAdmin ? '{{ t("cancelled_by_admin") }}' : '{{ t("cancelled_by_you") }}') + ':</p>';
-             if(byAdmin) {
-                html += '<p style="color:var(--text); font-size:0.8rem; margin:3px 0 0;">' + (e.rejection_reason || 'Reason not specified.') + '</p>';
-             }
-             html += '</div>';
-          }
+            return `
+            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:pointer;transition:border-color .2s,box-shadow .2s,transform .2s;"
+              onclick="if(!event.target.closest('button'))window.location.assign('event-detail.html?id=${e.id}')"
+              onmouseenter="this.style.borderColor='rgba(245,158,11,0.4)';this.style.boxShadow='0 6px 24px rgba(0,0,0,0.3)';this.style.transform='translateY(-1px)'"
+              onmouseleave="this.style.borderColor='var(--border)';this.style.boxShadow='none';this.style.transform='none'">
 
-          html += '</div>';
-          html += '<div style="display:flex; flex-direction:column; gap:8px;">';
-          if (e.status !== 'cancelled') {
-            html += '<button class="btn btn-primary btn-sm" onclick="editEvent(\'' + e.id + '\')">{{ t('edit') }}</button>';
-            html += '<button class="btn btn-danger btn-sm" onclick="cancelEvent(\'' + e.id + '\')">{{ t('cancel') }}</button>';
-          } else {
-            html += '<button class="btn btn-primary btn-sm" onclick="editEvent(\'' + e.id + '\')" style="background:var(--accent-teal); border-color:var(--accent-teal); color:black;">{{ t("edit") }} & {{ t("re_activate") }}</button>';
-            html += '<button class="btn btn-danger btn-sm" onclick="cancelEvent(\'' + e.id + '\', true)">{{ t("delete_permanently") }}</button>';
-          }
-          html += '<button class="btn btn-outline btn-sm" style="font-size:0.78rem;border-color:rgba(139,92,246,0.4);color:#a78bfa;margin-top:2px;" onclick="openAttendees(\'' + e.id + '\')">📋 {{ t("attendees") }}</button>';
-          html += '</div>';
-          html += '</div>';
-        }
-        el.innerHTML = html;
-      })
-      .catch(function(err) {
-        el.innerHTML = '<p class="loading-text" style="color:#f87171;">{{ t("failed_to_load") }} ' + err.message + '</p>';
-      });
+              <div style="display:flex;align-items:stretch;">
+                <!-- Thumbnail -->
+                <div style="position:relative;flex-shrink:0;width:120px;">
+                  <img src="${e.image}" style="width:120px;height:100%;min-height:80px;object-fit:cover;display:block;"
+                    onerror="this.src='https://images.unsplash.com/photo-1540039155733-5bb30b4a574b?w=200'">
+                  <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent 50%,var(--bg-card));"></div>
+                </div>
+
+                <!-- Content -->
+                <div style="flex:1;min-width:0;padding:16px 20px;display:flex;flex-direction:column;gap:6px;">
+
+                  <!-- Row 1: Title + Status + Buttons -->
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex:1;min-width:0;">
+                      <span style="color:var(--text);font-weight:700;font-size:0.92rem;">${e.title}</span>
+                      ${recBadge}
+                      <span style="background:${sBg(e.status)};color:${sColor(e.status)};border:1px solid ${sColor(e.status)}55;border-radius:100px;padding:1px 9px;font-size:0.7rem;font-weight:700;flex-shrink:0;">${sLabel(e.status)}</span>
+                    </div>
+                    <div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;">${btns}</div>
+                  </div>
+
+                  <!-- Row 2: Category badge -->
+                  ${e.category ? `<div><span style="background:${catColor(e.category)};color:#fff;border-radius:100px;padding:3px 10px;font-size:0.7rem;font-weight:700;letter-spacing:0.8px;text-shadow:0 1px 2px rgba(0,0,0,0.4);">${catLabel(e.category)}</span></div>` : ''}
+
+                  <!-- Row 3: Tarih | Mekan | Fiyat -->
+                  <div style="display:flex;gap:24px;flex-wrap:wrap;">
+                    <div style="display:flex;flex-direction:column;gap:2px;">
+                      <span style="color:var(--text-muted);font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">{{ t('date_time_col') }}</span>
+                      <span style="color:var(--text);font-size:0.8rem;font-weight:600;display:flex;align-items:center;gap:5px;">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        ${fd.date}${fd.time ? ' ' + fd.time : ''}
+                      </span>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:2px;">
+                      <span style="color:var(--text-muted);font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">{{ t('venue_col') }}</span>
+                      <span style="color:var(--text);font-size:0.8rem;font-weight:600;display:flex;align-items:center;gap:5px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        ${e.location}
+                      </span>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:2px;">
+                      <span style="color:var(--text-muted);font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">{{ t('price_col') }}</span>
+                      <span style="color:var(--text);font-size:0.88rem;font-weight:700;font-family:'Space Mono',monospace;">
+                        ${e.price.toLocaleString('tr-TR')} <span style="color:var(--gold);">₺</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Row 4: Kapasite bar -->
+                  ${e.capacity > 0 ? `
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="min-width:32px;text-align:right;font-size:0.68rem;font-weight:700;color:${barColor};">%${pct}</span>
+                    <div style="flex:1;height:3px;background:rgba(255,255,255,0.07);border-radius:100px;overflow:hidden;">
+                      <div style="height:100%;width:${pct}%;background:${barColor};border-radius:100px;transition:width 0.6s ease;"></div>
+                    </div>
+                    <span style="font-size:0.8rem;font-weight:700;color:var(--text-muted);white-space:nowrap;">${e.sold_count} / ${e.capacity} {{ t('tickets_sold_short') }}</span>
+                  </div>` : ''}
+
+                  ${note}
+                </div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>`;
+      } catch(err) {
+        el.innerHTML = '<p class="loading-text" style="color:#f87171;">{{ t("failed_to_load") }}</p>';
+      }
     }
+
+
 
     function cancelEvent(id, permanent = false) {
       const msg = permanent ? 'Are you sure you want to PERMANENTLY delete this event and ALL its data? This action cannot be undone.' : 'Are you sure you want to cancel this event?';
