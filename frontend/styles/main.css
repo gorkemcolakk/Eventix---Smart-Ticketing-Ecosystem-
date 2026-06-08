@@ -731,10 +731,12 @@ footer,
    MOBILE RESPONSIVE — Genel Düzeltmeler
    ═══════════════════════════════════════════════════ */
 
-/* Yatay scroll önle */
-html, body {
-  overflow-x: hidden;
-  max-width: 100vw;
+/* Yatay scroll önle - sadece main body, nav değil */
+body {
+  overflow-x: clip;
+}
+.hero, .events-section, .container:not(.nav-container) {
+  max-width: 100%;
 }
 
 /* iOS input zoom önle (font-size < 16px ise iOS zoom yapar) */
@@ -884,17 +886,45 @@ html, body {
 }
 
 /* ───────────────────────────────────────────────────────
-   NAVBAR COMPACT — Mobil logged-in durumu
-   user-dropdown-wrapper mobil overlay'de zaten var
+   NAVBAR COMPACT — Mobil (tüm durumlar)
    ─────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Hamburger her zaman görünür, flex dışına itilmesin */
+  #mobileMenuBtn {
+    display: flex !important;
+    flex-shrink: 0 !important;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* nav-container taşmasın, ama hamburger kesilmesin */
+  .nav-container {
+    overflow: visible !important;
+  }
+}
+
 @media (max-width: 640px) {
-  /* User dropdown wrapper gizle — mobil nav overlay halleder */
+  /* user-dropdown-wrapper gizle (isim+dropdown) — mobil overlay halleder */
   .user-dropdown-wrapper { display: none !important; }
 
   /* Cart: sadece ikon göster, metni gizle */
   #navCartText { display: none !important; }
 
-  /* user-controls'taki login/register butonları gizli (zaten vardı) */
-  .user-controls .btn-outline,
-  .user-controls .btn-primary { display: none !important; }
+  /* SADECE direct child <a> login/register butonlarını gizle */
+  /* LANG_BTN .lang-dropdown içinde olduğu için korunur */
+  .user-controls > a.btn-outline,
+  .user-controls > a.btn-primary { display: none !important; }
+
+  /* Dil seçici butonunu her zaman göster */
+  .user-controls .lang-dropdown { display: inline-block !important; }
+  .user-controls .lang-dropdown button.btn-outline {
+    display: flex !important;
+    padding: 5px 8px !important;
+    font-size: 0.78rem !important;
+  }
+
+  /* Cart link: flex ve küçük */
+  .cart-link-nav {
+    margin-right: 4px !important;
+  }
 }

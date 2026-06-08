@@ -365,6 +365,45 @@
       }
     }
 
+
+    /* ── Kullanici Listesi: yatay scroll (satis gecmisi mantigi) ── */
+    @media (max-width: 640px) {
+      #usersGrid {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        padding-bottom: 8px;
+      }
+      #usersGrid .user-card {
+        min-width: 480px !important;
+      }
+    }
+
+    /* ── Tum Etkinlikler: yatay scroll ── */
+    @media (max-width: 760px) {
+      #allEventsList {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        padding-bottom: 8px;
+      }
+      #allEventsList .admin-event-card {
+        min-width: 620px !important;
+        overflow: visible !important;
+      }
+      /* Aksiyon butonlari: wrap yerine min-width ile scroll */
+      .admin-event-card-inner {
+        grid-template-columns: 96px minmax(0, 1fr) !important;
+        gap: 16px !important;
+      }
+      .admin-event-actions {
+        flex-wrap: nowrap !important;
+        gap: 6px !important;
+      }
+      .admin-event-action.btn {
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+      }
+    }
+
   </style>
 </head>
 <body>
