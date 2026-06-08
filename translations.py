@@ -94,6 +94,10 @@ TRANSLATIONS = {
         'hero_title': 'Eğlence Zamanı!',
         # ── Auth brand panel ──────────────────────────────────
         'auth_brand_tagline': 'Etkinliklerin\nen iyi bileti\nburada.',
+        # ── Bildirimler ───────────────────────────────────────
+        'notif_ticket_purchased': 'Bilet Satın Alındı! 🎟️',
+        'notif_event_for': 'etkinliğine',
+        'notif_ticket_bought': 'adet bilet satın alındı',
         'auth_brand_desc': 'Konserler, tiyatrolar ve atölyelere anlık QR bilet satın al, etkinlikten önce güvenle iptal et.',
         'auth_brand_feat1': 'Anlık QR e-bilet teslimatı',
         'auth_brand_feat2': '256-bit SSL güvenli ödeme',
@@ -724,6 +728,10 @@ TRANSLATIONS = {
         'hero_title': 'Time for Entertainment!',
         # ── Auth brand panel ──────────────────────────────────
         'auth_brand_tagline': 'The best\nevent tickets,\nright here.',
+        # ── Notifications ─────────────────────────────────────
+        'notif_ticket_purchased': 'Ticket Purchased! 🎟️',
+        'notif_event_for': 'event for',
+        'notif_ticket_bought': 'tickets purchased',
         'auth_brand_desc': 'Buy instant QR tickets for concerts, theaters and workshops. Cancel safely before the event.',
         'auth_brand_feat1': 'Instant QR e-ticket delivery',
         'auth_brand_feat2': '256-bit SSL secure payment',
@@ -1355,6 +1363,10 @@ TRANSLATIONS = {
         'hero_title': 'Zeit für Unterhaltung!',
         # ── Auth brand panel ──────────────────────────────────
         'auth_brand_tagline': 'Die besten\nVeranstaltungstickets,\nhier.',
+        # ── Benachrichtigungen ────────────────────────────────
+        'notif_ticket_purchased': 'Ticket gekauft! 🎟️',
+        'notif_event_for': 'Veranstaltung für',
+        'notif_ticket_bought': 'Tickets gekauft',
         'auth_brand_desc': 'Kaufe sofortige QR-Tickets für Konzerte, Theater und Workshops. Sicher stornieren.',
         'auth_brand_feat1': 'Sofortige QR-E-Ticket-Lieferung',
         'auth_brand_feat2': '256-Bit-SSL-Sichere Zahlung',
