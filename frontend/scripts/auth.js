@@ -332,37 +332,37 @@ function renderNav() {
         if (token && user) {
             const firstName = user.fullname.split(' ')[0];
             const dashBase = user.role === 'admin' ? 'admin.html' : user.role === 'organizer' ? 'organizer.html' : 'dashboard.html';
-            const lnk = (href, icon, label) =>
-              `<a href="${href}" class="btn btn-outline mobile-link" style="justify-content:center;gap:8px;">${icon} ${label}</a>`;
+            const lnk = (href, label) =>
+              `<a href="${href}" class="btn btn-outline mobile-link" style="justify-content:center;gap:8px;">${label}</a>`;
 
             let roleLinks = '';
             if (user.role === 'admin') {
               roleLinks = `
-                ${lnk('admin.html?tab=pending', '⏳', t('pending_approval'))}
-                ${lnk('admin.html?tab=users', '👥', t('users'))}
-                ${lnk('admin.html?tab=allevents', '📋', t('all_events'))}
-                ${lnk('admin.html?tab=revenue', '💰', t('platform_revenue'))}
-                ${lnk('admin.html?tab=sales', '📜', t('sales_history'))}`;
+                ${lnk('admin.html?tab=pending', t('pending_approval'))}
+                ${lnk('admin.html?tab=users', t('users'))}
+                ${lnk('admin.html?tab=allevents', t('all_events'))}
+                ${lnk('admin.html?tab=revenue', t('platform_revenue'))}
+                ${lnk('admin.html?tab=sales', t('sales_history'))}`;
             } else if (user.role === 'organizer') {
               roleLinks = `
-                ${lnk('organizer.html?tab=myevents', '🎪', t('my_events'))}
-                ${lnk('organizer.html?tab=create', '➕', t('create_event'))}
-                ${lnk('organizer.html?tab=revenue', '📊', t('revenue_report'))}
-                ${lnk('organizer.html?tab=sales', '📜', t('sales_history'))}
-                ${lnk('organizer.html?tab=promotions', '🏷️', t('promotions'))}`;
+                ${lnk('organizer.html?tab=myevents', t('my_events'))}
+                ${lnk('organizer.html?tab=create', t('create_event'))}
+                ${lnk('organizer.html?tab=revenue', t('revenue_report'))}
+                ${lnk('organizer.html?tab=sales', t('sales_history'))}
+                ${lnk('organizer.html?tab=promotions', t('promotions'))}`;
             } else {
               roleLinks = `
-                ${lnk('cart.html', '🛒', t('cart'))}
-                ${lnk(dashBase + '?tab=profile', '👤', firstName)}
-                ${lnk(dashBase + '?tab=tickets', '🎟️', t('my_tickets'))}
-                ${lnk(dashBase + '?tab=wishlist', '❤️', t('my_wishlist'))}
-                ${lnk(dashBase + '?tab=notifications', '🔔', t('notifications'))}`;
+                ${lnk('cart.html', '🛒 ' + t('cart'))}
+                ${lnk(dashBase + '?tab=profile', '👤 ' + firstName)}
+                ${lnk(dashBase + '?tab=tickets', t('my_tickets'))}
+                ${lnk(dashBase + '?tab=wishlist', t('my_wishlist'))}
+                ${lnk(dashBase + '?tab=notifications', t('notifications'))}`;
             }
 
             // Admin ve organizer için profil + biletler de ekle
             const commonBottom = (user.role !== 'customer') ? `
-              ${lnk(dashBase + '?tab=tickets', '🎟️', t('my_tickets'))}
-              ${lnk(dashBase + '?tab=profile', '👤', firstName)}` : '';
+              ${lnk(dashBase + '?tab=tickets', t('my_tickets'))}
+              ${lnk(dashBase + '?tab=profile', '👤 ' + firstName)}` : '';
 
             mobileAuthArea.innerHTML = `
               ${roleLinks}

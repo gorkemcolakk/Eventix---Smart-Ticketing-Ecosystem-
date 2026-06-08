@@ -292,43 +292,24 @@
       }
     }
 
-    /* ── Tüm Etkinlikler: overflow scroll ── */
+    /* ── Tüm Etkinlikler: yatay scroll (satış geçmişi mantığı) ── */
     #tab-allevents {
-      overflow-x: hidden;
-    }
-    #allEventsList {
-      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
     }
     @media (max-width: 760px) {
+      #allEventsList {
+        min-width: 680px; /* kart genişliği sabit → yatay kaydır */
+      }
+      /* Kart orijinal layout (image|content) korunur, sadece scroll eklenir */
       .admin-event-card {
-        overflow: hidden;
-        max-width: 100%;
+        overflow: visible;
       }
-      .admin-event-card-inner {
-        grid-template-columns: 1fr !important;
-        gap: 14px !important;
-        padding: 16px 12px !important;
-      }
-      .admin-event-head {
-        grid-template-columns: 1fr !important;
-      }
+      /* Aksiyon butonları taşmasın */
       .admin-event-actions {
-        flex-wrap: wrap !important;
-        justify-content: flex-start !important;
-        gap: 6px !important;
-      }
-      .admin-event-action.btn {
-        padding: 7px 12px !important;
-        font-size: 0.78rem !important;
-      }
-      .admin-event-meta {
-        grid-template-columns: 1fr 1fr !important;
-        gap: 12px !important;
-      }
-    }
-    @media (max-width: 480px) {
-      .admin-event-meta {
-        grid-template-columns: 1fr !important;
+        flex-wrap: nowrap !important;
+        gap: 5px !important;
+        overflow-x: visible;
       }
     }
 
