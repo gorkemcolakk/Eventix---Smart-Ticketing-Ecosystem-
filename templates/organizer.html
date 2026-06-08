@@ -255,6 +255,30 @@
       .sales-filter-grid { grid-template-columns: 1fr !important; }
     }
 
+
+    /* ═══════════════════════════════════════════════════
+       ORGANIZER — Kapsamlı Mobil Düzeltmeler
+       ═══════════════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      .sales-stats { grid-template-columns: repeat(2, 1fr) !important; }
+      .sales-filter-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px 10px !important; }
+      .sales-filter-grid input[type="date"] {
+        min-height: 44px; font-size: 14px !important;
+        -webkit-appearance: none; padding: 8px 10px !important;
+      }
+      .sales-filter-grid select { min-height: 44px; }
+      .sales-table-wrap { overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; }
+      #tab-sales .sales-table { min-width: 640px !important; table-layout: auto !important; }
+      .sales-search-row { flex-direction: column !important; }
+      .sales-search-input { width: 100% !important; min-width: unset !important; }
+      .sales-export-btn { width: 100% !important; justify-content: center !important; }
+    }
+    @media (max-width: 480px) {
+      .sales-stats { grid-template-columns: repeat(2, 1fr) !important; }
+      .sales-filter-grid { grid-template-columns: 1fr !important; }
+      .dash-nav-btn { font-size: 0.72rem !important; padding: 7px 6px !important; min-width: 70px !important; }
+    }
+
   </style>
 </head>
 <body>

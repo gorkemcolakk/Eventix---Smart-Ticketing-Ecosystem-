@@ -801,17 +801,18 @@ html, body {
 }
 
 /* Mobil nav overlay link boyutu */
-.mobile-nav-overlay a,
-.mobile-nav-overlay button {
-  font-size: 1.2rem;
+.mobile-nav-overlay .mobile-link,
+.mobile-nav-overlay .nav-link {
+  font-size: 1.05rem;
   font-weight: 700;
-  padding: 14px 32px;
+  padding: 12px 24px;
   width: 100%;
   text-align: center;
   border-radius: var(--radius-md);
   transition: var(--transition);
 }
-.mobile-nav-overlay a:hover {
+.mobile-nav-overlay .mobile-link:hover,
+.mobile-nav-overlay .nav-link:hover {
   background: var(--bg-hover);
   color: var(--gold);
 }
@@ -819,16 +820,19 @@ html, body {
 /* Kapatma butonu mobil menüde */
 .mobile-nav-close {
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: 16px;
+  right: 16px;
   background: none;
   border: none;
   color: var(--text-muted);
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   cursor: pointer;
   padding: 8px;
+  width: 36px !important;   /* dev boyut engelle */
+  height: 36px !important;
   line-height: 1;
   transition: var(--transition);
+  flex: none !important;     /* flex genişlemesini engelle */
 }
 .mobile-nav-close:hover { color: var(--text); transform: rotate(90deg); }
 
@@ -877,4 +881,20 @@ html, body {
     min-width: 100px;
     font-size: 0.7rem;
   }
+}
+
+/* ───────────────────────────────────────────────────────
+   NAVBAR COMPACT — Mobil logged-in durumu
+   user-dropdown-wrapper mobil overlay'de zaten var
+   ─────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* User dropdown wrapper gizle — mobil nav overlay halleder */
+  .user-dropdown-wrapper { display: none !important; }
+
+  /* Cart: sadece ikon göster, metni gizle */
+  #navCartText { display: none !important; }
+
+  /* user-controls'taki login/register butonları gizli (zaten vardı) */
+  .user-controls .btn-outline,
+  .user-controls .btn-primary { display: none !important; }
 }

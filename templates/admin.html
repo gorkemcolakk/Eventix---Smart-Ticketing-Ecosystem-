@@ -227,6 +227,144 @@
     .sales-panel.is-admin .sales-org-col { display: table-cell; }
     .sales-panel.is-admin .sales-filter-org { display: block; }
     .sales-filter-org { display: none; }
+
+    /* ═══════════════════════════════════════════════════
+       ADMIN — Kapsamlı Mobil Düzeltmeler
+       ═══════════════════════════════════════════════════ */
+
+    /* ── Kullanıcılar: 4 kolon → 2x2 ── */
+    @media (max-width: 680px) {
+      #usersList > div:first-child {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+      /* Search + role filter: dikey */
+      #usersList > div:nth-child(2) {
+        flex-direction: column !important;
+      }
+      #usersList > div:nth-child(2) select {
+        width: 100% !important;
+      }
+    }
+
+    /* ── User kartları: mobil sıkıştırma ── */
+    @media (max-width: 580px) {
+      .user-card > div[style*="display:flex"] {
+        flex-wrap: wrap !important;
+      }
+    }
+
+    /* ── Platform Geliri: 5 kolon → 3+2 ── */
+    @media (max-width: 900px) {
+      #adminRevenue > div:first-child {
+        grid-template-columns: repeat(3, 1fr) !important;
+      }
+    }
+    @media (max-width: 560px) {
+      #adminRevenue > div:first-child {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+    }
+
+    /* ── Satış Geçmişi: stat kartlar ── */
+    @media (max-width: 768px) {
+      .sales-stats {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+    }
+
+    /* ── Satış filtresi: tarih input düzelt ── */
+    @media (max-width: 768px) {
+      .sales-filter-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px 10px !important;
+      }
+      #tab-sales.is-admin .sales-filter-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+      .sales-filter-grid input[type="date"] {
+        min-height: 44px;
+        font-size: 14px !important;
+        -webkit-appearance: none;
+        padding: 8px 10px !important;
+      }
+      .sales-filter-grid select {
+        min-height: 44px;
+      }
+    }
+
+    /* ── Tüm Etkinlikler: overflow scroll ── */
+    #tab-allevents {
+      overflow-x: hidden;
+    }
+    #allEventsList {
+      width: 100%;
+    }
+    @media (max-width: 760px) {
+      .admin-event-card {
+        overflow: hidden;
+        max-width: 100%;
+      }
+      .admin-event-card-inner {
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+        padding: 16px 12px !important;
+      }
+      .admin-event-head {
+        grid-template-columns: 1fr !important;
+      }
+      .admin-event-actions {
+        flex-wrap: wrap !important;
+        justify-content: flex-start !important;
+        gap: 6px !important;
+      }
+      .admin-event-action.btn {
+        padding: 7px 12px !important;
+        font-size: 0.78rem !important;
+      }
+      .admin-event-meta {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 12px !important;
+      }
+    }
+    @media (max-width: 480px) {
+      .admin-event-meta {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    /* ── Satış tablosu: yatay scroll ── */
+    .sales-table-wrap {
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      border-radius: 16px;
+    }
+    @media (max-width: 768px) {
+      #tab-sales .sales-table {
+        min-width: 680px !important;
+        table-layout: auto !important;
+      }
+      .sales-search-row {
+        flex-direction: column !important;
+      }
+      .sales-search-input {
+        width: 100% !important;
+        min-width: unset !important;
+      }
+      .sales-export-btn {
+        width: 100% !important;
+        justify-content: center !important;
+      }
+    }
+
+    /* ── Sidebar: mobilde daha compact ── */
+    @media (max-width: 480px) {
+      .dash-nav-btn {
+        font-size: 0.72rem !important;
+        padding: 7px 6px !important;
+        min-width: 70px !important;
+      }
+    }
+
   </style>
 </head>
 <body>
