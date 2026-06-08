@@ -92,6 +92,12 @@ TRANSLATIONS = {
 
         # ── Hero ──────────────────────────────────────────
         'hero_title': 'Eğlence Zamanı!',
+        # ── Auth brand panel ──────────────────────────────────
+        'auth_brand_tagline': 'Etkinliklerin\nen iyi bileti\nburada.',
+        'auth_brand_desc': 'Konserler, tiyatrolar ve atölyelere anlık QR bilet satın al, etkinlikten önce güvenle iptal et.',
+        'auth_brand_feat1': 'Anlık QR e-bilet teslimatı',
+        'auth_brand_feat2': '256-bit SSL güvenli ödeme',
+        'auth_brand_feat3': 'Etkinliğe 72 saat kalana kadar iade (%20 kesinti)',
         'hero_desc': 'Konserler, tiyatrolar, atölyeler ve dahası... Tüm popüler etkinlikler ve biletler tek bir platformda sizi bekliyor.',
         'featured_badge': 'Öne Çıkan',
         'sold_out': 'Tükendi',
@@ -716,6 +722,12 @@ TRANSLATIONS = {
 
         # ── Hero ──────────────────────────────────────────
         'hero_title': 'Time for Entertainment!',
+        # ── Auth brand panel ──────────────────────────────────
+        'auth_brand_tagline': 'The best\nevent tickets,\nright here.',
+        'auth_brand_desc': 'Buy instant QR tickets for concerts, theaters and workshops. Cancel safely before the event.',
+        'auth_brand_feat1': 'Instant QR e-ticket delivery',
+        'auth_brand_feat2': '256-bit SSL secure payment',
+        'auth_brand_feat3': 'Refund up to 72h before event (20% fee)',
         'hero_desc': 'Concerts, theaters, workshops and more... All popular events and tickets are waiting for you on a single platform.',
         'featured_badge': 'Featured',
         'sold_out': 'Sold Out',
@@ -1341,6 +1353,12 @@ TRANSLATIONS = {
 
         # ── Hero ──────────────────────────────────────────
         'hero_title': 'Zeit für Unterhaltung!',
+        # ── Auth brand panel ──────────────────────────────────
+        'auth_brand_tagline': 'Die besten\nVeranstaltungstickets,\nhier.',
+        'auth_brand_desc': 'Kaufe sofortige QR-Tickets für Konzerte, Theater und Workshops. Sicher stornieren.',
+        'auth_brand_feat1': 'Sofortige QR-E-Ticket-Lieferung',
+        'auth_brand_feat2': '256-Bit-SSL-Sichere Zahlung',
+        'auth_brand_feat3': 'Erstattung bis 72h vor Event (20% Gebühr)',
         'hero_desc': 'Konzerte, Theater, Workshops und mehr... Alle beliebten Veranstaltungen und Tickets erwarten Sie auf einer einzigen Plattform.',
         'featured_badge': 'Hervorgehoben',
         'sold_out': 'Ausverkauft',

@@ -123,9 +123,18 @@ a { color: inherit; text-decoration: none; }
 }
 
 .navbar.scrolled .nav-container {
-  background: var(--bg-base);
-  border-bottom-color: var(--border);
-  box-shadow: 0 1px 20px rgba(0,0,0,0.25);
+  background: rgba(9,9,15,0.88);
+  border-bottom-color: rgba(245,158,11,0.22);
+  box-shadow: 0 2px 32px rgba(0,0,0,0.35);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+}
+[data-theme="light"] .navbar.scrolled .nav-container {
+  background: rgba(248,247,242,0.92);
+  border-bottom-color: rgba(180,83,9,0.2);
+  box-shadow: 0 2px 24px rgba(0,0,0,0.1);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
 }
 
 /* ── LOGO ────────────────────────────────────────────────── */
@@ -215,7 +224,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .mobile-nav-overlay {
-  display: none;
+  display: flex;                          /* Her zaman DOM'da */
   position: fixed;
   inset: 0;
   z-index: 950;
@@ -225,9 +234,19 @@ a { color: inherit; text-decoration: none; }
   justify-content: center;
   gap: 20px;
   padding: 40px;
+  /* Slide-in animasyonu */
+  transform: translateX(100%);
+  visibility: hidden;
+  transition: transform 0.38s cubic-bezier(0.16,1,0.3,1),
+              visibility 0s linear 0.38s;
 }
 
-.mobile-nav-overlay.active { display: flex; }
+.mobile-nav-overlay.active {
+  transform: translateX(0);
+  visibility: visible;
+  transition: transform 0.38s cubic-bezier(0.16,1,0.3,1),
+              visibility 0s linear 0s;
+}
 
 @media (max-width: 768px) {
   .mobile-menu-btn { display: flex; align-items: center; }
@@ -460,6 +479,17 @@ a { color: inherit; text-decoration: none; }
 
 .section-title span { color: var(--gold); }
 
+/* GUN-1: Section title accent underline */
+.section-title::after {
+  content: '';
+  display: block;
+  width: 44px;
+  height: 3px;
+  border-radius: 100px;
+  background: linear-gradient(90deg, var(--gold), #ec4899);
+  margin-top: 10px;
+}
+
 /* ── EVENTS GRID ─────────────────────────────────────────── */
 .events-grid {
   display: grid;
@@ -523,10 +553,7 @@ footer,
 
 .footer-trust-item svg { color: var(--gold); flex-shrink: 0; stroke-width: 2.5; }
 
-.site-footer {
-  padding: 48px 0 24px;
-  background: var(--bg-surface);
-}
+/* replaced by G below */
 
 .site-footer-grid {
   display: grid;
@@ -632,4 +659,222 @@ footer,
   background: var(--gold) !important;
   color: var(--text-inv) !important;
   border-color: var(--gold) !important;
+}
+
+/* GUN-1: Hero title gradient — daha belirgin */
+.hero-title {
+  background: linear-gradient(120deg, #f1f0ef 0%, #f1f0ef 40%, #f59e0b 70%, #ec4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200% auto;
+  animation: gradientShift 6s ease-in-out infinite alternate;
+}
+[data-theme="light"] .hero-title {
+  background: linear-gradient(120deg, #1a1a24 0%, #1a1a24 35%, #b45309 65%, #be185d 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200% auto;
+  animation: gradientShift 6s ease-in-out infinite alternate;
+}
+@keyframes gradientShift {
+  0%   { background-position: 0% center; }
+  100% { background-position: 100% center; }
+}
+
+/* GUN-1: Hero animated orbs */
+.hero-bg-collage::before {
+  content: '';
+  position: absolute;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(139,92,246,0.13), transparent 70%);
+  top: -120px; left: -80px;
+  animation: orbFloat 9s ease-in-out infinite;
+  pointer-events: none;
+}
+.hero-bg-collage::after {
+  content: '';
+  position: absolute;
+  width: 380px; height: 380px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245,158,11,0.1), transparent 70%);
+  bottom: -40px; right: -60px;
+  animation: orbFloat 12s ease-in-out infinite reverse;
+  pointer-events: none;
+}
+@keyframes orbFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%       { transform: translate(25px, -18px) scale(1.08); }
+}
+
+/* G: Footer top gradient glow */
+.site-footer {
+  border-top: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(245,158,11,0.04) 0%, var(--bg-surface) 64px);
+  padding: 48px 0 24px;
+}
+
+/* H: Scroll reveal */
+.sr {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16,1,0.3,1);
+}
+.sr.sr-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ═══════════════════════════════════════════════════
+   MOBILE RESPONSIVE — Genel Düzeltmeler
+   ═══════════════════════════════════════════════════ */
+
+/* Yatay scroll önle */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* iOS input zoom önle (font-size < 16px ise iOS zoom yapar) */
+@media (max-width: 768px) {
+  .form-control,
+  .search-input,
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  input[type="date"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Container padding mobilde daralt */
+@media (max-width: 480px) {
+  .container {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}
+
+/* Hero stats bar — mobilde dikey istif */
+@media (max-width: 600px) {
+  #heroStats {
+    gap: 20px !important;
+    flex-direction: column !important;
+  }
+  #heroStats > div[style*="width:1px"] {
+    display: none !important;
+  }
+}
+
+/* Kategori filtre butonları — yatay scroll */
+.hero-categories {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+  flex-wrap: nowrap !important;
+}
+.hero-categories::-webkit-scrollbar { display: none; }
+
+/* Events grid — mobilde tek sütun */
+@media (max-width: 480px) {
+  .events-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Event kartı butonları mobilde tam genişlik */
+@media (max-width: 480px) {
+  .event-footer {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .event-footer .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Mobil nav overlay link boyutu */
+.mobile-nav-overlay a,
+.mobile-nav-overlay button {
+  font-size: 1.2rem;
+  font-weight: 700;
+  padding: 14px 32px;
+  width: 100%;
+  text-align: center;
+  border-radius: var(--radius-md);
+  transition: var(--transition);
+}
+.mobile-nav-overlay a:hover {
+  background: var(--bg-hover);
+  color: var(--gold);
+}
+
+/* Kapatma butonu mobil menüde */
+.mobile-nav-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 8px;
+  line-height: 1;
+  transition: var(--transition);
+}
+.mobile-nav-close:hover { color: var(--text); transform: rotate(90deg); }
+
+/* Auth kart — çok küçük ekranda tam genişlik */
+@media (max-width: 380px) {
+  .auth-card { padding: 20px 14px !important; }
+  .auth-title { font-size: 1.25rem !important; }
+}
+
+/* Modal — mobilde bottom sheet */
+@media (max-width: 480px) {
+  .modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+  .modal-content {
+    max-width: 100%;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    max-height: 92vh;
+  }
+}
+
+/* Detail grid — tablet'te stack */
+@media (max-width: 900px) {
+  .detail-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Ticket card mobilde dikey */
+@media (max-width: 580px) {
+  .ticket-card {
+    flex-direction: column !important;
+  }
+  .ticket-card > img {
+    width: 100% !important;
+    height: 160px !important;
+    border-radius: 10px !important;
+  }
+  .ticket-card > div:last-child {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+  }
+  .ticket-card > div:last-child .btn {
+    flex: 1;
+    min-width: 100px;
+    font-size: 0.7rem;
+  }
 }

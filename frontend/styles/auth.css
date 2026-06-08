@@ -1,42 +1,68 @@
 /* ═══════════════════════════════════════════════════════════
-   EVENTİX — Auth Pages · Gold Editorial
+   EVENTİX — Auth Pages · Clean Split Layout
    ═══════════════════════════════════════════════════════════ */
 
+/* ── Temel mobil/tek kart layout ─────────────────────────── */
 .auth-page {
   min-height: 100vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 80px 20px 40px;
+  align-items: stretch;
   position: relative;
   overflow: hidden;
 }
 
-.auth-page::before {
-  content: '';
-  position: absolute;
-  width: 700px;
-  height: 700px;
-  background: radial-gradient(circle, rgba(245,158,11,0.08) 0%, transparent 65%);
-  top: -200px;
-  right: -200px;
-  pointer-events: none;
+/* ── Sol branding paneli (desktop'ta görünür) ────────────── */
+.auth-brand-panel {
+  display: none; /* mobilde gizli */
 }
 
-.auth-page::after {
-  content: '';
-  position: absolute;
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(20,184,166,0.05) 0%, transparent 65%);
-  bottom: -100px;
-  left: -100px;
-  pointer-events: none;
+/* ── Sağ form paneli ─────────────────────────────────────── */
+.auth-form-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px 40px;
+  background: var(--bg-base);
+  position: relative;
+  overflow: hidden;
 }
 
+/* Arka plan orb'ları (form paneli için) */
+.auth-form-panel::before {
+  content: '';
+  position: absolute;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245,158,11,0.07) 0%, transparent 65%);
+  top: -150px; right: -150px;
+  pointer-events: none;
+  animation: authOrb1 10s ease-in-out infinite;
+}
+.auth-form-panel::after {
+  content: '';
+  position: absolute;
+  width: 350px; height: 350px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(139,92,246,0.06) 0%, transparent 65%);
+  bottom: -80px; left: -80px;
+  pointer-events: none;
+  animation: authOrb2 13s ease-in-out infinite;
+}
+
+@keyframes authOrb1 {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  50%       { transform: translate(-20px, 15px) scale(1.08); }
+}
+@keyframes authOrb2 {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  50%       { transform: translate(18px, -20px) scale(0.93); }
+}
+
+/* ── Auth kart ───────────────────────────────────────────── */
 .auth-card {
   width: 100%;
-  max-width: 430px;
+  max-width: 420px;
   padding: 36px 32px;
   position: relative;
   z-index: 1;
@@ -134,7 +160,6 @@
 }
 .auth-link:hover { color: var(--gold-dim); }
 
-/* Alert message in auth form */
 .auth-alert {
   padding: 10px 14px;
   border-radius: var(--radius-sm);
@@ -144,10 +169,132 @@
 .auth-alert.error   { background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3); color: #fca5a5; }
 .auth-alert.success { background: rgba(20,184,166,.1); border: 1px solid rgba(20,184,166,.3); color: #5eead4; }
 
-/* ── MOBILE ───────────────────────────────────────────── */
+/* ── DESKTOP SPLIT LAYOUT (1000px+) ─────────────────────── */
+@media (min-width: 1000px) {
+  .auth-page {
+    flex-direction: row;
+  }
+
+  /* Sol branding paneli — her zaman koyu (premium dark) */
+  .auth-brand-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 440px;
+    flex-shrink: 0;
+    padding: 60px 52px;
+    background: linear-gradient(150deg, #09090f 0%, #13131e 60%, rgba(139,92,246,0.07) 100%);
+    border-right: 1px solid rgba(255,255,255,0.06);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Brand panel'in arka plan dekorasyonu */
+  .auth-brand-panel::before {
+    content: '';
+    position: absolute;
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(245,158,11,0.1), transparent 70%);
+    bottom: -80px; right: -60px;
+    pointer-events: none;
+  }
+  .auth-brand-panel::after {
+    content: '';
+    position: absolute;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(139,92,246,0.1), transparent 70%);
+    top: -40px; left: -40px;
+    pointer-events: none;
+  }
+
+  /* Brand panel içindeki tüm renkler HEP açık */
+  .auth-brand-panel .logo,
+  .auth-brand-panel .logo > span {
+    color: #f1f0ef !important;
+    -webkit-text-fill-color: #f1f0ef !important;
+    background: none !important;
+  }
+  .auth-brand-panel .logo-highlight {
+    color: #f59e0b !important;
+    -webkit-text-fill-color: #f59e0b !important;
+    background: none !important;
+  }
+
+  /* Form paneli */
+  .auth-form-panel {
+    flex: 1;
+    padding: 40px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* ── TABLET (600–999px) ──────────────────────────────────── */
+@media (min-width: 600px) and (max-width: 999px) {
+  .auth-form-panel { padding: 80px 40px 40px; }
+}
+
+/* ── MOBİL ───────────────────────────────────────────────── */
 @media (max-width: 480px) {
-  .auth-page { padding: 70px 12px 30px; }
+  .auth-form-panel { padding: 70px 12px 30px; }
   .auth-card { padding: 24px 20px; }
   .auth-title { font-size: 1.4rem; }
   .social-login-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Auth brand panel içerik CSS class'ları ──────────────── */
+.auth-brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.4rem;
+  color: #f1f0ef !important;
+  -webkit-text-fill-color: #f1f0ef !important;
+  text-decoration: none;
+  margin-bottom: 44px;
+}
+.auth-brand-name {
+  color: #f1f0ef !important;
+  -webkit-text-fill-color: #f1f0ef !important;
+  background: none !important;
+}
+.auth-brand-name .logo-highlight {
+  color: #f59e0b !important;
+  -webkit-text-fill-color: #f59e0b !important;
+  background: none !important;
+}
+.auth-brand-tagline {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1.25;
+  color: #f1f0ef;
+  margin-bottom: 16px;
+}
+.auth-brand-desc {
+  font-size: 0.9rem;
+  line-height: 1.75;
+  color: rgba(200,200,200,0.65);
+  max-width: 340px;
+  margin-bottom: 40px;
+}
+.auth-brand-features { display: flex; flex-direction: column; gap: 18px; }
+.auth-feat-item { display: flex; align-items: center; gap: 14px; }
+.auth-feat-item > span { color: rgba(200,200,200,0.75); font-weight: 600; font-size: 0.88rem; }
+.auth-feat-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; flex-shrink: 0;
+}
+.auth-feat-gold   { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.28); }
+.auth-feat-green  { background: rgba(34,197,94,0.10);  border: 1px solid rgba(34,197,94,0.28); }
+.auth-feat-purple { background: rgba(139,92,246,0.10); border: 1px solid rgba(139,92,246,0.28); }
+
+/* ── AÇIK MOD — brand panel derin koyu mor/lacivert ────────── */
+[data-theme="light"] .auth-brand-panel {
+  background: linear-gradient(150deg, #0f172a 0%, #1e293b 60%, rgba(56,189,248,0.07) 100%);
+  border-right-color: rgba(0,0,0,0.06);
 }

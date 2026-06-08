@@ -239,6 +239,7 @@
       } else {
         rt.textContent = `${remaining.toLocaleString(langCode)} ` + "{{ t('tickets_left') }}";
         rt.style.color = remaining < 20 ? '#f59e0b' : '#2dd4bf';
+        if (remaining < 20) rt.classList.add('pulse-warning');
       }
     }
 

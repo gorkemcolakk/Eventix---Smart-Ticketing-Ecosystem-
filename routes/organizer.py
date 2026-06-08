@@ -113,7 +113,7 @@ def organizer_revenue():
             'capacity': ev['capacity'],
             'gross_revenue': gross,
             'commission': round(gross * COMMISSION_RATE),
-            'net_revenue': round(gross * (1 - COMMISSION_RATE)),
+            'net_revenue': round(gross * (1 - COMMISSION_RATE)) + ev_refund_comp,
             'refund_comp': ev_refund_comp,
             'admin_fee': ev_admin_fee,
             'status': ev['status']

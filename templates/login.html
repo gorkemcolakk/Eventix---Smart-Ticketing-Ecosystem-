@@ -13,6 +13,36 @@
 <body>
 
   <main class="auth-page">
+    <!-- D: Auth brand panel -->
+    <div class="auth-brand-panel">
+      <a href="index.html" class="logo auth-brand-logo">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="url(#bp_grad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <defs><linearGradient id="bp_grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#ec4899"/></linearGradient></defs>
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+          <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+          <line x1="12" y1="22.08" x2="12" y2="12"></line>
+        </svg>
+        <span class="auth-brand-name">EVENT<span class="logo-highlight">IX</span></span>
+      </a>
+      <h2 class="auth-brand-tagline">{{ t('auth_brand_tagline')|replace('\n','<br>')|safe }}</h2>
+      <p class="auth-brand-desc">{{ t('auth_brand_desc') }}</p>
+      <div class="auth-brand-features">
+        <div class="auth-feat-item">
+          <div class="auth-feat-icon auth-feat-gold">🎟️</div>
+          <span>{{ t('auth_brand_feat1') }}</span>
+        </div>
+        <div class="auth-feat-item">
+          <div class="auth-feat-icon auth-feat-green">🔒</div>
+          <span>{{ t('auth_brand_feat2') }}</span>
+        </div>
+        <div class="auth-feat-item">
+          <div class="auth-feat-icon auth-feat-purple">↩️</div>
+          <span>{{ t('auth_brand_feat3') }}</span>
+        </div>
+      </div>
+    </div>
+    <!-- D: Form panel wrapper -->
+    <div class="auth-form-panel">
     <div class="auth-card glass-panel animate-up">
       
       <div class="auth-header">
@@ -62,6 +92,7 @@
       </div>
 
     </div>
+    </div><!-- /auth-form-panel -->
   </main>
 
   <script>

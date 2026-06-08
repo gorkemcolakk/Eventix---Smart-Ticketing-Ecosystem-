@@ -241,3 +241,21 @@
   .ticket-box-price { font-size: 1.6rem !important; }
   .lineup-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
 }
+
+/* B: Hero cinematic zoom-in on load */
+.event-hero-img {
+  animation: heroZoom 7s ease-out forwards;
+}
+@keyframes heroZoom {
+  from { transform: scale(1.07); }
+  to   { transform: scale(1.0); }
+}
+
+/* C: Low-stock pulse warning */
+@keyframes stockPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.65; transform: scale(0.98); }
+}
+.pulse-warning {
+  animation: stockPulse 1.8s ease-in-out infinite;
+}

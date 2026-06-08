@@ -165,6 +165,37 @@
         </div>
       </div>
 
+
+      <!-- GUN-1: Stats Bar (dynamic) -->
+      <div id="heroStats" style="display:flex;gap:32px;justify-content:center;margin-top:28px;margin-bottom:8px;flex-wrap:wrap;opacity:0;transition:opacity 0.6s ease 0.4s;" class="animate-up delay-3">
+        <div style="text-align:center;">
+          <div id="statEvents" style="font-size:1.35rem;font-weight:800;color:var(--gold);line-height:1;">—</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);font-weight:600;margin-top:4px;letter-spacing:0.04em;">Aktif Etkinlik</div>
+        </div>
+        <div style="width:1px;background:var(--border);align-self:stretch;"></div>
+        <div style="text-align:center;">
+          <div style="font-size:1.35rem;font-weight:800;color:#8b5cf6;line-height:1;">🎟️ QR</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);font-weight:600;margin-top:4px;letter-spacing:0.04em;">Anlık E-Bilet</div>
+        </div>
+        <div style="width:1px;background:var(--border);align-self:stretch;"></div>
+        <div style="text-align:center;">
+          <div style="font-size:1.35rem;font-weight:800;color:#22c55e;line-height:1;">🔒 SSL</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);font-weight:600;margin-top:4px;letter-spacing:0.04em;">Güvenli Ödeme</div>
+        </div>
+      </div>
+      <script>
+        // Gercek etkinlik sayisini API'den cek
+        fetch('/api/events?limit=500').then(r=>r.ok?r.json():null).then(events=>{
+          if(!events) return;
+          const active = events.filter(e=>e.status==='active').length;
+          const el = document.getElementById('statEvents');
+          if(el) el.textContent = active + ' +';
+          document.getElementById('heroStats').style.opacity = '1';
+        }).catch(()=>{
+          document.getElementById('heroStats').style.opacity = '1';
+        });
+      </script>
+
       <!-- Categories shortcut -->
       <div class="hero-categories animate-up delay-3">
         <div class="hero-cat-item cat-active" data-filter="all" onclick="setFilter('all')">
@@ -189,7 +220,7 @@
 
   <!-- Events Section -->
   <main class="container" id="events-section">
-    <div class="section-header">
+    <div class="section-header sr">
       <div>
         <h2 class="section-title">{{ t('popular_events') }}</h2>
         <p style="color:var(--text-muted);margin-top:8px;">{{ t('popular_events_desc') }}</p>
@@ -257,6 +288,21 @@
       executeServerFiltering();
     }
 
+  </script>
+  <script>
+    // H: Scroll reveal — IntersectionObserver
+    (function() {
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('sr-visible'); obs.unobserve(e.target); } });
+      }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+      document.querySelectorAll('.sr').forEach(el => obs.observe(el));
+      // Also watch dynamically added cards
+      const gridObs = new MutationObserver(() => {
+        document.querySelectorAll('.sr:not(.sr-visible)').forEach(el => obs.observe(el));
+      });
+      const grid = document.getElementById('eventsGrid');
+      if (grid) gridObs.observe(grid, { childList: true });
+    })();
   </script>
 </body>
 </html>
