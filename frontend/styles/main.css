@@ -920,3 +920,7 @@ body {
 
   .cart-link-nav { margin-right: 4px !important; }
 }
+
+@media (max-width: 576px) {
+  .nav-panel-label { display: none !important; }
+}

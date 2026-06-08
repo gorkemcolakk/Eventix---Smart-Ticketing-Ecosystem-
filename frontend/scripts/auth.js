@@ -254,6 +254,65 @@ const CART_BTN = `
 
 function renderNav() {
     const token = getToken(), user = getUser();
+
+    // ── DYNAMIC MOBILE NAVIGATION GENERATION ──────────────────────
+    let mobileOverlay = document.getElementById('mobileNav');
+    if (!mobileOverlay) {
+        mobileOverlay = document.createElement('div');
+        mobileOverlay.className = 'mobile-nav-overlay';
+        mobileOverlay.id = 'mobileNav';
+        const exploreLabel = _lang === 'tr' ? 'Keşfet' : (_lang === 'de' ? 'Entdecken' : 'Explore');
+        mobileOverlay.innerHTML = `
+          <button class="mobile-menu-btn" id="closeMobileMenu" aria-label="Close" style="position:absolute;top:16px;right:16px;color:var(--text-muted);width:36px;height:36px;padding:6px;flex:none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+          <ul class="nav-links" style="display:flex; flex-direction:column; text-align:center; gap:8px;">
+            <li><a href="index.html" class="nav-link mobile-link" onclick="document.getElementById('mobileNav')?.classList.remove('active')">${exploreLabel}</a></li>
+          </ul>
+          <div id="mobileNavAuth" style="display:flex; flex-direction:column; gap:12px; width:100%; max-width:280px; margin-top: 15px;">
+            <!-- auth.js tarafından dinamik doldurulur -->
+          </div>
+        `;
+        document.body.appendChild(mobileOverlay);
+    }
+
+    const navContainer = document.querySelector('.navbar .nav-container') || document.querySelector('.navbar .container');
+    if (navContainer && !navContainer.querySelector('#mobileMenuBtn')) {
+        const btn = document.createElement('button');
+        btn.className = 'mobile-menu-btn';
+        btn.id = 'mobileMenuBtn';
+        btn.type = 'button';
+        btn.setAttribute('aria-label', 'Menu');
+        btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`;
+        navContainer.appendChild(btn);
+    }
+
+    const curPath = window.location.pathname;
+    const isIndex = curPath === '/' || curPath.endsWith('/index.html') || curPath === '' || (!curPath.includes('.html'));
+    const isEventDetail = curPath.endsWith('/event-detail.html');
+    const shouldBindOverlay = !isIndex && !isEventDetail;
+
+    if (shouldBindOverlay) {
+        const openBtn = document.getElementById('mobileMenuBtn');
+        const closeBtn = document.getElementById('closeMobileMenu');
+        if (openBtn && mobileOverlay && !openBtn.dataset.listened) {
+            openBtn.dataset.listened = "true";
+            openBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                mobileOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+        }
+        if (closeBtn && mobileOverlay && !closeBtn.dataset.listened) {
+            closeBtn.dataset.listened = "true";
+            closeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                mobileOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        }
+    }
+
     const ctrls = document.querySelectorAll('.user-controls');
     
     ctrls.forEach(ctrl => {
@@ -332,8 +391,19 @@ function renderNav() {
         if (token && user) {
             const firstName = user.fullname.split(' ')[0];
             const dashBase = user.role === 'admin' ? 'admin.html' : user.role === 'organizer' ? 'organizer.html' : 'dashboard.html';
-            const lnk = (href, label) =>
-              `<a href="${href}" class="btn btn-outline mobile-link" style="justify-content:center;gap:8px;">${label}</a>`;
+            const lnk = (href, label) => {
+              let tabName = '';
+              if (href.includes('tab=')) {
+                tabName = href.split('tab=')[1].split('&')[0];
+              }
+              const pageName = href.split('?')[0];
+              const curPage = window.location.pathname.split('/').pop() || 'index.html';
+              
+              if (tabName && (pageName === curPage || (curPage === 'index.html' && pageName === 'index.html'))) {
+                return `<a href="#" onclick="event.preventDefault(); document.getElementById('mobileNav')?.classList.remove('active'); document.body.style.overflow = ''; typeof showTab==='function' ? showTab('${tabName}') : window.location.href='${href}'" class="btn btn-outline mobile-link" style="justify-content:center;gap:8px;">${label}</a>`;
+              }
+              return `<a href="${href}" onclick="document.getElementById('mobileNav')?.classList.remove('active'); document.body.style.overflow = '';" class="btn btn-outline mobile-link" style="justify-content:center;gap:8px;">${label}</a>`;
+            };
 
             let roleLinks = '';
             if (user.role === 'admin') {
@@ -361,7 +431,7 @@ function renderNav() {
 
             // Admin ve organizer için profil + biletler de ekle
             const commonBottom = (user.role !== 'customer') ? `
-              ${lnk(dashBase + '?tab=tickets', t('my_tickets'))}
+              ${lnk('dashboard.html?tab=tickets', t('my_tickets'))}
               ${lnk(dashBase + '?tab=profile', '👤 ' + firstName)}` : '';
 
             mobileAuthArea.innerHTML = `
@@ -542,8 +612,22 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.navbar')?.classList.toggle('scrolled', window.scrollY > 40);
     });
     const mobileOverlay = document.getElementById('mobileNav');
-    document.getElementById('mobileMenuBtn')?.addEventListener('click', () => mobileOverlay?.classList.add('active'));
-    document.getElementById('closeMobileMenu')?.addEventListener('click', () => mobileOverlay?.classList.remove('active'));
+    const openBtn = document.getElementById('mobileMenuBtn');
+    const closeBtn = document.getElementById('closeMobileMenu');
+    if (mobileOverlay && openBtn && !openBtn.dataset.listened) {
+        openBtn.dataset.listened = "true";
+        openBtn.addEventListener('click', () => {
+            mobileOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+    }
+    if (mobileOverlay && closeBtn && !closeBtn.dataset.listened) {
+        closeBtn.dataset.listened = "true";
+        closeBtn.addEventListener('click', () => {
+            mobileOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+    }
 });
 
 // Password Reset Flow
