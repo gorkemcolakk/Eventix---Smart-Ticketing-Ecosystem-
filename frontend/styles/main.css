@@ -249,15 +249,17 @@ a { color: inherit; text-decoration: none; }
 }
 
 @media (max-width: 768px) {
-  .mobile-menu-btn { display: flex; align-items: center; }
+  /* Hamburger her zaman görünür */
+  .mobile-menu-btn { display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .nav-links { display: none; }
-  .user-controls { gap: 4px; }
+  /* Logo sola sabitlenir, user-controls + hamburger sağa yaslanır */
+  .logo { font-size: 1.05rem; margin-right: auto; }
+  /* user-controls: margin-left: auto KALDIRILIR — hamburger dışarı taşmasın */
+  .user-controls { gap: 4px; margin-left: 0; }
   .user-controls .btn-outline,
   .user-controls .btn-primary { display: none; }
   .user-controls .theme-toggle { display: flex; }
-  /* Cart icon still visible on mobile */
-  .nav-container { gap: 12px; }
-  .logo { font-size: 1.05rem; }
+  .nav-container { gap: 8px; }
 }
 
 /* ── HERO ────────────────────────────────────────────────── */
@@ -886,36 +888,20 @@ body {
 }
 
 /* ───────────────────────────────────────────────────────
-   NAVBAR COMPACT — Mobil (tüm durumlar)
+   NAVBAR COMPACT — Tüm mobil durumlar
    ─────────────────────────────────────────────────────── */
-@media (max-width: 768px) {
-  /* Hamburger her zaman görünür, flex dışına itilmesin */
-  #mobileMenuBtn {
-    display: flex !important;
-    flex-shrink: 0 !important;
-    align-items: center;
-    justify-content: center;
-  }
-
-  /* nav-container taşmasın, ama hamburger kesilmesin */
-  .nav-container {
-    overflow: visible !important;
-  }
-}
-
 @media (max-width: 640px) {
-  /* user-dropdown-wrapper gizle (isim+dropdown) — mobil overlay halleder */
+  /* user-dropdown-wrapper gizle — mobil overlay halleder */
   .user-dropdown-wrapper { display: none !important; }
 
-  /* Cart: sadece ikon göster, metni gizle */
+  /* Cart: sadece ikon, text gizle */
   #navCartText { display: none !important; }
 
-  /* SADECE direct child <a> login/register butonlarını gizle */
-  /* LANG_BTN .lang-dropdown içinde olduğu için korunur */
+  /* Sadece login/register <a> butonlarını gizle */
   .user-controls > a.btn-outline,
   .user-controls > a.btn-primary { display: none !important; }
 
-  /* Dil seçici butonunu her zaman göster */
+  /* Dil seçicisini her zaman göster */
   .user-controls .lang-dropdown { display: inline-block !important; }
   .user-controls .lang-dropdown button.btn-outline {
     display: flex !important;
@@ -923,8 +909,5 @@ body {
     font-size: 0.78rem !important;
   }
 
-  /* Cart link: flex ve küçük */
-  .cart-link-nav {
-    margin-right: 4px !important;
-  }
+  .cart-link-nav { margin-right: 4px !important; }
 }
