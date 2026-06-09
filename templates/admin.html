@@ -392,9 +392,24 @@
     <div class="container nav-container">
       <a href="index.html" class="logo"><span>EVENT<span class="logo-highlight">IX</span></span></a>
       <div class="nav-panel-label" style="font-weight:600;color:var(--accent-teal);">{{ t('admin_panel') }}</div>
+      <div id="navAuthArea" style="display:flex;align-items:center;gap:10px;"></div>
       <div class="user-controls"></div>
+
+      <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
     </div>
   </nav>
+
+  <!-- Mobile Nav -->
+  <div class="mobile-nav-overlay" id="mobileNav">
+    <button class="mobile-menu-btn" id="closeMobileMenu" aria-label="Kapat" style="position:absolute;top:16px;right:16px;color:var(--text-muted);width:36px;height:36px;padding:6px;flex:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+    <div id="mobileNavAuth" style="display:flex; flex-direction:column; gap:12px; width:100%; max-width:280px;">
+      <!-- auth.js tarafından dinamik doldurulur -->
+    </div>
+  </div>
 
   <main class="container dashboard-page">
     <aside class="dash-sidebar glass-panel">

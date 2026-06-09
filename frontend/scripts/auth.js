@@ -438,7 +438,7 @@ function renderNav() {
               ${roleLinks}
               ${commonBottom}
               <button onclick="logout()" class="btn btn-danger mobile-link" style="justify-content:center;border-color:rgba(239,68,68,0.4);">
-                🚪 ${t('logout')}
+                ${t('logout')}
               </button>`;
         } else {
             mobileAuthArea.innerHTML = `
