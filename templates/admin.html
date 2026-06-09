@@ -938,7 +938,7 @@
         const users = await r.json();
 
         const roleMeta = {
-          admin:     { label: '{{ t("admin_panel") }}', color: '#ef4444', bg: 'rgba(239,68,68,0.12)', border: 'rgba(239,68,68,0.3)', icon: '⚙️' },
+          admin:     { label: 'Admin', color: '#ef4444', bg: 'rgba(239,68,68,0.12)', border: 'rgba(239,68,68,0.3)', icon: '⚙️' },
           organizer: { label: '{{ t("organizer") }}',   color: '#f59e0b', bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.3)', icon: '🎪' },
           customer:  { label: '{{ t("customer") }}',    color: '#22c55e', bg: 'rgba(34,197,94,0.12)',  border: 'rgba(34,197,94,0.3)',  icon: '🎟️' },
           guest:     { label: '{{ t("guest") }}',       color: '#6b7280', bg: 'rgba(107,114,128,0.1)', border: 'rgba(107,114,128,0.25)', icon: '👤' },
@@ -958,9 +958,9 @@
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;">
             ${[
               { label:'{{ t("users") }}',     val: users.length, color:'#8b5cf6', icon:'👥' },
-              { label:'{{ t("organizer") }}s', val: orgs,         color:'#f59e0b', icon:'🎪' },
-              { label:'{{ t("customer") }}s',  val: customers,     color:'#22c55e', icon:'🎟️' },
-              { label:'{{ t("guest") }}s',     val: guests,        color:'#6b7280', icon:'👤' },
+              { label:'{{ t("organizer") }}', val: orgs,         color:'#f59e0b', icon:'🎪' },
+              { label:'{{ t("customer") }}',  val: customers,     color:'#22c55e', icon:'🎟️' },
+              { label:'{{ t("guest") }}',     val: guests,        color:'#6b7280', icon:'👤' },
             ].map(s => `
               <div class="glass-panel" style="padding:16px 18px;display:flex;align-items:center;gap:14px;border-top:2px solid ${s.color};">
                 <div style="font-size:1.5rem;">${s.icon}</div>
@@ -978,7 +978,7 @@
               onfocus="this.style.borderColor='#8b5cf6'" onblur="this.style.borderColor='var(--border)'">
             <select id="userRoleFilter" onchange="filterUsers()"
               style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:9px 14px;color:var(--text);font-size:0.85rem;outline:none;">
-              <option value="">{{ t('role_col') }}: {{ t('all_events') }}</option>
+              <option value="">{{ t('role_col') }}: {{ t('users') }}</option>
               <option value="admin">Admin</option>
               <option value="organizer">{{ t('organizer') }}</option>
               <option value="customer">{{ t('customer') }}</option>
@@ -987,37 +987,45 @@
           </div>
 
           <!-- User Cards Grid -->
-          <div id="usersGrid" style="display:flex;flex-direction:column;gap:8px;">
+          <div id="usersGrid" style="display:flex;flex-direction:column;gap:12px;width:100%;box-sizing:border-box;">
             ${users.map((u, i) => {
               const m = getMeta(u.role);
               const initials = getInitials(u.fullname);
               const avatarBg = getAvatarColor(u.fullname);
-              const dateStr = u.created_at ? new Date(u.created_at).toLocaleDateString('tr-TR', {day:'numeric',month:'short',year:'numeric'}) : '-';
+              const dateStr = u.created_at ? new Date(u.created_at).toLocaleDateString('tr-TR', {day:'numeric',month:'short',year:'numeric', hour:'2-digit', minute:'2-digit'}) : '-';
               return `
               <div class="user-card" data-name="${(u.fullname||'').toLowerCase()}" data-email="${(u.email||'').toLowerCase()}" data-role="${u.role}"
-                style="display:flex;align-items:center;gap:16px;padding:14px 18px;background:var(--bg-surface);border:1px solid var(--border);border-radius:14px;transition:all 0.2s;cursor:default;"
+                style="display:flex;flex-direction:column;gap:12px;padding:16px 20px;background:var(--bg-surface);border:1px solid var(--border);border-radius:14px;transition:all 0.2s;cursor:default;width:100%;box-sizing:border-box;overflow-x:auto;"
                 onmouseenter="this.style.borderColor='${m.color}55';this.style.background='var(--bg-surface-hover,var(--bg-surface))';this.style.transform='translateX(3px)'"
                 onmouseleave="this.style.borderColor='var(--border)';this.style.transform='none'">
-                <!-- Avatar -->
-                <div style="width:42px;height:42px;border-radius:50%;background:${avatarBg};display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;color:#fff;flex-shrink:0;letter-spacing:0.5px;">
-                  ${initials}
+                
+                <!-- Top Row: Avatar, Name, Role -->
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+                  <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:44px;height:44px;border-radius:50%;background:${avatarBg};display:flex;align-items:center;justify-content:center;font-size:0.9rem;font-weight:700;color:#fff;flex-shrink:0;letter-spacing:0.5px;">
+                      ${initials}
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:3px;">
+                      <span style="font-weight:700;color:var(--text);font-size:0.95rem;">${u.fullname || '-'}</span>
+                      <span style="background:${m.bg};color:${m.color};border:1px solid ${m.border};border-radius:100px;padding:3px 10px;font-size:0.68rem;font-weight:700;display:inline-block;width:max-content;">
+                        ${m.icon} ${m.label}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <!-- Name + Email -->
-                <div style="flex:1;min-width:0;">
-                  <div style="font-weight:700;color:var(--text);font-size:0.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${u.fullname || '-'}</div>
-                  <div style="font-size:0.78rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${u.email}</div>
+
+                <!-- Secondary Row: Email & Date -->
+                <div style="display:flex;flex-wrap:wrap;gap:24px;border-top:1px dashed rgba(255,255,255,0.06);padding-top:12px;margin-top:2px;">
+                  <div style="display:flex;flex-direction:column;gap:3px;">
+                    <span style="font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:0.5px;">{{ t('email_col') }}</span>
+                    <span style="font-size:0.85rem;color:var(--text);font-weight:600;">${u.email || '-'}</span>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:3px;">
+                    <span style="font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:0.5px;">{{ t('date_col') }}</span>
+                    <span style="font-size:0.85rem;color:var(--text);font-weight:600;">${dateStr}</span>
+                  </div>
                 </div>
-                <!-- Role Badge -->
-                <div style="flex-shrink:0;">
-                  <span style="background:${m.bg};color:${m.color};border:1px solid ${m.border};border-radius:100px;padding:4px 12px;font-size:0.72rem;font-weight:700;white-space:nowrap;">
-                    ${m.icon} ${m.label}
-                  </span>
-                </div>
-                <!-- Date -->
-                <div style="flex-shrink:0;text-align:right;min-width:80px;">
-                  <div style="font-size:0.75rem;color:var(--text-muted);">${dateStr}</div>
-                  <div style="font-size:0.68rem;color:var(--text-muted);opacity:0.6;">#${i+1}</div>
-                </div>
+
               </div>`;
             }).join('')}
           </div>`;
