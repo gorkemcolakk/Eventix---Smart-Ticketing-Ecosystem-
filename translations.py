@@ -92,6 +92,9 @@ TRANSLATIONS = {
 
         # ── Hero ──────────────────────────────────────────
         'hero_title': 'Eğlence Zamanı!',
+        'stat_active_events': 'Aktif Etkinlik',
+        'stat_instant_ticket': 'Anlık E-Bilet',
+        'stat_secure_payment': 'Güvenli Ödeme',
         # ── Auth brand panel ──────────────────────────────────
         'auth_brand_tagline': 'Etkinliklerin\nen iyi bileti\nburada.',
         # ── Bildirimler ───────────────────────────────────────
@@ -359,6 +362,7 @@ TRANSLATIONS = {
         # ── Cart ──────────────────────────────────────────
         'your_cart': 'Sepetiniz',
         'checkout': 'Ödemeye Geç',
+        'confirmation': 'Onay',
         'total': 'Toplam',
         'subtotal': 'Ara Toplam',
         'empty_cart': 'Sepetiniz boş.',
@@ -726,6 +730,9 @@ TRANSLATIONS = {
 
         # ── Hero ──────────────────────────────────────────
         'hero_title': 'Time for Entertainment!',
+        'stat_active_events': 'Active Events',
+        'stat_instant_ticket': 'Instant E-Ticket',
+        'stat_secure_payment': 'Secure Payment',
         # ── Auth brand panel ──────────────────────────────────
         'auth_brand_tagline': 'The best\nevent tickets,\nright here.',
         # ── Notifications ─────────────────────────────────────
@@ -993,6 +1000,7 @@ TRANSLATIONS = {
         # ── Cart ──────────────────────────────────────────
         'your_cart': 'Your Cart',
         'checkout': 'Checkout',
+        'confirmation': 'Confirmation',
         'total': 'Total',
         'subtotal': 'Subtotal',
         'empty_cart': 'Your cart is empty.',
@@ -1361,6 +1369,9 @@ TRANSLATIONS = {
 
         # ── Hero ──────────────────────────────────────────
         'hero_title': 'Zeit für Unterhaltung!',
+        'stat_active_events': 'Aktive Events',
+        'stat_instant_ticket': 'Sofort-E-Ticket',
+        'stat_secure_payment': 'Sichere Zahlung',
         # ── Auth brand panel ──────────────────────────────────
         'auth_brand_tagline': 'Die besten\nVeranstaltungstickets,\nhier.',
         # ── Benachrichtigungen ────────────────────────────────
@@ -1628,6 +1639,7 @@ TRANSLATIONS = {
         # ── Cart ──────────────────────────────────────────
         'your_cart': 'Ihr Warenkorb',
         'checkout': 'Zur Kasse',
+        'confirmation': 'Bestätigung',
         'total': 'Gesamt',
         'subtotal': 'Zwischensumme',
         'empty_cart': 'Ihr Warenkorb ist leer.',

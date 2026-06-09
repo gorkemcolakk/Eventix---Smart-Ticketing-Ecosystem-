@@ -61,11 +61,11 @@
   <nav class="navbar">
     <div class="container nav-container">
       <a href="index.html" class="logo">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <defs><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#ec4899"/></linearGradient></defs>
-          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-          <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-          <line x1="12" y1="22.08" x2="12" y2="12"></line>
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <defs><linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#ec4899"/></linearGradient></defs>
+          <path stroke="url(#lg1)" d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
+          <line stroke="url(#lg1)" x1="13" y1="5" x2="13" y2="19" stroke-dasharray="2,1.5"/>
+          <polygon fill="url(#lg1)" stroke="none" points="7.5,9.2 8.21,11.03 10.16,11.13 8.64,12.37 9.15,14.27 7.5,13.2 5.85,14.27 6.36,12.37 4.84,11.13 6.79,11.03"/>
         </svg>
         <span>EVENT<span class="logo-highlight">IX</span></span>
       </a>
@@ -170,17 +170,17 @@
       <div id="heroStats" style="display:flex;gap:32px;justify-content:center;margin-top:28px;margin-bottom:8px;flex-wrap:wrap;opacity:0;transition:opacity 0.6s ease 0.4s;" class="animate-up delay-3">
         <div style="text-align:center;">
           <div id="statEvents" style="font-size:1.35rem;font-weight:800;color:var(--gold);line-height:1;">—</div>
-          <div style="font-size:0.75rem;color:var(--text-muted);font-weight:600;margin-top:4px;letter-spacing:0.04em;">Aktif Etkinlik</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);font-weight:600;margin-top:4px;letter-spacing:0.04em;">{{ t('stat_active_events') }}</div>
         </div>
         <div style="width:1px;background:var(--border);align-self:stretch;"></div>
         <div style="text-align:center;">
           <div style="font-size:1.35rem;font-weight:800;color:#8b5cf6;line-height:1;">🎟️ QR</div>
-          <div style="font-size:0.75rem;color:var(--text-muted);font-weight:600;margin-top:4px;letter-spacing:0.04em;">Anlık E-Bilet</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);font-weight:600;margin-top:4px;letter-spacing:0.04em;">{{ t('stat_instant_ticket') }}</div>
         </div>
         <div style="width:1px;background:var(--border);align-self:stretch;"></div>
         <div style="text-align:center;">
           <div style="font-size:1.35rem;font-weight:800;color:#22c55e;line-height:1;">🔒 SSL</div>
-          <div style="font-size:0.75rem;color:var(--text-muted);font-weight:600;margin-top:4px;letter-spacing:0.04em;">Güvenli Ödeme</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);font-weight:600;margin-top:4px;letter-spacing:0.04em;">{{ t('stat_secure_payment') }}</div>
         </div>
       </div>
       <script>
