@@ -997,7 +997,8 @@
           </div>
 
           <!-- User Cards Grid -->
-          <div id="usersGrid" style="display:flex;flex-direction:column;gap:12px;width:100%;box-sizing:border-box;">
+          <div style="width:100%;overflow-x:auto;padding-bottom:12px;">
+            <div id="usersGrid" style="display:flex;flex-direction:column;gap:12px;min-width:max-content;box-sizing:border-box;">
             ${users.map((u, i) => {
               const m = getMeta(u.role);
               const initials = getInitials(u.fullname);
@@ -1017,7 +1018,7 @@
 
               return `
               <div class="user-card" data-name="${(u.fullname||'').toLowerCase()}" data-email="${(u.email||'').toLowerCase()}" data-role="${u.role}"
-                style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px;padding:18px 24px;background:var(--bg-surface);border:1px solid var(--border);border-radius:14px;transition:all 0.2s;cursor:default;width:100%;box-sizing:border-box;"
+                style="display:flex;flex-wrap:nowrap;align-items:center;justify-content:space-between;gap:20px;padding:18px 24px;background:var(--bg-surface);border:1px solid var(--border);border-radius:14px;transition:all 0.2s;cursor:default;width:100%;box-sizing:border-box;"
                 onmouseenter="this.style.borderColor='${m.color}55';this.style.background='var(--bg-surface-hover,var(--bg-surface))';this.style.transform='translateX(3px)'"
                 onmouseleave="this.style.borderColor='var(--border)';this.style.transform='none'">
                 
@@ -1035,7 +1036,7 @@
                 </div>
 
                 <!-- Right: Info Grid -->
-                <div style="display:flex;flex-wrap:wrap;gap:24px;flex:1;justify-content:flex-start;align-items:center;">
+                <div style="display:flex;flex-wrap:nowrap;gap:24px;flex:1;justify-content:flex-start;align-items:center;">
                   <div style="display:flex;flex-direction:column;gap:4px;width:240px;max-width:100%;">
                     <span style="font-size:0.75rem;color:var(--text);text-transform:uppercase;font-weight:800;letter-spacing:0.8px;opacity:0.85;">E-POSTA</span>
                     <span style="font-size:0.95rem;color:var(--text);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${u.email || '-'}">${u.email || '-'}</span>
@@ -1056,6 +1057,7 @@
 
               </div>`;
             }).join('')}
+          </div>
           </div>`;
       } catch { el.innerHTML = '<p class="loading-text" style="color:#f87171;">{{ t("failed_to_load") }}</p>'; }
     }
