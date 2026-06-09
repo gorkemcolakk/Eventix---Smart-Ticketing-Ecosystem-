@@ -18,7 +18,10 @@ if TURSO_DB_URL and TURSO_DB_URL.startswith('libsql://'):
     TURSO_DB_URL = TURSO_DB_URL.replace('libsql://', 'https://')
 TURSO_AUTH_TOKEN = os.getenv('TURSO_AUTH_TOKEN')
 
-DB_PATH = os.path.join(_BASE_DIR, 'database.db')
+if getattr(sys, 'frozen', False):
+    DB_PATH = os.path.join(os.path.dirname(sys.executable), 'database.db')
+else:
+    DB_PATH = os.path.join(_BASE_DIR, 'database.db')
 
 USING_TURSO = bool(TURSO_DB_URL and TURSO_AUTH_TOKEN)
 
