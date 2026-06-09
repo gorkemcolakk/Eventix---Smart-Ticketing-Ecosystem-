@@ -1,6 +1,8 @@
 <div align="center">
 
-<br/>
+  <img src="./images/poster.png" alt="Eventix Poster" width="100%" style="border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); margin-bottom: 20px;"/>
+  <br/>
+
 
 <!-- LOGO SVG - Bilet tasarımı -->
 <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
