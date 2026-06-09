@@ -100,7 +100,7 @@
     .sales-stats { display:grid; grid-template-columns:repeat(6,1fr); gap:10px; margin-bottom:22px; }
     .sales-stat-card {
       position:relative; padding:16px 12px; border-radius:14px; overflow:hidden;
-      background:rgba(255,255,255,0.03); border:1px solid var(--border);
+      background:var(--bg-card); border:1px solid var(--border);
       transition:transform .2s, box-shadow .2s;
     }
     .sales-stat-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.15); }
@@ -1328,11 +1328,11 @@
         var refundComp = d.total_refund_comp || 0;
         el.innerHTML =
           '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;">' +
-          '<div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid #3b82f6;"><div style="font-size:1.6rem;font-weight:700;color:#3b82f6;">' + (d.total_tickets || 0) + '</div><div style="color:var(--text-muted);font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;">{{ t("sold_ticket_count") }}</div></div>' +
-          '<div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid var(--gold);"><div style="font-size:1.6rem;font-weight:700;color:var(--gold);">' + (d.total_revenue || 0).toLocaleString('en-US') + ' ₺</div><div style="color:var(--text-muted);font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;">{{ t("tickets_sold_revenue") }}</div></div>' +
-          '<div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid #ef4444;"><div style="font-size:1.6rem;font-weight:700;color:#ef4444;">' + (d.commission || 0).toLocaleString('en-US') + ' ₺</div><div style="color:var(--text-muted);font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;white-space:nowrap;">{{ t("platform_commission") }} (%10)</div></div>' +
-          '<div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid #8b5cf6;box-shadow:0 4px 20px rgba(139,92,246,0.15);"><div style="font-size:1.6rem;font-weight:700;background:linear-gradient(135deg,#8b5cf6,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">' + refundComp.toLocaleString('en-US') + ' ₺</div><div style="color:var(--text-muted);font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;white-space:nowrap;">{{ t("refund_revenue") }} (%15)</div></div>' +
-          '<div class="glass-panel" style="padding:18px 10px;text-align:center;border-top:2px solid #22c55e;"><div style="font-size:1.6rem;font-weight:700;color:#22c55e;">' + (d.net_revenue || 0).toLocaleString('en-US') + ' ₺</div><div style="color:var(--text-muted);font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;">{{ t("net_revenue") }}</div></div>' +
+          '<div class="sales-stat-card used" style="padding:18px 10px;text-align:center;"><div style="font-size:1.6rem;font-weight:700;color:#3b82f6;">' + (d.total_tickets || 0) + '</div><div style="color:var(--text-muted);font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;">{{ t("sold_ticket_count") }}</div></div>' +
+          '<div class="sales-stat-card amount" style="padding:18px 10px;text-align:center;"><div style="font-size:1.6rem;font-weight:700;color:var(--gold);">' + (d.total_revenue || 0).toLocaleString('en-US') + ' ₺</div><div style="color:var(--text-muted);font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;">{{ t("tickets_sold_revenue") }}</div></div>' +
+          '<div class="sales-stat-card cancel" style="padding:18px 10px;text-align:center;"><div style="font-size:1.6rem;font-weight:700;color:#ef4444;">' + (d.commission || 0).toLocaleString('en-US') + ' ₺</div><div style="color:var(--text-muted);font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;white-space:nowrap;">{{ t("platform_commission") }} (%10)</div></div>' +
+          '<div class="sales-stat-card total" style="padding:18px 10px;text-align:center;"><div style="font-size:1.6rem;font-weight:700;background:linear-gradient(135deg,#8b5cf6,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">' + refundComp.toLocaleString('en-US') + ' ₺</div><div style="color:var(--text-muted);font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;white-space:nowrap;">{{ t("refund_revenue") }} (%15)</div></div>' +
+          '<div class="sales-stat-card valid" style="padding:18px 10px;text-align:center;"><div style="font-size:1.6rem;font-weight:700;color:#22c55e;">' + (d.net_revenue || 0).toLocaleString('en-US') + ' ₺</div><div style="color:var(--text-muted);font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;">{{ t("net_revenue") }}</div></div>' +
           '</div>';
         var rows = '';
         var chartLabels = [];
