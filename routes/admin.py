@@ -9,7 +9,7 @@ admin_bp = Blueprint('admin', __name__, url_prefix='/api/admin')
 def admin_list_users():
     conn = get_db_connection()
     users = conn.execute(
-        'SELECT id, fullname, email, role, created_at FROM users ORDER BY id'
+        'SELECT id, fullname, email, role, created_at, phone, birthdate FROM users ORDER BY id'
     ).fetchall()
     conn.close()
     return jsonify([dict(u) for u in users]), 200
