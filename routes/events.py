@@ -93,7 +93,7 @@ def get_event(event_id):
         token = auth_header.split(' ')[1]
         try:
             g.user = decode_token(token)
-        except:
+        except Exception:
             g.user = None
 
     conn = get_db_connection()
@@ -144,7 +144,7 @@ def get_event_seats(event_id):
             from utils import SECRET_KEY
             payload = _jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
             current_user_id = payload.get('id')
-    except Exception:
+    except (_jwt.ExpiredSignatureError, _jwt.InvalidTokenError, Exception):
         current_user_id = None
 
     conn = get_db_connection()
@@ -180,7 +180,7 @@ def get_event_seats(event_id):
                 try:
                     from datetime import datetime
                     locked_dt = datetime.fromtimestamp(int(val) / 1000.0)
-                except:
+                except (ValueError, OSError):
                     pass
             else:
                 # Checkout formatlarını dene

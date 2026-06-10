@@ -15,12 +15,20 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))  # Load SMTP and other settings from
 import certifi
 os.environ['SSL_CERT_FILE'] = certifi.where()
 
+# ── Logging ──────────────────────────────────────────────────
+import logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+logger = logging.getLogger('eventix')
+
 from flask import Flask, request, session, render_template, redirect, make_response
 from flask_cors import CORS
 from utils import SECRET_KEY, limiter, cache, send_birthday_emails
+from services import birthday_job
 import threading
-import time
-from datetime import datetime
 from translations import TRANSLATIONS
 
 from routes.auth import auth_bp
@@ -36,7 +44,11 @@ from routes.contact import contact_bp
 from database import run_schema_migrations
 
 app = Flask(__name__, static_folder=None, template_folder=os.path.join(BASE_DIR, 'templates'))
-CORS(app)
+
+# CORS: .env'den origins oku, yoksa varsayılan olarak localhost'a izin ver
+_cors_origins = os.getenv('CORS_ORIGINS', 'http://localhost:5002,http://127.0.0.1:5002')
+_cors_list = [o.strip() for o in _cors_origins.split(',') if o.strip()]
+CORS(app, origins=_cors_list if _cors_list else None)
 app.config['SECRET_KEY'] = SECRET_KEY
 limiter.init_app(app)
 cache.init_app(app)
@@ -109,23 +121,13 @@ def serve_static(path):
         except Exception:
             return render_template('index.html')
 
-def birthday_job():
-    """Runs in background and sends emails at exactly 00:00."""
-    while True:
-        now = datetime.now()
-        if now.hour == 0 and now.minute == 0:
-            send_birthday_emails()
-            time.sleep(65) # Aynı dakika içinde tekrar tetiklenmesini önle
-        else:
-            time.sleep(30)
-
 if __name__ == '__main__':
     # init_db()  # <-- Turso kurulu olduğu için her başlatmada kapatıyoruz.
     
-    # Check to prevent duplicate threads during development reload
+    # Start background jobs (birthday emails)
     if os.environ.get('WERKZEUG_RUN_MAIN') == 'true' or not app.debug:
-        t = threading.Thread(target=birthday_job, daemon=True)
+        t = threading.Thread(target=birthday_job, args=(send_birthday_emails,), daemon=True)
         t.start()
-        print(">>> Birthday Background Service Started (Waiting for 00:00)")
     # On Windows, using use_reloader=False is more stable for custom threading
-    app.run(debug=True, host='0.0.0.0', port=5002, use_reloader=False)
+    _debug = os.getenv('DEBUG', 'false').lower() == 'true'
+    app.run(debug=_debug, host='0.0.0.0', port=5002, use_reloader=False)

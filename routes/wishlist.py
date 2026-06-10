@@ -1,3 +1,5 @@
+import sqlite3
+import logging
 from flask import Blueprint, jsonify, g
 from database import get_db_connection
 from utils import token_required, event_to_dict
@@ -19,9 +21,9 @@ def get_wishlist():
     try:
         data = [event_to_dict(e) for e in items]
         return jsonify(data), 200
-    except Exception as e:
-        print(f"Wishlist mapping error: {e}")
-        return jsonify([]), 200 # Hata olsa bile bos liste dondur ki arayuz cokmesin
+    except (KeyError, TypeError, json.JSONDecodeError) as e:
+        logging.getLogger('eventix').warning('Wishlist mapping error: %s', e)
+        return jsonify([]), 200
 
 @wishlist_bp.route('/<event_id>', methods=['POST'])
 @token_required
@@ -39,7 +41,7 @@ def add_to_wishlist(event_id):
         conn.commit()
         conn.close()
         return jsonify({'message': 'Added to wishlist'}), 201
-    except Exception:
+    except sqlite3.IntegrityError:
         conn.close()
         return jsonify({'message': 'Already in wishlist'}), 409
 

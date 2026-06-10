@@ -2,11 +2,14 @@ from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 import datetime
+import re
 from database import get_db_connection
 from utils import SECRET_KEY, limiter, sanitize_html
 import os
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
+
+EMAIL_RE = re.compile(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
 
 @auth_bp.route('/register', methods=['POST'])
 @limiter.limit("5 per hour")
@@ -14,6 +17,9 @@ def register():
     data = request.get_json()
     if not data or not data.get('email') or not data.get('password') or not data.get('fullname'):
         return jsonify({'message': 'Missing data'}), 400
+
+    if not EMAIL_RE.match(data['email']):
+        return jsonify({'message': 'Invalid email format'}), 400
 
     if len(data['password']) < 6:
         return jsonify({'message': 'Password must be at least 6 characters'}), 400
@@ -48,6 +54,9 @@ def login():
     data = request.get_json()
     if not data or not data.get('email') or not data.get('password'):
         return jsonify({'message': 'Missing data'}), 400
+
+    if not EMAIL_RE.match(data['email']):
+        return jsonify({'message': 'Invalid email format'}), 400
 
     conn = get_db_connection()
     user = conn.execute('SELECT * FROM users WHERE email = ?', (data['email'],)).fetchone()
@@ -85,6 +94,8 @@ def forgot_password():
     email = data.get('email')
     if not email:
         return jsonify({'message': 'Email is required'}), 400
+    if not EMAIL_RE.match(email):
+        return jsonify({'message': 'Invalid email format'}), 400
 
     conn = get_db_connection()
     user = conn.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
@@ -144,7 +155,7 @@ def reset_password():
         decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
         if decoded.get('purpose') != 'password_reset':
             return jsonify({'message': 'Invalid token purpose'}), 400
-    except Exception:
+    except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
         return jsonify({'message': 'Invalid or expired token'}), 400
     
     hashed_pw = generate_password_hash(new_password)

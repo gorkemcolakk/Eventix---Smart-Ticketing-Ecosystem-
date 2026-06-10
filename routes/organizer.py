@@ -1,6 +1,9 @@
 from flask import Blueprint, request, jsonify, g, Response
+import logging
 from database import get_db_connection
 from utils import role_required, event_to_dict, COMMISSION_RATE
+
+logger = logging.getLogger('eventix')
 
 organizer_bp = Blueprint('organizer', __name__, url_prefix='/api/organizer')
 
@@ -17,8 +20,8 @@ def organizer_events():
         ).fetchall()
     conn.close()
     
-    # Debug log for you to see in terminal
-    print(f"--- LOG: Organizator {g.user['id']} icin {len(events)} etkinlik/seans donduruldu. ---")
+    # Debug log
+    logger.debug("Organizer %s: %d events returned.", g.user['id'], len(events))
     
     return jsonify([event_to_dict(e) for e in events]), 200
 
@@ -93,7 +96,7 @@ def organizer_revenue():
             raw_title = ev['title']
             short_title = raw_title[:12] + '...' if len(raw_title) > 15 else raw_title
             display_title = f"{short_title} ({day_str})"
-        except:
+        except (ValueError, TypeError):
             display_title = ev['title']
 
         # Bu etkinliğe ait iade tazminatını çek (Admin fee'yi tickets üzerinden hesapladık)

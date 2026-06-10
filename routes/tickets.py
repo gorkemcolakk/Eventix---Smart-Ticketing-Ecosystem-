@@ -1,9 +1,10 @@
 import uuid
+import logging
 from flask import Blueprint, request, jsonify, g
 from database import get_db_connection
 from utils import token_required, make_qr_base64, make_qr_bytes, create_notification, sign_ticket_data, verify_ticket_signature, send_email, send_ticket_confirmation_email, get_request_lang, limiter, sanitize_html, cache, SECRET_KEY
 import jwt
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 tickets_bp = Blueprint('tickets', __name__, url_prefix='/api/tickets')
 
@@ -180,7 +181,7 @@ def guest_buy_ticket():
                        ticket_base_prices[idx], stored_promo)
         ticket_db_id = c.lastrowid
         
-        gen_tix.append({'id': ticket_db_id, 'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'seat_id': sid, 'purchase_date': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')})
+        gen_tix.append({'id': ticket_db_id, 'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'seat_id': sid, 'purchase_date': datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')})
 
     conn.commit()
     conn.close()
@@ -188,7 +189,8 @@ def guest_buy_ticket():
     cache.clear()
     try:
         send_ticket_confirmation_email(guest_email, guest_fullname, event, gen_tix, total_price, seat_labels_str, lang=get_request_lang(data))
-    except: pass
+    except Exception:
+        logging.getLogger('eventix').exception('Failed to send guest confirmation email')
 
     return jsonify({'message': 'Success!', 'tickets': gen_tix, 'total_price': total_price}), 201
 
@@ -215,7 +217,7 @@ def lock_seat():
         if val.isdigit():
             try:
                 locked_dt = datetime.fromtimestamp(int(val) / 1000.0)
-            except:
+            except (ValueError, OSError):
                 pass
         else:
             for fmt in ('%Y-%m-%d %H:%M:%S.%f', '%Y-%m-%d %H:%M:%S', '%Y-%m-%dT%H:%M:%S.%f', '%Y-%m-%dT%H:%M:%S'):
@@ -265,7 +267,7 @@ def get_dynamic_qr(ticket_id):
         return jsonify({'message': 'Not found'}), 404
         
     # Her 30 saniyede yenilenen dinamik token (JWT)
-    exp_time = datetime.utcnow() + timedelta(seconds=30)
+    exp_time = datetime.now(timezone.utc) + timedelta(seconds=30)
     dynamic_payload = {
         'ticket_key': ticket['ticket_key'],
         'exp': exp_time,
@@ -413,7 +415,7 @@ def buy_ticket():
         _insert_ticket(c, g.user['id'], event_id, key, q_data, t_p, t_name, t_surname, sid,
                        ticket_base_prices[idx], stored_promo)
         ticket_db_id = c.lastrowid
-        gen_tix.append({'id': ticket_db_id, 'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'seat_id': sid, 'purchase_date': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')})
+        gen_tix.append({'id': ticket_db_id, 'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'seat_id': sid, 'purchase_date': datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')})
 
     import json
     notif_data = {
@@ -430,7 +432,8 @@ def buy_ticket():
     cache.clear()
     try:
         send_ticket_confirmation_email(g.user['email'], g.user['fullname'], event, gen_tix, total_price, seat_labels_str, lang=get_request_lang(data))
-    except: pass
+    except Exception:
+        logging.getLogger('eventix').exception('Failed to send user confirmation email')
     return jsonify({'message': 'Success!', 'tickets': gen_tix}), 201
 
 
@@ -542,7 +545,7 @@ def cart_buy():
             inserts.append((g.user['id'], event_id, key, q_data, 1, t_p, t_name, t_surname, sid,
                             ticket_base_prices[idx], stored_promo))
             s_label = f"{seats_dict[str(sid)]['zone']} - R{seats_dict[str(sid)]['row_label']} S{seats_dict[str(sid)]['col_label']}" if sid and event['has_seating'] else ""
-            all_gen_tix.append({'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'event_id': event_id, 'seat_id': sid, 'seat_label': s_label, 'purchase_date': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')})
+            all_gen_tix.append({'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'event_id': event_id, 'seat_id': sid, 'seat_label': s_label, 'purchase_date': datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')})
             
     # PAYMENT
     from payment import PaymentGateway
@@ -724,7 +727,7 @@ def guest_cart_buy():
             inserts.append((guest_user_id, event_id, key, q_data, 1, t_p, t_name, t_surname, sid,
                             ticket_base_prices[idx], stored_promo))
             s_label = f"{seats_dict[str(sid)]['zone']} - R{seats_dict[str(sid)]['row_label']} S{seats_dict[str(sid)]['col_label']}" if sid and event['has_seating'] else ""
-            all_gen_tix.append({'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'event_id': event_id, 'seat_id': sid, 'seat_label': s_label, 'purchase_date': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')})
+            all_gen_tix.append({'ticket_key': key, 'qr_code': make_qr_base64(q_data), 'name': t_name, 'surname': t_surname, 'price': t_p, 'event_id': event_id, 'seat_id': sid, 'seat_label': s_label, 'purchase_date': datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')})
             
     from payment import PaymentGateway
     pay_res = PaymentGateway.process_payment(total_price, card_name, card_number, card_exp, cvc)

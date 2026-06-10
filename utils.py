@@ -19,8 +19,9 @@ from flask_limiter.util import get_remote_address
 from flask_caching import Cache
 import html
 from translations import TRANSLATIONS
+import secrets
 
-SECRET_KEY = 'eventix-super-secret-key-2026'
+SECRET_KEY = os.getenv('SECRET_KEY', secrets.token_hex(32))
 
 
 def get_request_lang(data=None):
@@ -399,7 +400,7 @@ def decode_token(token):
         user = conn.execute('SELECT * FROM users WHERE id = ?', (data['id'],)).fetchone()
         conn.close()
         return dict(user) if user else None
-    except:
+    except (jwt.ExpiredSignatureError, jwt.InvalidTokenError, KeyError):
         return None
 
 def token_required(f):
