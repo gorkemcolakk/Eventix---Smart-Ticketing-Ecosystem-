@@ -1,6 +1,6 @@
 <div align="center">
 
-  <img src="./images/poster.png" alt="Eventix Poster" width="100%" style="border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); margin-bottom: 20px;"/>
+  <img src="./images/poster.jpeg" alt="Eventix Poster" width="100%" style="border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); margin-bottom: 20px;"/>
   <br/>
 
 
